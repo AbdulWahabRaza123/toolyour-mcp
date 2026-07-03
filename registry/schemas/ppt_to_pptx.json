@@ -1,0 +1,12 @@
+{
+  "operationId": "ppt_to_pptx",
+  "gatewayPath": "/api/v1/office/ppt-to-pptx",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns ToolFileResponse with downloadUrl"
+}

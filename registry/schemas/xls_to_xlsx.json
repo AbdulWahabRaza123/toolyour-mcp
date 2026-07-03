@@ -1,0 +1,12 @@
+{
+  "operationId": "xls_to_xlsx",
+  "gatewayPath": "/api/v1/office/xls-to-xlsx",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns ToolFileResponse with downloadUrl"
+}

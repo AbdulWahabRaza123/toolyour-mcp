@@ -1,0 +1,12 @@
+{
+  "operationId": "cost_plus_pricing_calculator_post",
+  "gatewayPath": "/api/v1/calculators/cost-plus-pricing-calculator",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns Node API envelope JSON"
+}

@@ -1,0 +1,133 @@
+{
+  "operationId": "piiScrub",
+  "gatewayPath": "/api/v1/text-intelligence/pii-scrub",
+  "method": "POST",
+  "request": {
+    "oneOf": [
+      {
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100000
+          },
+          "options": {
+            "type": "object",
+            "properties": {
+              "redactEmails": {
+                "type": "boolean",
+                "default": true
+              },
+              "redactPhones": {
+                "type": "boolean",
+                "default": true
+              },
+              "redactNames": {
+                "type": "boolean",
+                "default": true
+              },
+              "redactOrganizations": {
+                "type": "boolean",
+                "default": false
+              },
+              "redactLocations": {
+                "type": "boolean",
+                "default": false
+              }
+            }
+          }
+        }
+      },
+      {
+        "type": "object",
+        "required": [
+          "inputs"
+        ],
+        "properties": {
+          "inputs": {
+            "type": "object",
+            "required": [
+              "text"
+            ],
+            "properties": {
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100000
+              },
+              "options": {
+                "type": "object",
+                "properties": {
+                  "redactEmails": {
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "redactPhones": {
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "redactNames": {
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "redactOrganizations": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "redactLocations": {
+                    "type": "boolean",
+                    "default": false
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    ],
+    "description": "Send fields at the top level, or nested under `inputs`."
+  },
+  "response": {
+    "type": "object",
+    "required": [
+      "text"
+    ],
+    "properties": {
+      "text": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100000
+      },
+      "options": {
+        "type": "object",
+        "properties": {
+          "redactEmails": {
+            "type": "boolean",
+            "default": true
+          },
+          "redactPhones": {
+            "type": "boolean",
+            "default": true
+          },
+          "redactNames": {
+            "type": "boolean",
+            "default": true
+          },
+          "redactOrganizations": {
+            "type": "boolean",
+            "default": false
+          },
+          "redactLocations": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      }
+    }
+  },
+  "responseHint": "Returns Python API envelope JSON"
+}

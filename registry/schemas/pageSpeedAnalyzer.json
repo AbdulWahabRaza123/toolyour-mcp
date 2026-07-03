@@ -1,0 +1,12 @@
+{
+  "operationId": "pageSpeedAnalyzer",
+  "gatewayPath": "/api/v1/seo-apis/page-speed-analyzer",
+  "method": "GET",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

@@ -1,0 +1,127 @@
+{
+  "tasks": [
+    {
+      "id": "seo-audit",
+      "title": "SEO site audit",
+      "description": "On-page SEO analysis plus page speed for a URL.",
+      "keywords": [
+        "seo audit",
+        "site audit",
+        "audit seo",
+        "analyze seo",
+        "seo analysis",
+        "check seo",
+        "lighthouse audit",
+        "full seo",
+        "improve seo",
+        "fix seo",
+        "optimize seo",
+        "local",
+        "my code",
+        "before deploy",
+        "dev server"
+      ],
+      "type": "workflow",
+      "target": "full-seo-audit",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "seo-audit-local",
+      "title": "Local HTML SEO review",
+      "description": "Audit page HTML from your repo without a deployed URL (MCP-only, free).",
+      "keywords": [
+        "local seo",
+        "html seo",
+        "improve seo of",
+        "seo of my",
+        "this html",
+        "landing page seo",
+        "meta tags check",
+        "before i deploy"
+      ],
+      "type": "local",
+      "target": "html-seo-audit",
+      "requiredInput": ["html"]
+    },
+    {
+      "id": "content-improve-local",
+      "title": "Improve content from text or code",
+      "description": "Headlines, jargon, snippets from html/text/code without a URL (MCP content bridge).",
+      "keywords": [
+        "improve copy",
+        "rewrite headline",
+        "simplify jargon",
+        "local content",
+        "my landing page copy",
+        "this text",
+        "from my code"
+      ],
+      "type": "local",
+      "target": "content-bridge",
+      "requiredInput": ["text", "html", "code"]
+    },
+    {
+      "id": "link-extract-local",
+      "title": "Extract links from HTML",
+      "description": "Pull internal and external links from page HTML without fetching a URL.",
+      "keywords": [
+        "extract links",
+        "internal links",
+        "link audit",
+        "links in my page",
+        "html links"
+      ],
+      "type": "local",
+      "target": "html-link-extract",
+      "requiredInput": ["html"]
+    },
+    {
+      "id": "content-optimization",
+      "title": "Content optimization",
+      "description": "Optimize page content for SEO.",
+      "keywords": [
+        "content optimization",
+        "optimize content",
+        "seo content",
+        "improve content",
+        "content refresh"
+      ],
+      "type": "workflow",
+      "target": "content-optimization",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "docx-to-pdf",
+      "title": "Convert DOCX to PDF",
+      "description": "Convert a Word document to PDF.",
+      "keywords": [
+        "docx to pdf",
+        "word to pdf",
+        "convert docx",
+        "document to pdf",
+        "doc to pdf"
+      ],
+      "type": "workflow",
+      "target": "document-convert-pipeline",
+      "requiredInput": ["file"]
+    },
+    {
+      "id": "seo-analyze",
+      "title": "Analyze URL SEO",
+      "description": "Single-page on-page SEO analysis.",
+      "keywords": ["seo analyze", "analyze url", "on-page seo", "meta tags"],
+      "type": "tool",
+      "target": "seoAnalyze",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "page-speed",
+      "title": "Page speed analysis",
+      "description": "Measure page speed and performance.",
+      "keywords": ["page speed", "pagespeed", "performance test", "load time"],
+      "type": "tool",
+      "target": "pageSpeedAnalyzer",
+      "requiredInput": ["url"]
+    }
+  ]
+}

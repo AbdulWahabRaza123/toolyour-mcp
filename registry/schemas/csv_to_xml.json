@@ -1,0 +1,12 @@
+{
+  "operationId": "csv_to_xml",
+  "gatewayPath": "/api/v1/web/csv-to-xml",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns ToolFileResponse with downloadUrl"
+}

@@ -1,0 +1,12 @@
+{
+  "operationId": "youtube_rpm_calculator_post",
+  "gatewayPath": "/api/v1/youtube-tools/youtube-rpm-calculator",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns Node API envelope JSON"
+}

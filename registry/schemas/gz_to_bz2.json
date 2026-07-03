@@ -1,0 +1,12 @@
+{
+  "operationId": "gz_to_bz2",
+  "gatewayPath": "/api/v1/archive/gz-to-bz2",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns ToolFileResponse with downloadUrl"
+}

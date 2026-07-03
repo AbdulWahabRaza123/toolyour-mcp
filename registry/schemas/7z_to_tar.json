@@ -1,0 +1,12 @@
+{
+  "operationId": "7z_to_tar",
+  "gatewayPath": "/api/v1/archive/7z-to-tar",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns ToolFileResponse with downloadUrl"
+}

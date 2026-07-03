@@ -1,0 +1,12 @@
+{
+  "operationId": "web_supported_conversions",
+  "gatewayPath": "/api/v1/web/supported-conversions",
+  "method": "GET",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

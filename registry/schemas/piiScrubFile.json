@@ -1,0 +1,12 @@
+{
+  "operationId": "piiScrubFile",
+  "gatewayPath": "/api/v1/text-intelligence/pii-scrub-file",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns Python API envelope JSON"
+}

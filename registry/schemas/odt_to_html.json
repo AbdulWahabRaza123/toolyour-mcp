@@ -1,0 +1,12 @@
+{
+  "operationId": "odt_to_html",
+  "gatewayPath": "/api/v1/office/odt-to-html",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns ToolFileResponse with downloadUrl"
+}

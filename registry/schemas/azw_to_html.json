@@ -1,0 +1,12 @@
+{
+  "operationId": "azw_to_html",
+  "gatewayPath": "/api/v1/ebook/azw-to-html",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns ToolFileResponse with downloadUrl"
+}

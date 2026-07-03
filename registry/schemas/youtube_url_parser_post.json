@@ -1,0 +1,12 @@
+{
+  "operationId": "youtube_url_parser_post",
+  "gatewayPath": "/api/v1/youtube-tools/youtube-url-parser",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns Node API envelope JSON"
+}

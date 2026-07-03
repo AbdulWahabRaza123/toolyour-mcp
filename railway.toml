@@ -1,0 +1,11 @@
+# Railway deploy for toolyour-mcp (MCP gateway).
+# Service root directory: toolyour-mcp/
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "npm start"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10

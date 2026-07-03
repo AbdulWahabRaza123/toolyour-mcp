@@ -1,0 +1,12 @@
+{
+  "operationId": "repeat_text_post",
+  "gatewayPath": "/api/v1/text-utilities/repeat-text",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns Node API envelope JSON"
+}

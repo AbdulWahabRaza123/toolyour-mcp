@@ -1,0 +1,76 @@
+{
+  "adapters": [
+    {
+      "id": "on-page-seo",
+      "keywords": [
+        "seo",
+        "meta tag",
+        "on-page",
+        "headings",
+        "title tag",
+        "audit",
+        "improve seo",
+        "fix seo"
+      ],
+      "taskIds": ["seo-audit", "seo-analyze", "seo-audit-local"],
+      "workflowIds": ["full-seo-audit"],
+      "urlOperationIds": ["seoAnalyze", "pageSpeedAnalyzer"],
+      "localHandlers": ["html-seo-audit"],
+      "textPipeline": ["headlineRestructurer"],
+      "inputKinds": ["html", "code", "text"]
+    },
+    {
+      "id": "content-improve",
+      "keywords": [
+        "content",
+        "copy",
+        "rewrite",
+        "headline",
+        "snippet",
+        "jargon",
+        "simplify",
+        "optimize content",
+        "improve content",
+        "refresh content"
+      ],
+      "taskIds": ["content-optimization", "content-improve-local"],
+      "workflowIds": ["content-optimization"],
+      "urlOperationIds": ["contentOptimization"],
+      "textPipeline": ["headlineRestructurer", "jargonBuster", "snippetMaker"],
+      "inputKinds": ["text", "code", "html"]
+    },
+    {
+      "id": "links",
+      "keywords": [
+        "links",
+        "internal linking",
+        "extract links",
+        "link extract",
+        "outbound",
+        "inbound"
+      ],
+      "taskIds": ["link-extract-local"],
+      "urlOperationIds": ["linkExtractor", "internalLinking"],
+      "localHandlers": ["html-link-extract"],
+      "inputKinds": ["html", "code"]
+    },
+    {
+      "id": "pii-scrub",
+      "keywords": ["pii", "redact", "scrub", "personal data", "sanitize"],
+      "textPipeline": ["piiScrub"],
+      "inputKinds": ["text", "code"]
+    },
+    {
+      "id": "text-ai",
+      "keywords": [
+        "summarize",
+        "explain code",
+        "analyze text",
+        "ai rewrite",
+        "improve writing"
+      ],
+      "textPipeline": ["aiTextAi"],
+      "inputKinds": ["text", "code"]
+    }
+  ]
+}

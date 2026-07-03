@@ -1,0 +1,12 @@
+{
+  "operationId": "csvToJson",
+  "gatewayPath": "/api/v1/convertors/csv-2-json",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

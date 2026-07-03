@@ -1,0 +1,12 @@
+{
+  "operationId": "mobi_to_epub",
+  "gatewayPath": "/api/v1/ebook/mobi-to-epub",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns ToolFileResponse with downloadUrl"
+}

@@ -1,0 +1,12 @@
+{
+  "operationId": "ods_to_json",
+  "gatewayPath": "/api/v1/office/ods-to-json",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON file content"
+}

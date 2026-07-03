@@ -1,0 +1,12 @@
+{
+  "operationId": "text_case_converter_post",
+  "gatewayPath": "/api/v1/text-utilities/text-case-converter",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns Node API envelope JSON"
+}

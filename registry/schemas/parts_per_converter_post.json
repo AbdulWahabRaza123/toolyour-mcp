@@ -1,0 +1,12 @@
+{
+  "operationId": "parts_per_converter_post",
+  "gatewayPath": "/api/v1/unit-conversions/parts-per-converter",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns Node API envelope JSON"
+}

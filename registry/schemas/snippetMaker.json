@@ -1,0 +1,76 @@
+{
+  "operationId": "snippetMaker",
+  "gatewayPath": "/api/v1/text-intelligence/snippet-maker",
+  "method": "POST",
+  "request": {
+    "oneOf": [
+      {
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 50,
+            "maxLength": 100000
+          },
+          "topicCount": {
+            "type": "integer",
+            "minimum": 2,
+            "maximum": 10,
+            "default": 5
+          }
+        }
+      },
+      {
+        "type": "object",
+        "required": [
+          "inputs"
+        ],
+        "properties": {
+          "inputs": {
+            "type": "object",
+            "required": [
+              "text"
+            ],
+            "properties": {
+              "text": {
+                "type": "string",
+                "minLength": 50,
+                "maxLength": 100000
+              },
+              "topicCount": {
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 10,
+                "default": 5
+              }
+            }
+          }
+        }
+      }
+    ],
+    "description": "Send fields at the top level, or nested under `inputs`."
+  },
+  "response": {
+    "type": "object",
+    "required": [
+      "text"
+    ],
+    "properties": {
+      "text": {
+        "type": "string",
+        "minLength": 50,
+        "maxLength": 100000
+      },
+      "topicCount": {
+        "type": "integer",
+        "minimum": 2,
+        "maximum": 10,
+        "default": 5
+      }
+    }
+  },
+  "responseHint": "Returns Python API envelope JSON"
+}

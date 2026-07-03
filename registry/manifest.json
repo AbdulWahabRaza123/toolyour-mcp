@@ -1,0 +1,5468 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-07-02T18:47:48.631Z",
+  "stats": {
+    "totalOpenApiRoutes": 231,
+    "hasApiIncluded": 231,
+    "excluded": 0
+  },
+  "categories": [
+    "AI Models",
+    "Archive",
+    "Calculators",
+    "Convertors",
+    "Documents",
+    "File Extract",
+    "Office",
+    "SEO APIs",
+    "SEO Tools",
+    "Text Intelligence",
+    "Text Utilities",
+    "Unit Conversions",
+    "Web",
+    "YouTube Tools",
+    "eBook"
+  ],
+  "tools": [
+    {
+      "operationId": "convertToJpg",
+      "name": "Convert image to JPG",
+      "category": "Convertors",
+      "description": "Convert image to JPG",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "convertToPng",
+      "name": "Convert image to PNG",
+      "category": "Convertors",
+      "description": "Convert image to PNG",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "convertToWebp",
+      "name": "Convert image to WebP",
+      "category": "Convertors",
+      "description": "Convert image to WebP",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "convertToSvg",
+      "name": "Convert image to SVG",
+      "category": "Convertors",
+      "description": "Convert image to SVG",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "convertToAvif",
+      "name": "Convert image to AVIF",
+      "category": "Convertors",
+      "description": "Convert image to AVIF",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "convertToHeic",
+      "name": "Convert image to HEIC",
+      "category": "Convertors",
+      "description": "Convert image to HEIC",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "convertToHeif",
+      "name": "Convert image to HEIF",
+      "category": "Convertors",
+      "description": "Convert image to HEIF",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "convertToTiff",
+      "name": "Convert image to TIFF",
+      "category": "Convertors",
+      "description": "Convert image to TIFF",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "convertToGif",
+      "name": "Convert image to GIF",
+      "category": "Convertors",
+      "description": "Convert image to GIF",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "compressImage",
+      "name": "Compress image",
+      "category": "Convertors",
+      "description": "Compress image",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "compressSvg",
+      "name": "Compress SVG",
+      "category": "Convertors",
+      "description": "Compress SVG",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "convertToGrayscale",
+      "name": "Convert image to grayscale",
+      "category": "Convertors",
+      "description": "Convert image to grayscale",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "imageToBase64",
+      "name": "Image to Base64",
+      "category": "Convertors",
+      "description": "Image to Base64",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "imageToPdf",
+      "name": "Convert image to PDF",
+      "category": "Convertors",
+      "description": "Convert image to PDF",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "imageMetadata",
+      "name": "Read image metadata",
+      "category": "Convertors",
+      "description": "Read image metadata",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "csvToJson",
+      "name": "Convert CSV to JSON",
+      "category": "Convertors",
+      "description": "Convert CSV to JSON",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "jsonToCsv",
+      "name": "Convert JSON to CSV",
+      "category": "Convertors",
+      "description": "Convert JSON to CSV",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "docx_to_pdf",
+      "name": "docx to pdf",
+      "category": "Documents",
+      "description": "docx to pdf",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "docx_to_txt",
+      "name": "docx to txt",
+      "category": "Documents",
+      "description": "docx to txt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "txt_to_pdf",
+      "name": "txt to pdf",
+      "category": "Documents",
+      "description": "txt to pdf",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "docx_to_html",
+      "name": "docx to html",
+      "category": "Documents",
+      "description": "docx to html",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "pdf_to_txt",
+      "name": "pdf to txt",
+      "category": "Documents",
+      "description": "pdf to txt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "docx_to_rtf",
+      "name": "docx to rtf",
+      "category": "Documents",
+      "description": "docx to rtf",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "pdf_to_rtf",
+      "name": "pdf to rtf",
+      "category": "Documents",
+      "description": "pdf to rtf",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "txt_to_rtf",
+      "name": "txt to rtf",
+      "category": "Documents",
+      "description": "txt to rtf",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "rtf_to_txt",
+      "name": "rtf to txt",
+      "category": "Documents",
+      "description": "rtf to txt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "txt_to_md",
+      "name": "txt to md",
+      "category": "Documents",
+      "description": "txt to md",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "rtf_to_pdf",
+      "name": "rtf to pdf",
+      "category": "Documents",
+      "description": "rtf to pdf",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "md_to_pdf",
+      "name": "md to pdf",
+      "category": "Documents",
+      "description": "md to pdf",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "md_to_txt",
+      "name": "md to txt",
+      "category": "Documents",
+      "description": "md to txt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "md_to_html",
+      "name": "md to html",
+      "category": "Documents",
+      "description": "md to html",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "pdf_to_html",
+      "name": "pdf to html",
+      "category": "Documents",
+      "description": "pdf to html",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "txt_to_html",
+      "name": "txt to html",
+      "category": "Documents",
+      "description": "txt to html",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "rtf_to_html",
+      "name": "rtf to html",
+      "category": "Documents",
+      "description": "rtf to html",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "html_to_pdf",
+      "name": "html to pdf",
+      "category": "Documents",
+      "description": "html to pdf",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "html_to_txt",
+      "name": "html to txt",
+      "category": "Documents",
+      "description": "html to txt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "html_to_md",
+      "name": "html to md",
+      "category": "Documents",
+      "description": "html to md",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "txt_to_docx",
+      "name": "txt to docx",
+      "category": "Documents",
+      "description": "txt to docx",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "pdf_to_docx",
+      "name": "pdf to docx",
+      "category": "Documents",
+      "description": "pdf to docx",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "rtf_to_docx",
+      "name": "rtf to docx",
+      "category": "Documents",
+      "description": "rtf to docx",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "md_to_docx",
+      "name": "md to docx",
+      "category": "Documents",
+      "description": "md to docx",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "html_to_docx",
+      "name": "html to docx",
+      "category": "Documents",
+      "description": "html to docx",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "documents_supported_conversions",
+      "name": "List supported conversions",
+      "category": "Documents",
+      "description": "List supported conversions",
+      "inputShape": "query",
+      "backend": "python"
+    },
+    {
+      "operationId": "xls_to_xlsx",
+      "name": "xls to xlsx",
+      "category": "Office",
+      "description": "xls to xlsx",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "xls_to_csv",
+      "name": "xls to csv",
+      "category": "Office",
+      "description": "xls to csv",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "xls_to_txt",
+      "name": "xls to txt",
+      "category": "Office",
+      "description": "xls to txt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "xls_to_json",
+      "name": "xls to json",
+      "category": "Office",
+      "description": "xls to json",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "xlsx_to_xls",
+      "name": "xlsx to xls",
+      "category": "Office",
+      "description": "xlsx to xls",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "xlsx_to_csv",
+      "name": "xlsx to csv",
+      "category": "Office",
+      "description": "xlsx to csv",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "xlsx_to_txt",
+      "name": "xlsx to txt",
+      "category": "Office",
+      "description": "xlsx to txt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "xlsx_to_json",
+      "name": "xlsx to json",
+      "category": "Office",
+      "description": "xlsx to json",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "ppt_to_pptx",
+      "name": "ppt to pptx",
+      "category": "Office",
+      "description": "ppt to pptx",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "ppt_to_txt",
+      "name": "ppt to txt",
+      "category": "Office",
+      "description": "ppt to txt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "ppt_to_html",
+      "name": "ppt to html",
+      "category": "Office",
+      "description": "ppt to html",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "pptx_to_ppt",
+      "name": "pptx to ppt",
+      "category": "Office",
+      "description": "pptx to ppt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "pptx_to_txt",
+      "name": "pptx to txt",
+      "category": "Office",
+      "description": "pptx to txt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "pptx_to_html",
+      "name": "pptx to html",
+      "category": "Office",
+      "description": "pptx to html",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "xlsx_to_pdf",
+      "name": "xlsx to pdf",
+      "category": "Office",
+      "description": "xlsx to pdf",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "xls_to_pdf",
+      "name": "xls to pdf",
+      "category": "Office",
+      "description": "xls to pdf",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "ppt_to_pdf",
+      "name": "ppt to pdf",
+      "category": "Office",
+      "description": "ppt to pdf",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "pptx_to_pdf",
+      "name": "pptx to pdf",
+      "category": "Office",
+      "description": "pptx to pdf",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "pptx_to_images",
+      "name": "pptx to images",
+      "category": "Office",
+      "description": "pptx to images",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "odt_to_pdf",
+      "name": "odt to pdf",
+      "category": "Office",
+      "description": "odt to pdf",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "odt_to_docx",
+      "name": "odt to docx",
+      "category": "Office",
+      "description": "odt to docx",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "odt_to_txt",
+      "name": "odt to txt",
+      "category": "Office",
+      "description": "odt to txt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "odt_to_html",
+      "name": "odt to html",
+      "category": "Office",
+      "description": "odt to html",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "ods_to_pdf",
+      "name": "ods to pdf",
+      "category": "Office",
+      "description": "ods to pdf",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "ods_to_xlsx",
+      "name": "ods to xlsx",
+      "category": "Office",
+      "description": "ods to xlsx",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "ods_to_csv",
+      "name": "ods to csv",
+      "category": "Office",
+      "description": "ods to csv",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "ods_to_txt",
+      "name": "ods to txt",
+      "category": "Office",
+      "description": "ods to txt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "ods_to_json",
+      "name": "ods to json",
+      "category": "Office",
+      "description": "ods to json",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "odp_to_pdf",
+      "name": "odp to pdf",
+      "category": "Office",
+      "description": "odp to pdf",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "odp_to_pptx",
+      "name": "odp to pptx",
+      "category": "Office",
+      "description": "odp to pptx",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "odp_to_txt",
+      "name": "odp to txt",
+      "category": "Office",
+      "description": "odp to txt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "odp_to_html",
+      "name": "odp to html",
+      "category": "Office",
+      "description": "odp to html",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "office_supported_conversions",
+      "name": "List supported conversions",
+      "category": "Office",
+      "description": "List supported conversions",
+      "inputShape": "query",
+      "backend": "python"
+    },
+    {
+      "operationId": "html_to_xml",
+      "name": "html to xml",
+      "category": "Web",
+      "description": "html to xml",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "html_to_json",
+      "name": "html to json",
+      "category": "Web",
+      "description": "html to json",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "html_to_md",
+      "name": "html to md",
+      "category": "Web",
+      "description": "html to md",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "xml_to_html",
+      "name": "xml to html",
+      "category": "Web",
+      "description": "xml to html",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "xml_to_json",
+      "name": "xml to json",
+      "category": "Web",
+      "description": "xml to json",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "xml_to_txt",
+      "name": "xml to txt",
+      "category": "Web",
+      "description": "xml to txt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "xml_to_csv",
+      "name": "xml to csv",
+      "category": "Web",
+      "description": "xml to csv",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "json_to_html",
+      "name": "json to html",
+      "category": "Web",
+      "description": "json to html",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "json_to_xml",
+      "name": "json to xml",
+      "category": "Web",
+      "description": "json to xml",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "json_to_txt",
+      "name": "json to txt",
+      "category": "Web",
+      "description": "json to txt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "json_to_csv",
+      "name": "json to csv",
+      "category": "Web",
+      "description": "json to csv",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "csv_to_html",
+      "name": "csv to html",
+      "category": "Web",
+      "description": "csv to html",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "csv_to_xml",
+      "name": "csv to xml",
+      "category": "Web",
+      "description": "csv to xml",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "csv_to_json",
+      "name": "csv to json",
+      "category": "Web",
+      "description": "csv to json",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "csv_to_txt",
+      "name": "csv to txt",
+      "category": "Web",
+      "description": "csv to txt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "web_supported_conversions",
+      "name": "List supported conversions",
+      "category": "Web",
+      "description": "List supported conversions",
+      "inputShape": "query",
+      "backend": "python"
+    },
+    {
+      "operationId": "epub_to_mobi",
+      "name": "epub to mobi",
+      "category": "eBook",
+      "description": "epub to mobi",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "epub_to_azw",
+      "name": "epub to azw",
+      "category": "eBook",
+      "description": "epub to azw",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "epub_to_fb2",
+      "name": "epub to fb2",
+      "category": "eBook",
+      "description": "epub to fb2",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "epub_to_txt",
+      "name": "epub to txt",
+      "category": "eBook",
+      "description": "epub to txt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "epub_to_html",
+      "name": "epub to html",
+      "category": "eBook",
+      "description": "epub to html",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "epub_to_pdf",
+      "name": "epub to pdf",
+      "category": "eBook",
+      "description": "epub to pdf",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "epub_to_docx",
+      "name": "epub to docx",
+      "category": "eBook",
+      "description": "epub to docx",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "mobi_to_epub",
+      "name": "mobi to epub",
+      "category": "eBook",
+      "description": "mobi to epub",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "mobi_to_txt",
+      "name": "mobi to txt",
+      "category": "eBook",
+      "description": "mobi to txt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "mobi_to_html",
+      "name": "mobi to html",
+      "category": "eBook",
+      "description": "mobi to html",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "mobi_to_pdf",
+      "name": "mobi to pdf",
+      "category": "eBook",
+      "description": "mobi to pdf",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "azw_to_epub",
+      "name": "azw to epub",
+      "category": "eBook",
+      "description": "azw to epub",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "azw_to_mobi",
+      "name": "azw to mobi",
+      "category": "eBook",
+      "description": "azw to mobi",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "azw_to_txt",
+      "name": "azw to txt",
+      "category": "eBook",
+      "description": "azw to txt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "azw_to_html",
+      "name": "azw to html",
+      "category": "eBook",
+      "description": "azw to html",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "azw_to_pdf",
+      "name": "azw to pdf",
+      "category": "eBook",
+      "description": "azw to pdf",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "fb2_to_epub",
+      "name": "fb2 to epub",
+      "category": "eBook",
+      "description": "fb2 to epub",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "fb2_to_txt",
+      "name": "fb2 to txt",
+      "category": "eBook",
+      "description": "fb2 to txt",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "fb2_to_html",
+      "name": "fb2 to html",
+      "category": "eBook",
+      "description": "fb2 to html",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "fb2_to_pdf",
+      "name": "fb2 to pdf",
+      "category": "eBook",
+      "description": "fb2 to pdf",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "ebook_supported_conversions",
+      "name": "List supported conversions",
+      "category": "eBook",
+      "description": "List supported conversions",
+      "inputShape": "query",
+      "backend": "python"
+    },
+    {
+      "operationId": "zip_to_rar",
+      "name": "zip to rar",
+      "category": "Archive",
+      "description": "zip to rar",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "zip_to_7z",
+      "name": "zip to 7z",
+      "category": "Archive",
+      "description": "zip to 7z",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "zip_to_tar",
+      "name": "zip to tar",
+      "category": "Archive",
+      "description": "zip to tar",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "zip_to_gz",
+      "name": "zip to gz",
+      "category": "Archive",
+      "description": "zip to gz",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "zip_to_bz2",
+      "name": "zip to bz2",
+      "category": "Archive",
+      "description": "zip to bz2",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "rar_to_zip",
+      "name": "rar to zip",
+      "category": "Archive",
+      "description": "rar to zip",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "rar_to_7z",
+      "name": "rar to 7z",
+      "category": "Archive",
+      "description": "rar to 7z",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "rar_to_tar",
+      "name": "rar to tar",
+      "category": "Archive",
+      "description": "rar to tar",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "rar_to_gz",
+      "name": "rar to gz",
+      "category": "Archive",
+      "description": "rar to gz",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "rar_to_bz2",
+      "name": "rar to bz2",
+      "category": "Archive",
+      "description": "rar to bz2",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "7z_to_zip",
+      "name": "7z to zip",
+      "category": "Archive",
+      "description": "7z to zip",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "7z_to_rar",
+      "name": "7z to rar",
+      "category": "Archive",
+      "description": "7z to rar",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "7z_to_tar",
+      "name": "7z to tar",
+      "category": "Archive",
+      "description": "7z to tar",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "7z_to_gz",
+      "name": "7z to gz",
+      "category": "Archive",
+      "description": "7z to gz",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "7z_to_bz2",
+      "name": "7z to bz2",
+      "category": "Archive",
+      "description": "7z to bz2",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "tar_to_zip",
+      "name": "tar to zip",
+      "category": "Archive",
+      "description": "tar to zip",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "tar_to_rar",
+      "name": "tar to rar",
+      "category": "Archive",
+      "description": "tar to rar",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "tar_to_7z",
+      "name": "tar to 7z",
+      "category": "Archive",
+      "description": "tar to 7z",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "tar_to_gz",
+      "name": "tar to gz",
+      "category": "Archive",
+      "description": "tar to gz",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "tar_to_bz2",
+      "name": "tar to bz2",
+      "category": "Archive",
+      "description": "tar to bz2",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "gz_to_zip",
+      "name": "gz to zip",
+      "category": "Archive",
+      "description": "gz to zip",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "gz_to_rar",
+      "name": "gz to rar",
+      "category": "Archive",
+      "description": "gz to rar",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "gz_to_7z",
+      "name": "gz to 7z",
+      "category": "Archive",
+      "description": "gz to 7z",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "gz_to_tar",
+      "name": "gz to tar",
+      "category": "Archive",
+      "description": "gz to tar",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "gz_to_bz2",
+      "name": "gz to bz2",
+      "category": "Archive",
+      "description": "gz to bz2",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "bz2_to_zip",
+      "name": "bz2 to zip",
+      "category": "Archive",
+      "description": "bz2 to zip",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "bz2_to_rar",
+      "name": "bz2 to rar",
+      "category": "Archive",
+      "description": "bz2 to rar",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "bz2_to_7z",
+      "name": "bz2 to 7z",
+      "category": "Archive",
+      "description": "bz2 to 7z",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "bz2_to_tar",
+      "name": "bz2 to tar",
+      "category": "Archive",
+      "description": "bz2 to tar",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "bz2_to_gz",
+      "name": "bz2 to gz",
+      "category": "Archive",
+      "description": "bz2 to gz",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "archive_supported_conversions",
+      "name": "List supported conversions",
+      "category": "Archive",
+      "description": "List supported conversions",
+      "inputShape": "query",
+      "backend": "python"
+    },
+    {
+      "operationId": "extract_text",
+      "name": "Extract text from file content (base64 JSON body)",
+      "category": "File Extract",
+      "description": "Extract text from file content (base64 JSON body)",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "text_case_converter_post",
+      "name": "text case converter",
+      "category": "Text Utilities",
+      "description": "text case converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "reverse_text_post",
+      "name": "reverse text",
+      "category": "Text Utilities",
+      "description": "reverse text",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "remove_spaces_post",
+      "name": "remove spaces",
+      "category": "Text Utilities",
+      "description": "remove spaces",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "remove_line_breaks_post",
+      "name": "remove line breaks",
+      "category": "Text Utilities",
+      "description": "remove line breaks",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "convert_to_slug_post",
+      "name": "convert to slug",
+      "category": "Text Utilities",
+      "description": "convert to slug",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "convert_to_hashtags_post",
+      "name": "convert to hashtags",
+      "category": "Text Utilities",
+      "description": "convert to hashtags",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "comma_separate_post",
+      "name": "comma separate",
+      "category": "Text Utilities",
+      "description": "comma separate",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "sort_words_post",
+      "name": "sort words",
+      "category": "Text Utilities",
+      "description": "sort words",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "sort_lines_post",
+      "name": "sort lines",
+      "category": "Text Utilities",
+      "description": "sort lines",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "repeat_text_post",
+      "name": "repeat text",
+      "category": "Text Utilities",
+      "description": "repeat text",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "dummy_text_generator_post",
+      "name": "dummy text generator",
+      "category": "Text Utilities",
+      "description": "dummy text generator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "random_word_generator_post",
+      "name": "random word generator",
+      "category": "Text Utilities",
+      "description": "random word generator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "number_to_words_post",
+      "name": "number to words",
+      "category": "Text Utilities",
+      "description": "number to words",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "words_to_number_post",
+      "name": "words to number",
+      "category": "Text Utilities",
+      "description": "words to number",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "compare_texts_post",
+      "name": "compare texts",
+      "category": "Text Utilities",
+      "description": "compare texts",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "text_stats_post",
+      "name": "text stats",
+      "category": "Text Utilities",
+      "description": "text stats",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "convert_to_xml_tags_post",
+      "name": "convert to xml tags",
+      "category": "Text Utilities",
+      "description": "convert to xml tags",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "seoAnalyze",
+      "name": "Analyze URL SEO",
+      "category": "SEO Tools",
+      "description": "Analyze URL SEO",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "seoCompare",
+      "name": "Compare two URLs",
+      "category": "SEO Tools",
+      "description": "Compare two URLs",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "rankCheckerKeywords",
+      "name": "Rank checker keywords",
+      "category": "SEO APIs",
+      "description": "Rank checker keywords",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "socialMediaIntegration",
+      "name": "Social media integration check",
+      "category": "SEO APIs",
+      "description": "Social media integration check",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "pageSpeedAnalyzer",
+      "name": "Page speed analysis",
+      "category": "SEO APIs",
+      "description": "Page speed analysis",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "contentOptimization",
+      "name": "Content optimization",
+      "category": "SEO APIs",
+      "description": "Content optimization",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "internalLinking",
+      "name": "Internal linking analysis",
+      "category": "SEO APIs",
+      "description": "Internal linking analysis",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "linkExtractor",
+      "name": "Extract links from URL",
+      "category": "SEO APIs",
+      "description": "Extract links from URL",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "gst_calculator_post",
+      "name": "gst calculator",
+      "category": "Calculators",
+      "description": "gst calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "vat_calculator_post",
+      "name": "vat calculator",
+      "category": "Calculators",
+      "description": "vat calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "invoice_total_calculator_post",
+      "name": "invoice total calculator",
+      "category": "Calculators",
+      "description": "invoice total calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "discount_calculator_post",
+      "name": "discount calculator",
+      "category": "Calculators",
+      "description": "discount calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "profit_margin_calculator_post",
+      "name": "profit margin calculator",
+      "category": "Calculators",
+      "description": "profit margin calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "markup_calculator_post",
+      "name": "markup calculator",
+      "category": "Calculators",
+      "description": "markup calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "freelancer_hourly_rate_calculator_post",
+      "name": "freelancer hourly rate calculator",
+      "category": "Calculators",
+      "description": "freelancer hourly rate calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "salary_to_hourly_converter_post",
+      "name": "salary to hourly converter",
+      "category": "Calculators",
+      "description": "salary to hourly converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "payment_due_date_calculator_post",
+      "name": "payment due date calculator",
+      "category": "Calculators",
+      "description": "payment due date calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "emi_calculator_post",
+      "name": "emi calculator",
+      "category": "Calculators",
+      "description": "emi calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "simple_interest_calculator_post",
+      "name": "simple interest calculator",
+      "category": "Calculators",
+      "description": "simple interest calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "compound_interest_calculator_post",
+      "name": "compound interest calculator",
+      "category": "Calculators",
+      "description": "compound interest calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "break_even_calculator_post",
+      "name": "break even calculator",
+      "category": "Calculators",
+      "description": "break even calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "cost_plus_pricing_calculator_post",
+      "name": "cost plus pricing calculator",
+      "category": "Calculators",
+      "description": "cost plus pricing calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "currency_converter_post",
+      "name": "currency converter",
+      "category": "Calculators",
+      "description": "currency converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "tax_compliant_invoice_calculator_post",
+      "name": "tax compliant invoice calculator",
+      "category": "Calculators",
+      "description": "tax compliant invoice calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "credit_note_calculator_post",
+      "name": "credit note calculator",
+      "category": "Calculators",
+      "description": "credit note calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "debit_note_calculator_post",
+      "name": "debit note calculator",
+      "category": "Calculators",
+      "description": "debit note calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "recurring_invoice_calculator_post",
+      "name": "recurring invoice calculator",
+      "category": "Calculators",
+      "description": "recurring invoice calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "timesheet_invoice_calculator_post",
+      "name": "timesheet invoice calculator",
+      "category": "Calculators",
+      "description": "timesheet invoice calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "length_converter_post",
+      "name": "length converter",
+      "category": "Unit Conversions",
+      "description": "length converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "area_converter_post",
+      "name": "area converter",
+      "category": "Unit Conversions",
+      "description": "area converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "mass_converter_post",
+      "name": "mass converter",
+      "category": "Unit Conversions",
+      "description": "mass converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "volume_converter_post",
+      "name": "volume converter",
+      "category": "Unit Conversions",
+      "description": "volume converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "each_converter_post",
+      "name": "each converter",
+      "category": "Unit Conversions",
+      "description": "each converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "temperature_converter_post",
+      "name": "temperature converter",
+      "category": "Unit Conversions",
+      "description": "temperature converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "time_converter_post",
+      "name": "time converter",
+      "category": "Unit Conversions",
+      "description": "time converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "digital_converter_post",
+      "name": "digital converter",
+      "category": "Unit Conversions",
+      "description": "digital converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "parts_per_converter_post",
+      "name": "parts per converter",
+      "category": "Unit Conversions",
+      "description": "parts per converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "speed_converter_post",
+      "name": "speed converter",
+      "category": "Unit Conversions",
+      "description": "speed converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "pace_converter_post",
+      "name": "pace converter",
+      "category": "Unit Conversions",
+      "description": "pace converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "pressure_converter_post",
+      "name": "pressure converter",
+      "category": "Unit Conversions",
+      "description": "pressure converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "current_converter_post",
+      "name": "current converter",
+      "category": "Unit Conversions",
+      "description": "current converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "voltage_converter_post",
+      "name": "voltage converter",
+      "category": "Unit Conversions",
+      "description": "voltage converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "power_converter_post",
+      "name": "power converter",
+      "category": "Unit Conversions",
+      "description": "power converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "reactive_power_converter_post",
+      "name": "reactive power converter",
+      "category": "Unit Conversions",
+      "description": "reactive power converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "apparent_power_converter_post",
+      "name": "apparent power converter",
+      "category": "Unit Conversions",
+      "description": "apparent power converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "energy_converter_post",
+      "name": "energy converter",
+      "category": "Unit Conversions",
+      "description": "energy converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "reactive_energy_converter_post",
+      "name": "reactive energy converter",
+      "category": "Unit Conversions",
+      "description": "reactive energy converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "volume_flow_rate_converter_post",
+      "name": "volume flow rate converter",
+      "category": "Unit Conversions",
+      "description": "volume flow rate converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "illuminance_converter_post",
+      "name": "illuminance converter",
+      "category": "Unit Conversions",
+      "description": "illuminance converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "frequency_converter_post",
+      "name": "frequency converter",
+      "category": "Unit Conversions",
+      "description": "frequency converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "angle_converter_post",
+      "name": "angle converter",
+      "category": "Unit Conversions",
+      "description": "angle converter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "youtube_url_parser_post",
+      "name": "youtube url parser",
+      "category": "YouTube Tools",
+      "description": "youtube url parser",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "youtube_title_optimizer_post",
+      "name": "youtube title optimizer",
+      "category": "YouTube Tools",
+      "description": "youtube title optimizer",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "youtube_description_optimizer_post",
+      "name": "youtube description optimizer",
+      "category": "YouTube Tools",
+      "description": "youtube description optimizer",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "youtube_engagement_calculator_post",
+      "name": "youtube engagement calculator",
+      "category": "YouTube Tools",
+      "description": "youtube engagement calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "youtube_rpm_calculator_post",
+      "name": "youtube rpm calculator",
+      "category": "YouTube Tools",
+      "description": "youtube rpm calculator",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "youtube_caption_formatter_post",
+      "name": "youtube caption formatter",
+      "category": "YouTube Tools",
+      "description": "youtube caption formatter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "piiScrub",
+      "name": "Scrub PII from text",
+      "category": "Text Intelligence",
+      "description": "Scrub PII from text",
+      "inputShape": "json",
+      "backend": "python"
+    },
+    {
+      "operationId": "piiScrubFile",
+      "name": "Scrub PII from uploaded file",
+      "category": "Text Intelligence",
+      "description": "Scrub PII from uploaded file",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "jargonBuster",
+      "name": "Simplify jargon in text",
+      "category": "Text Intelligence",
+      "description": "Simplify jargon in text",
+      "inputShape": "json",
+      "backend": "python"
+    },
+    {
+      "operationId": "snippetMaker",
+      "name": "Generate text snippets",
+      "category": "Text Intelligence",
+      "description": "Generate text snippets",
+      "inputShape": "json",
+      "backend": "python"
+    },
+    {
+      "operationId": "headlineRestructurer",
+      "name": "Restructure headlines",
+      "category": "Text Intelligence",
+      "description": "Restructure headlines",
+      "inputShape": "json",
+      "backend": "python"
+    },
+    {
+      "operationId": "atsGap",
+      "name": "ATS keyword gap analysis",
+      "category": "Text Intelligence",
+      "description": "ATS keyword gap analysis",
+      "inputShape": "json",
+      "backend": "python"
+    },
+    {
+      "operationId": "atsGapFile",
+      "name": "ATS gap from resume file",
+      "category": "Text Intelligence",
+      "description": "ATS gap from resume file",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "expenseCategorizer",
+      "name": "Categorize expenses from text",
+      "category": "Text Intelligence",
+      "description": "Categorize expenses from text",
+      "inputShape": "json",
+      "backend": "python"
+    },
+    {
+      "operationId": "expenseCategorizerFile",
+      "name": "Categorize expenses from file",
+      "category": "Text Intelligence",
+      "description": "Categorize expenses from file",
+      "inputShape": "multipart",
+      "backend": "python"
+    },
+    {
+      "operationId": "aiFileInsights",
+      "name": "Analyze uploaded file with AI",
+      "category": "AI Models",
+      "description": "Analyze uploaded file with AI",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "aiTextAi",
+      "name": "Text generation and analysis",
+      "category": "AI Models",
+      "description": "Text generation and analysis",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "aiYoutubeInsight",
+      "name": "YouTube video insights",
+      "category": "AI Models",
+      "description": "YouTube video insights",
+      "inputShape": "json",
+      "backend": "node"
+    }
+  ],
+  "routes": {
+    "convertToJpg": {
+      "operationId": "convertToJpg",
+      "method": "POST",
+      "gatewayPath": "/api/v1/convertors/to-jpg",
+      "category": "Convertors",
+      "name": "Convert image to JPG",
+      "description": "Convert image to JPG",
+      "backend": "node",
+      "multipart": true,
+      "fileField": "image",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "convertors/to-jpg"
+      ]
+    },
+    "convertToPng": {
+      "operationId": "convertToPng",
+      "method": "POST",
+      "gatewayPath": "/api/v1/convertors/to-png",
+      "category": "Convertors",
+      "name": "Convert image to PNG",
+      "description": "Convert image to PNG",
+      "backend": "node",
+      "multipart": true,
+      "fileField": "image",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "convertors/to-png"
+      ]
+    },
+    "convertToWebp": {
+      "operationId": "convertToWebp",
+      "method": "POST",
+      "gatewayPath": "/api/v1/convertors/to-webp",
+      "category": "Convertors",
+      "name": "Convert image to WebP",
+      "description": "Convert image to WebP",
+      "backend": "node",
+      "multipart": true,
+      "fileField": "image",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "convertors/to-webp"
+      ]
+    },
+    "convertToSvg": {
+      "operationId": "convertToSvg",
+      "method": "POST",
+      "gatewayPath": "/api/v1/convertors/to-svg",
+      "category": "Convertors",
+      "name": "Convert image to SVG",
+      "description": "Convert image to SVG",
+      "backend": "node",
+      "multipart": true,
+      "fileField": "image",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "convertors/to-svg"
+      ]
+    },
+    "convertToAvif": {
+      "operationId": "convertToAvif",
+      "method": "POST",
+      "gatewayPath": "/api/v1/convertors/to-avif",
+      "category": "Convertors",
+      "name": "Convert image to AVIF",
+      "description": "Convert image to AVIF",
+      "backend": "node",
+      "multipart": true,
+      "fileField": "image",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "convertors/to-avif"
+      ]
+    },
+    "convertToHeic": {
+      "operationId": "convertToHeic",
+      "method": "POST",
+      "gatewayPath": "/api/v1/convertors/to-heic",
+      "category": "Convertors",
+      "name": "Convert image to HEIC",
+      "description": "Convert image to HEIC",
+      "backend": "node",
+      "multipart": true,
+      "fileField": "image",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "convertors/to-heic"
+      ]
+    },
+    "convertToHeif": {
+      "operationId": "convertToHeif",
+      "method": "POST",
+      "gatewayPath": "/api/v1/convertors/to-heif",
+      "category": "Convertors",
+      "name": "Convert image to HEIF",
+      "description": "Convert image to HEIF",
+      "backend": "node",
+      "multipart": true,
+      "fileField": "image",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "convertors/to-heif"
+      ]
+    },
+    "convertToTiff": {
+      "operationId": "convertToTiff",
+      "method": "POST",
+      "gatewayPath": "/api/v1/convertors/to-tiff",
+      "category": "Convertors",
+      "name": "Convert image to TIFF",
+      "description": "Convert image to TIFF",
+      "backend": "node",
+      "multipart": true,
+      "fileField": "image",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "convertors/to-tiff"
+      ]
+    },
+    "convertToGif": {
+      "operationId": "convertToGif",
+      "method": "POST",
+      "gatewayPath": "/api/v1/convertors/to-gif",
+      "category": "Convertors",
+      "name": "Convert image to GIF",
+      "description": "Convert image to GIF",
+      "backend": "node",
+      "multipart": true,
+      "fileField": "image",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "convertors/to-gif"
+      ]
+    },
+    "compressImage": {
+      "operationId": "compressImage",
+      "method": "POST",
+      "gatewayPath": "/api/v1/convertors/compress-image",
+      "category": "Convertors",
+      "name": "Compress image",
+      "description": "Compress image",
+      "backend": "node",
+      "multipart": true,
+      "fileField": "image",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "convertors/compress-image"
+      ]
+    },
+    "compressSvg": {
+      "operationId": "compressSvg",
+      "method": "POST",
+      "gatewayPath": "/api/v1/convertors/compress-svg",
+      "category": "Convertors",
+      "name": "Compress SVG",
+      "description": "Compress SVG",
+      "backend": "node",
+      "multipart": true,
+      "fileField": "image",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "convertors/compress-svg"
+      ]
+    },
+    "convertToGrayscale": {
+      "operationId": "convertToGrayscale",
+      "method": "POST",
+      "gatewayPath": "/api/v1/convertors/to-grayscale",
+      "category": "Convertors",
+      "name": "Convert image to grayscale",
+      "description": "Convert image to grayscale",
+      "backend": "node",
+      "multipart": true,
+      "fileField": "image",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "convertors/to-grayscale"
+      ]
+    },
+    "imageToBase64": {
+      "operationId": "imageToBase64",
+      "method": "POST",
+      "gatewayPath": "/api/v1/convertors/to-base64",
+      "category": "Convertors",
+      "name": "Image to Base64",
+      "description": "Image to Base64",
+      "backend": "node",
+      "multipart": true,
+      "fileField": "image",
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "convertors/to-base64"
+      ]
+    },
+    "imageToPdf": {
+      "operationId": "imageToPdf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/convertors/image-to-pdf",
+      "category": "Convertors",
+      "name": "Convert image to PDF",
+      "description": "Convert image to PDF",
+      "backend": "node",
+      "multipart": true,
+      "fileField": "image",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "convertors/image-to-pdf"
+      ]
+    },
+    "imageMetadata": {
+      "operationId": "imageMetadata",
+      "method": "POST",
+      "gatewayPath": "/api/v1/convertors/image-metadata",
+      "category": "Convertors",
+      "name": "Read image metadata",
+      "description": "Read image metadata",
+      "backend": "node",
+      "multipart": true,
+      "fileField": "image",
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "convertors/image-metadata"
+      ]
+    },
+    "csvToJson": {
+      "operationId": "csvToJson",
+      "method": "POST",
+      "gatewayPath": "/api/v1/convertors/csv-2-json",
+      "category": "Convertors",
+      "name": "Convert CSV to JSON",
+      "description": "Convert CSV to JSON",
+      "backend": "node",
+      "multipart": true,
+      "fileField": "csvFile",
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "convertors/csv-2-json"
+      ]
+    },
+    "jsonToCsv": {
+      "operationId": "jsonToCsv",
+      "method": "POST",
+      "gatewayPath": "/api/v1/convertors/json-2-csv",
+      "category": "Convertors",
+      "name": "Convert JSON to CSV",
+      "description": "Convert JSON to CSV",
+      "backend": "node",
+      "multipart": true,
+      "fileField": "jsonFile",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "convertors/json-2-csv"
+      ]
+    },
+    "docx_to_pdf": {
+      "operationId": "docx_to_pdf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/docx-to-pdf",
+      "category": "Documents",
+      "name": "docx to pdf",
+      "description": "docx to pdf",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/docx-to-pdf"
+      ]
+    },
+    "docx_to_txt": {
+      "operationId": "docx_to_txt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/docx-to-txt",
+      "category": "Documents",
+      "name": "docx to txt",
+      "description": "docx to txt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/docx-to-txt"
+      ]
+    },
+    "txt_to_pdf": {
+      "operationId": "txt_to_pdf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/txt-to-pdf",
+      "category": "Documents",
+      "name": "txt to pdf",
+      "description": "txt to pdf",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/txt-to-pdf"
+      ]
+    },
+    "docx_to_html": {
+      "operationId": "docx_to_html",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/docx-to-html",
+      "category": "Documents",
+      "name": "docx to html",
+      "description": "docx to html",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/docx-to-html"
+      ]
+    },
+    "pdf_to_txt": {
+      "operationId": "pdf_to_txt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/pdf-to-txt",
+      "category": "Documents",
+      "name": "pdf to txt",
+      "description": "pdf to txt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/pdf-to-txt"
+      ]
+    },
+    "docx_to_rtf": {
+      "operationId": "docx_to_rtf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/docx-to-rtf",
+      "category": "Documents",
+      "name": "docx to rtf",
+      "description": "docx to rtf",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/docx-to-rtf"
+      ]
+    },
+    "pdf_to_rtf": {
+      "operationId": "pdf_to_rtf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/pdf-to-rtf",
+      "category": "Documents",
+      "name": "pdf to rtf",
+      "description": "pdf to rtf",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/pdf-to-rtf"
+      ]
+    },
+    "txt_to_rtf": {
+      "operationId": "txt_to_rtf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/txt-to-rtf",
+      "category": "Documents",
+      "name": "txt to rtf",
+      "description": "txt to rtf",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/txt-to-rtf"
+      ]
+    },
+    "rtf_to_txt": {
+      "operationId": "rtf_to_txt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/rtf-to-txt",
+      "category": "Documents",
+      "name": "rtf to txt",
+      "description": "rtf to txt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/rtf-to-txt"
+      ]
+    },
+    "txt_to_md": {
+      "operationId": "txt_to_md",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/txt-to-md",
+      "category": "Documents",
+      "name": "txt to md",
+      "description": "txt to md",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/txt-to-md"
+      ]
+    },
+    "rtf_to_pdf": {
+      "operationId": "rtf_to_pdf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/rtf-to-pdf",
+      "category": "Documents",
+      "name": "rtf to pdf",
+      "description": "rtf to pdf",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/rtf-to-pdf"
+      ]
+    },
+    "md_to_pdf": {
+      "operationId": "md_to_pdf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/md-to-pdf",
+      "category": "Documents",
+      "name": "md to pdf",
+      "description": "md to pdf",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/md-to-pdf"
+      ]
+    },
+    "md_to_txt": {
+      "operationId": "md_to_txt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/md-to-txt",
+      "category": "Documents",
+      "name": "md to txt",
+      "description": "md to txt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/md-to-txt"
+      ]
+    },
+    "md_to_html": {
+      "operationId": "md_to_html",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/md-to-html",
+      "category": "Documents",
+      "name": "md to html",
+      "description": "md to html",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/md-to-html"
+      ]
+    },
+    "pdf_to_html": {
+      "operationId": "pdf_to_html",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/pdf-to-html",
+      "category": "Documents",
+      "name": "pdf to html",
+      "description": "pdf to html",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/pdf-to-html"
+      ]
+    },
+    "txt_to_html": {
+      "operationId": "txt_to_html",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/txt-to-html",
+      "category": "Documents",
+      "name": "txt to html",
+      "description": "txt to html",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/txt-to-html"
+      ]
+    },
+    "rtf_to_html": {
+      "operationId": "rtf_to_html",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/rtf-to-html",
+      "category": "Documents",
+      "name": "rtf to html",
+      "description": "rtf to html",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/rtf-to-html"
+      ]
+    },
+    "html_to_pdf": {
+      "operationId": "html_to_pdf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/html-to-pdf",
+      "category": "Documents",
+      "name": "html to pdf",
+      "description": "html to pdf",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/html-to-pdf"
+      ]
+    },
+    "html_to_txt": {
+      "operationId": "html_to_txt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/html-to-txt",
+      "category": "Documents",
+      "name": "html to txt",
+      "description": "html to txt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/html-to-txt"
+      ]
+    },
+    "html_to_md": {
+      "operationId": "html_to_md",
+      "method": "POST",
+      "gatewayPath": "/api/v1/web/html-to-md",
+      "category": "Web",
+      "name": "html to md",
+      "description": "html to md",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "web/html-to-md"
+      ]
+    },
+    "txt_to_docx": {
+      "operationId": "txt_to_docx",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/txt-to-docx",
+      "category": "Documents",
+      "name": "txt to docx",
+      "description": "txt to docx",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/txt-to-docx"
+      ]
+    },
+    "pdf_to_docx": {
+      "operationId": "pdf_to_docx",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/pdf-to-docx",
+      "category": "Documents",
+      "name": "pdf to docx",
+      "description": "pdf to docx",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/pdf-to-docx"
+      ]
+    },
+    "rtf_to_docx": {
+      "operationId": "rtf_to_docx",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/rtf-to-docx",
+      "category": "Documents",
+      "name": "rtf to docx",
+      "description": "rtf to docx",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/rtf-to-docx"
+      ]
+    },
+    "md_to_docx": {
+      "operationId": "md_to_docx",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/md-to-docx",
+      "category": "Documents",
+      "name": "md to docx",
+      "description": "md to docx",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/md-to-docx"
+      ]
+    },
+    "html_to_docx": {
+      "operationId": "html_to_docx",
+      "method": "POST",
+      "gatewayPath": "/api/v1/documents/html-to-docx",
+      "category": "Documents",
+      "name": "html to docx",
+      "description": "html to docx",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "documents/html-to-docx"
+      ]
+    },
+    "documents_supported_conversions": {
+      "operationId": "documents_supported_conversions",
+      "method": "GET",
+      "gatewayPath": "/api/v1/documents/supported-conversions",
+      "category": "Documents",
+      "name": "List supported conversions",
+      "description": "List supported conversions",
+      "backend": "python",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "documents/supported-conversions"
+      ]
+    },
+    "xls_to_xlsx": {
+      "operationId": "xls_to_xlsx",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/xls-to-xlsx",
+      "category": "Office",
+      "name": "xls to xlsx",
+      "description": "xls to xlsx",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/xls-to-xlsx"
+      ]
+    },
+    "xls_to_csv": {
+      "operationId": "xls_to_csv",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/xls-to-csv",
+      "category": "Office",
+      "name": "xls to csv",
+      "description": "xls to csv",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/xls-to-csv"
+      ]
+    },
+    "xls_to_txt": {
+      "operationId": "xls_to_txt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/xls-to-txt",
+      "category": "Office",
+      "name": "xls to txt",
+      "description": "xls to txt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/xls-to-txt"
+      ]
+    },
+    "xls_to_json": {
+      "operationId": "xls_to_json",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/xls-to-json",
+      "category": "Office",
+      "name": "xls to json",
+      "description": "xls to json",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns JSON file content",
+      "validatePaths": [
+        "office/xls-to-json"
+      ]
+    },
+    "xlsx_to_xls": {
+      "operationId": "xlsx_to_xls",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/xlsx-to-xls",
+      "category": "Office",
+      "name": "xlsx to xls",
+      "description": "xlsx to xls",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/xlsx-to-xls"
+      ]
+    },
+    "xlsx_to_csv": {
+      "operationId": "xlsx_to_csv",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/xlsx-to-csv",
+      "category": "Office",
+      "name": "xlsx to csv",
+      "description": "xlsx to csv",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/xlsx-to-csv"
+      ]
+    },
+    "xlsx_to_txt": {
+      "operationId": "xlsx_to_txt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/xlsx-to-txt",
+      "category": "Office",
+      "name": "xlsx to txt",
+      "description": "xlsx to txt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/xlsx-to-txt"
+      ]
+    },
+    "xlsx_to_json": {
+      "operationId": "xlsx_to_json",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/xlsx-to-json",
+      "category": "Office",
+      "name": "xlsx to json",
+      "description": "xlsx to json",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns JSON file content",
+      "validatePaths": [
+        "office/xlsx-to-json"
+      ]
+    },
+    "ppt_to_pptx": {
+      "operationId": "ppt_to_pptx",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/ppt-to-pptx",
+      "category": "Office",
+      "name": "ppt to pptx",
+      "description": "ppt to pptx",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/ppt-to-pptx"
+      ]
+    },
+    "ppt_to_txt": {
+      "operationId": "ppt_to_txt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/ppt-to-txt",
+      "category": "Office",
+      "name": "ppt to txt",
+      "description": "ppt to txt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/ppt-to-txt"
+      ]
+    },
+    "ppt_to_html": {
+      "operationId": "ppt_to_html",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/ppt-to-html",
+      "category": "Office",
+      "name": "ppt to html",
+      "description": "ppt to html",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/ppt-to-html"
+      ]
+    },
+    "pptx_to_ppt": {
+      "operationId": "pptx_to_ppt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/pptx-to-ppt",
+      "category": "Office",
+      "name": "pptx to ppt",
+      "description": "pptx to ppt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/pptx-to-ppt"
+      ]
+    },
+    "pptx_to_txt": {
+      "operationId": "pptx_to_txt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/pptx-to-txt",
+      "category": "Office",
+      "name": "pptx to txt",
+      "description": "pptx to txt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/pptx-to-txt"
+      ]
+    },
+    "pptx_to_html": {
+      "operationId": "pptx_to_html",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/pptx-to-html",
+      "category": "Office",
+      "name": "pptx to html",
+      "description": "pptx to html",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/pptx-to-html"
+      ]
+    },
+    "xlsx_to_pdf": {
+      "operationId": "xlsx_to_pdf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/xlsx-to-pdf",
+      "category": "Office",
+      "name": "xlsx to pdf",
+      "description": "xlsx to pdf",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/xlsx-to-pdf"
+      ]
+    },
+    "xls_to_pdf": {
+      "operationId": "xls_to_pdf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/xls-to-pdf",
+      "category": "Office",
+      "name": "xls to pdf",
+      "description": "xls to pdf",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/xls-to-pdf"
+      ]
+    },
+    "ppt_to_pdf": {
+      "operationId": "ppt_to_pdf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/ppt-to-pdf",
+      "category": "Office",
+      "name": "ppt to pdf",
+      "description": "ppt to pdf",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/ppt-to-pdf"
+      ]
+    },
+    "pptx_to_pdf": {
+      "operationId": "pptx_to_pdf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/pptx-to-pdf",
+      "category": "Office",
+      "name": "pptx to pdf",
+      "description": "pptx to pdf",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/pptx-to-pdf"
+      ]
+    },
+    "pptx_to_images": {
+      "operationId": "pptx_to_images",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/pptx-to-images",
+      "category": "Office",
+      "name": "pptx to images",
+      "description": "pptx to images",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "office/pptx-to-images"
+      ]
+    },
+    "odt_to_pdf": {
+      "operationId": "odt_to_pdf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/odt-to-pdf",
+      "category": "Office",
+      "name": "odt to pdf",
+      "description": "odt to pdf",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/odt-to-pdf"
+      ]
+    },
+    "odt_to_docx": {
+      "operationId": "odt_to_docx",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/odt-to-docx",
+      "category": "Office",
+      "name": "odt to docx",
+      "description": "odt to docx",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/odt-to-docx"
+      ]
+    },
+    "odt_to_txt": {
+      "operationId": "odt_to_txt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/odt-to-txt",
+      "category": "Office",
+      "name": "odt to txt",
+      "description": "odt to txt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/odt-to-txt"
+      ]
+    },
+    "odt_to_html": {
+      "operationId": "odt_to_html",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/odt-to-html",
+      "category": "Office",
+      "name": "odt to html",
+      "description": "odt to html",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/odt-to-html"
+      ]
+    },
+    "ods_to_pdf": {
+      "operationId": "ods_to_pdf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/ods-to-pdf",
+      "category": "Office",
+      "name": "ods to pdf",
+      "description": "ods to pdf",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/ods-to-pdf"
+      ]
+    },
+    "ods_to_xlsx": {
+      "operationId": "ods_to_xlsx",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/ods-to-xlsx",
+      "category": "Office",
+      "name": "ods to xlsx",
+      "description": "ods to xlsx",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/ods-to-xlsx"
+      ]
+    },
+    "ods_to_csv": {
+      "operationId": "ods_to_csv",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/ods-to-csv",
+      "category": "Office",
+      "name": "ods to csv",
+      "description": "ods to csv",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/ods-to-csv"
+      ]
+    },
+    "ods_to_txt": {
+      "operationId": "ods_to_txt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/ods-to-txt",
+      "category": "Office",
+      "name": "ods to txt",
+      "description": "ods to txt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/ods-to-txt"
+      ]
+    },
+    "ods_to_json": {
+      "operationId": "ods_to_json",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/ods-to-json",
+      "category": "Office",
+      "name": "ods to json",
+      "description": "ods to json",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns JSON file content",
+      "validatePaths": [
+        "office/ods-to-json"
+      ]
+    },
+    "odp_to_pdf": {
+      "operationId": "odp_to_pdf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/odp-to-pdf",
+      "category": "Office",
+      "name": "odp to pdf",
+      "description": "odp to pdf",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/odp-to-pdf"
+      ]
+    },
+    "odp_to_pptx": {
+      "operationId": "odp_to_pptx",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/odp-to-pptx",
+      "category": "Office",
+      "name": "odp to pptx",
+      "description": "odp to pptx",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/odp-to-pptx"
+      ]
+    },
+    "odp_to_txt": {
+      "operationId": "odp_to_txt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/odp-to-txt",
+      "category": "Office",
+      "name": "odp to txt",
+      "description": "odp to txt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/odp-to-txt"
+      ]
+    },
+    "odp_to_html": {
+      "operationId": "odp_to_html",
+      "method": "POST",
+      "gatewayPath": "/api/v1/office/odp-to-html",
+      "category": "Office",
+      "name": "odp to html",
+      "description": "odp to html",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "office/odp-to-html"
+      ]
+    },
+    "office_supported_conversions": {
+      "operationId": "office_supported_conversions",
+      "method": "GET",
+      "gatewayPath": "/api/v1/office/supported-conversions",
+      "category": "Office",
+      "name": "List supported conversions",
+      "description": "List supported conversions",
+      "backend": "python",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "office/supported-conversions"
+      ]
+    },
+    "html_to_xml": {
+      "operationId": "html_to_xml",
+      "method": "POST",
+      "gatewayPath": "/api/v1/web/html-to-xml",
+      "category": "Web",
+      "name": "html to xml",
+      "description": "html to xml",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "web/html-to-xml"
+      ]
+    },
+    "html_to_json": {
+      "operationId": "html_to_json",
+      "method": "POST",
+      "gatewayPath": "/api/v1/web/html-to-json",
+      "category": "Web",
+      "name": "html to json",
+      "description": "html to json",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns JSON file content",
+      "validatePaths": [
+        "web/html-to-json"
+      ]
+    },
+    "xml_to_html": {
+      "operationId": "xml_to_html",
+      "method": "POST",
+      "gatewayPath": "/api/v1/web/xml-to-html",
+      "category": "Web",
+      "name": "xml to html",
+      "description": "xml to html",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "web/xml-to-html"
+      ]
+    },
+    "xml_to_json": {
+      "operationId": "xml_to_json",
+      "method": "POST",
+      "gatewayPath": "/api/v1/web/xml-to-json",
+      "category": "Web",
+      "name": "xml to json",
+      "description": "xml to json",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns JSON file content",
+      "validatePaths": [
+        "web/xml-to-json"
+      ]
+    },
+    "xml_to_txt": {
+      "operationId": "xml_to_txt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/web/xml-to-txt",
+      "category": "Web",
+      "name": "xml to txt",
+      "description": "xml to txt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "web/xml-to-txt"
+      ]
+    },
+    "xml_to_csv": {
+      "operationId": "xml_to_csv",
+      "method": "POST",
+      "gatewayPath": "/api/v1/web/xml-to-csv",
+      "category": "Web",
+      "name": "xml to csv",
+      "description": "xml to csv",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "web/xml-to-csv"
+      ]
+    },
+    "json_to_html": {
+      "operationId": "json_to_html",
+      "method": "POST",
+      "gatewayPath": "/api/v1/web/json-to-html",
+      "category": "Web",
+      "name": "json to html",
+      "description": "json to html",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "web/json-to-html"
+      ]
+    },
+    "json_to_xml": {
+      "operationId": "json_to_xml",
+      "method": "POST",
+      "gatewayPath": "/api/v1/web/json-to-xml",
+      "category": "Web",
+      "name": "json to xml",
+      "description": "json to xml",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "web/json-to-xml"
+      ]
+    },
+    "json_to_txt": {
+      "operationId": "json_to_txt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/web/json-to-txt",
+      "category": "Web",
+      "name": "json to txt",
+      "description": "json to txt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "web/json-to-txt"
+      ]
+    },
+    "json_to_csv": {
+      "operationId": "json_to_csv",
+      "method": "POST",
+      "gatewayPath": "/api/v1/web/json-to-csv",
+      "category": "Web",
+      "name": "json to csv",
+      "description": "json to csv",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "web/json-to-csv"
+      ]
+    },
+    "csv_to_html": {
+      "operationId": "csv_to_html",
+      "method": "POST",
+      "gatewayPath": "/api/v1/web/csv-to-html",
+      "category": "Web",
+      "name": "csv to html",
+      "description": "csv to html",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "web/csv-to-html"
+      ]
+    },
+    "csv_to_xml": {
+      "operationId": "csv_to_xml",
+      "method": "POST",
+      "gatewayPath": "/api/v1/web/csv-to-xml",
+      "category": "Web",
+      "name": "csv to xml",
+      "description": "csv to xml",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "web/csv-to-xml"
+      ]
+    },
+    "csv_to_json": {
+      "operationId": "csv_to_json",
+      "method": "POST",
+      "gatewayPath": "/api/v1/web/csv-to-json",
+      "category": "Web",
+      "name": "csv to json",
+      "description": "csv to json",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns JSON file content",
+      "validatePaths": [
+        "web/csv-to-json"
+      ]
+    },
+    "csv_to_txt": {
+      "operationId": "csv_to_txt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/web/csv-to-txt",
+      "category": "Web",
+      "name": "csv to txt",
+      "description": "csv to txt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "web/csv-to-txt"
+      ]
+    },
+    "web_supported_conversions": {
+      "operationId": "web_supported_conversions",
+      "method": "GET",
+      "gatewayPath": "/api/v1/web/supported-conversions",
+      "category": "Web",
+      "name": "List supported conversions",
+      "description": "List supported conversions",
+      "backend": "python",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "web/supported-conversions"
+      ]
+    },
+    "epub_to_mobi": {
+      "operationId": "epub_to_mobi",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/epub-to-mobi",
+      "category": "eBook",
+      "name": "epub to mobi",
+      "description": "epub to mobi",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/epub-to-mobi"
+      ]
+    },
+    "epub_to_azw": {
+      "operationId": "epub_to_azw",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/epub-to-azw",
+      "category": "eBook",
+      "name": "epub to azw",
+      "description": "epub to azw",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/epub-to-azw"
+      ]
+    },
+    "epub_to_fb2": {
+      "operationId": "epub_to_fb2",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/epub-to-fb2",
+      "category": "eBook",
+      "name": "epub to fb2",
+      "description": "epub to fb2",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/epub-to-fb2"
+      ]
+    },
+    "epub_to_txt": {
+      "operationId": "epub_to_txt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/epub-to-txt",
+      "category": "eBook",
+      "name": "epub to txt",
+      "description": "epub to txt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/epub-to-txt"
+      ]
+    },
+    "epub_to_html": {
+      "operationId": "epub_to_html",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/epub-to-html",
+      "category": "eBook",
+      "name": "epub to html",
+      "description": "epub to html",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/epub-to-html"
+      ]
+    },
+    "epub_to_pdf": {
+      "operationId": "epub_to_pdf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/epub-to-pdf",
+      "category": "eBook",
+      "name": "epub to pdf",
+      "description": "epub to pdf",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/epub-to-pdf"
+      ]
+    },
+    "epub_to_docx": {
+      "operationId": "epub_to_docx",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/epub-to-docx",
+      "category": "eBook",
+      "name": "epub to docx",
+      "description": "epub to docx",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/epub-to-docx"
+      ]
+    },
+    "mobi_to_epub": {
+      "operationId": "mobi_to_epub",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/mobi-to-epub",
+      "category": "eBook",
+      "name": "mobi to epub",
+      "description": "mobi to epub",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/mobi-to-epub"
+      ]
+    },
+    "mobi_to_txt": {
+      "operationId": "mobi_to_txt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/mobi-to-txt",
+      "category": "eBook",
+      "name": "mobi to txt",
+      "description": "mobi to txt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/mobi-to-txt"
+      ]
+    },
+    "mobi_to_html": {
+      "operationId": "mobi_to_html",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/mobi-to-html",
+      "category": "eBook",
+      "name": "mobi to html",
+      "description": "mobi to html",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/mobi-to-html"
+      ]
+    },
+    "mobi_to_pdf": {
+      "operationId": "mobi_to_pdf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/mobi-to-pdf",
+      "category": "eBook",
+      "name": "mobi to pdf",
+      "description": "mobi to pdf",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/mobi-to-pdf"
+      ]
+    },
+    "azw_to_epub": {
+      "operationId": "azw_to_epub",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/azw-to-epub",
+      "category": "eBook",
+      "name": "azw to epub",
+      "description": "azw to epub",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/azw-to-epub"
+      ]
+    },
+    "azw_to_mobi": {
+      "operationId": "azw_to_mobi",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/azw-to-mobi",
+      "category": "eBook",
+      "name": "azw to mobi",
+      "description": "azw to mobi",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/azw-to-mobi"
+      ]
+    },
+    "azw_to_txt": {
+      "operationId": "azw_to_txt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/azw-to-txt",
+      "category": "eBook",
+      "name": "azw to txt",
+      "description": "azw to txt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/azw-to-txt"
+      ]
+    },
+    "azw_to_html": {
+      "operationId": "azw_to_html",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/azw-to-html",
+      "category": "eBook",
+      "name": "azw to html",
+      "description": "azw to html",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/azw-to-html"
+      ]
+    },
+    "azw_to_pdf": {
+      "operationId": "azw_to_pdf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/azw-to-pdf",
+      "category": "eBook",
+      "name": "azw to pdf",
+      "description": "azw to pdf",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/azw-to-pdf"
+      ]
+    },
+    "fb2_to_epub": {
+      "operationId": "fb2_to_epub",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/fb2-to-epub",
+      "category": "eBook",
+      "name": "fb2 to epub",
+      "description": "fb2 to epub",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/fb2-to-epub"
+      ]
+    },
+    "fb2_to_txt": {
+      "operationId": "fb2_to_txt",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/fb2-to-txt",
+      "category": "eBook",
+      "name": "fb2 to txt",
+      "description": "fb2 to txt",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/fb2-to-txt"
+      ]
+    },
+    "fb2_to_html": {
+      "operationId": "fb2_to_html",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/fb2-to-html",
+      "category": "eBook",
+      "name": "fb2 to html",
+      "description": "fb2 to html",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/fb2-to-html"
+      ]
+    },
+    "fb2_to_pdf": {
+      "operationId": "fb2_to_pdf",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ebook/fb2-to-pdf",
+      "category": "eBook",
+      "name": "fb2 to pdf",
+      "description": "fb2 to pdf",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "ebook/fb2-to-pdf"
+      ]
+    },
+    "ebook_supported_conversions": {
+      "operationId": "ebook_supported_conversions",
+      "method": "GET",
+      "gatewayPath": "/api/v1/ebook/supported-conversions",
+      "category": "eBook",
+      "name": "List supported conversions",
+      "description": "List supported conversions",
+      "backend": "python",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "ebook/supported-conversions"
+      ]
+    },
+    "zip_to_rar": {
+      "operationId": "zip_to_rar",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/zip-to-rar",
+      "category": "Archive",
+      "name": "zip to rar",
+      "description": "zip to rar",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/zip-to-rar"
+      ]
+    },
+    "zip_to_7z": {
+      "operationId": "zip_to_7z",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/zip-to-7z",
+      "category": "Archive",
+      "name": "zip to 7z",
+      "description": "zip to 7z",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/zip-to-7z"
+      ]
+    },
+    "zip_to_tar": {
+      "operationId": "zip_to_tar",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/zip-to-tar",
+      "category": "Archive",
+      "name": "zip to tar",
+      "description": "zip to tar",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/zip-to-tar"
+      ]
+    },
+    "zip_to_gz": {
+      "operationId": "zip_to_gz",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/zip-to-gz",
+      "category": "Archive",
+      "name": "zip to gz",
+      "description": "zip to gz",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/zip-to-gz"
+      ]
+    },
+    "zip_to_bz2": {
+      "operationId": "zip_to_bz2",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/zip-to-bz2",
+      "category": "Archive",
+      "name": "zip to bz2",
+      "description": "zip to bz2",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/zip-to-bz2"
+      ]
+    },
+    "rar_to_zip": {
+      "operationId": "rar_to_zip",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/rar-to-zip",
+      "category": "Archive",
+      "name": "rar to zip",
+      "description": "rar to zip",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/rar-to-zip"
+      ]
+    },
+    "rar_to_7z": {
+      "operationId": "rar_to_7z",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/rar-to-7z",
+      "category": "Archive",
+      "name": "rar to 7z",
+      "description": "rar to 7z",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/rar-to-7z"
+      ]
+    },
+    "rar_to_tar": {
+      "operationId": "rar_to_tar",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/rar-to-tar",
+      "category": "Archive",
+      "name": "rar to tar",
+      "description": "rar to tar",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/rar-to-tar"
+      ]
+    },
+    "rar_to_gz": {
+      "operationId": "rar_to_gz",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/rar-to-gz",
+      "category": "Archive",
+      "name": "rar to gz",
+      "description": "rar to gz",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/rar-to-gz"
+      ]
+    },
+    "rar_to_bz2": {
+      "operationId": "rar_to_bz2",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/rar-to-bz2",
+      "category": "Archive",
+      "name": "rar to bz2",
+      "description": "rar to bz2",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/rar-to-bz2"
+      ]
+    },
+    "7z_to_zip": {
+      "operationId": "7z_to_zip",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/7z-to-zip",
+      "category": "Archive",
+      "name": "7z to zip",
+      "description": "7z to zip",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/7z-to-zip"
+      ]
+    },
+    "7z_to_rar": {
+      "operationId": "7z_to_rar",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/7z-to-rar",
+      "category": "Archive",
+      "name": "7z to rar",
+      "description": "7z to rar",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/7z-to-rar"
+      ]
+    },
+    "7z_to_tar": {
+      "operationId": "7z_to_tar",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/7z-to-tar",
+      "category": "Archive",
+      "name": "7z to tar",
+      "description": "7z to tar",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/7z-to-tar"
+      ]
+    },
+    "7z_to_gz": {
+      "operationId": "7z_to_gz",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/7z-to-gz",
+      "category": "Archive",
+      "name": "7z to gz",
+      "description": "7z to gz",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/7z-to-gz"
+      ]
+    },
+    "7z_to_bz2": {
+      "operationId": "7z_to_bz2",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/7z-to-bz2",
+      "category": "Archive",
+      "name": "7z to bz2",
+      "description": "7z to bz2",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/7z-to-bz2"
+      ]
+    },
+    "tar_to_zip": {
+      "operationId": "tar_to_zip",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/tar-to-zip",
+      "category": "Archive",
+      "name": "tar to zip",
+      "description": "tar to zip",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/tar-to-zip"
+      ]
+    },
+    "tar_to_rar": {
+      "operationId": "tar_to_rar",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/tar-to-rar",
+      "category": "Archive",
+      "name": "tar to rar",
+      "description": "tar to rar",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/tar-to-rar"
+      ]
+    },
+    "tar_to_7z": {
+      "operationId": "tar_to_7z",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/tar-to-7z",
+      "category": "Archive",
+      "name": "tar to 7z",
+      "description": "tar to 7z",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/tar-to-7z"
+      ]
+    },
+    "tar_to_gz": {
+      "operationId": "tar_to_gz",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/tar-to-gz",
+      "category": "Archive",
+      "name": "tar to gz",
+      "description": "tar to gz",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/tar-to-gz"
+      ]
+    },
+    "tar_to_bz2": {
+      "operationId": "tar_to_bz2",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/tar-to-bz2",
+      "category": "Archive",
+      "name": "tar to bz2",
+      "description": "tar to bz2",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/tar-to-bz2"
+      ]
+    },
+    "gz_to_zip": {
+      "operationId": "gz_to_zip",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/gz-to-zip",
+      "category": "Archive",
+      "name": "gz to zip",
+      "description": "gz to zip",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/gz-to-zip"
+      ]
+    },
+    "gz_to_rar": {
+      "operationId": "gz_to_rar",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/gz-to-rar",
+      "category": "Archive",
+      "name": "gz to rar",
+      "description": "gz to rar",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/gz-to-rar"
+      ]
+    },
+    "gz_to_7z": {
+      "operationId": "gz_to_7z",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/gz-to-7z",
+      "category": "Archive",
+      "name": "gz to 7z",
+      "description": "gz to 7z",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/gz-to-7z"
+      ]
+    },
+    "gz_to_tar": {
+      "operationId": "gz_to_tar",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/gz-to-tar",
+      "category": "Archive",
+      "name": "gz to tar",
+      "description": "gz to tar",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/gz-to-tar"
+      ]
+    },
+    "gz_to_bz2": {
+      "operationId": "gz_to_bz2",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/gz-to-bz2",
+      "category": "Archive",
+      "name": "gz to bz2",
+      "description": "gz to bz2",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/gz-to-bz2"
+      ]
+    },
+    "bz2_to_zip": {
+      "operationId": "bz2_to_zip",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/bz2-to-zip",
+      "category": "Archive",
+      "name": "bz2 to zip",
+      "description": "bz2 to zip",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/bz2-to-zip"
+      ]
+    },
+    "bz2_to_rar": {
+      "operationId": "bz2_to_rar",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/bz2-to-rar",
+      "category": "Archive",
+      "name": "bz2 to rar",
+      "description": "bz2 to rar",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/bz2-to-rar"
+      ]
+    },
+    "bz2_to_7z": {
+      "operationId": "bz2_to_7z",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/bz2-to-7z",
+      "category": "Archive",
+      "name": "bz2 to 7z",
+      "description": "bz2 to 7z",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/bz2-to-7z"
+      ]
+    },
+    "bz2_to_tar": {
+      "operationId": "bz2_to_tar",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/bz2-to-tar",
+      "category": "Archive",
+      "name": "bz2 to tar",
+      "description": "bz2 to tar",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/bz2-to-tar"
+      ]
+    },
+    "bz2_to_gz": {
+      "operationId": "bz2_to_gz",
+      "method": "POST",
+      "gatewayPath": "/api/v1/archive/bz2-to-gz",
+      "category": "Archive",
+      "name": "bz2 to gz",
+      "description": "bz2 to gz",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "archive/bz2-to-gz"
+      ]
+    },
+    "archive_supported_conversions": {
+      "operationId": "archive_supported_conversions",
+      "method": "GET",
+      "gatewayPath": "/api/v1/archive/supported-conversions",
+      "category": "Archive",
+      "name": "List supported conversions",
+      "description": "List supported conversions",
+      "backend": "python",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "archive/supported-conversions"
+      ]
+    },
+    "extract_text": {
+      "operationId": "extract_text",
+      "method": "POST",
+      "gatewayPath": "/api/v1/extract",
+      "category": "File Extract",
+      "name": "Extract text from file content (base64 JSON body)",
+      "description": "Extract text from file content (base64 JSON body)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "/api/v1/extract"
+      ]
+    },
+    "text_case_converter_post": {
+      "operationId": "text_case_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-utilities/text-case-converter",
+      "category": "Text Utilities",
+      "name": "text case converter",
+      "description": "text case converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "text-utilities/text-case-converter"
+      ]
+    },
+    "reverse_text_post": {
+      "operationId": "reverse_text_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-utilities/reverse-text",
+      "category": "Text Utilities",
+      "name": "reverse text",
+      "description": "reverse text",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "text-utilities/reverse-text"
+      ]
+    },
+    "remove_spaces_post": {
+      "operationId": "remove_spaces_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-utilities/remove-spaces",
+      "category": "Text Utilities",
+      "name": "remove spaces",
+      "description": "remove spaces",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "text-utilities/remove-spaces"
+      ]
+    },
+    "remove_line_breaks_post": {
+      "operationId": "remove_line_breaks_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-utilities/remove-line-breaks",
+      "category": "Text Utilities",
+      "name": "remove line breaks",
+      "description": "remove line breaks",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "text-utilities/remove-line-breaks"
+      ]
+    },
+    "convert_to_slug_post": {
+      "operationId": "convert_to_slug_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-utilities/convert-to-slug",
+      "category": "Text Utilities",
+      "name": "convert to slug",
+      "description": "convert to slug",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "text-utilities/convert-to-slug"
+      ]
+    },
+    "convert_to_hashtags_post": {
+      "operationId": "convert_to_hashtags_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-utilities/convert-to-hashtags",
+      "category": "Text Utilities",
+      "name": "convert to hashtags",
+      "description": "convert to hashtags",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "text-utilities/convert-to-hashtags"
+      ]
+    },
+    "comma_separate_post": {
+      "operationId": "comma_separate_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-utilities/comma-separate",
+      "category": "Text Utilities",
+      "name": "comma separate",
+      "description": "comma separate",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "text-utilities/comma-separate"
+      ]
+    },
+    "sort_words_post": {
+      "operationId": "sort_words_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-utilities/sort-words",
+      "category": "Text Utilities",
+      "name": "sort words",
+      "description": "sort words",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "text-utilities/sort-words"
+      ]
+    },
+    "sort_lines_post": {
+      "operationId": "sort_lines_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-utilities/sort-lines",
+      "category": "Text Utilities",
+      "name": "sort lines",
+      "description": "sort lines",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "text-utilities/sort-lines"
+      ]
+    },
+    "repeat_text_post": {
+      "operationId": "repeat_text_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-utilities/repeat-text",
+      "category": "Text Utilities",
+      "name": "repeat text",
+      "description": "repeat text",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "text-utilities/repeat-text"
+      ]
+    },
+    "dummy_text_generator_post": {
+      "operationId": "dummy_text_generator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-utilities/dummy-text-generator",
+      "category": "Text Utilities",
+      "name": "dummy text generator",
+      "description": "dummy text generator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "text-utilities/dummy-text-generator"
+      ]
+    },
+    "random_word_generator_post": {
+      "operationId": "random_word_generator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-utilities/random-word-generator",
+      "category": "Text Utilities",
+      "name": "random word generator",
+      "description": "random word generator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "text-utilities/random-word-generator"
+      ]
+    },
+    "number_to_words_post": {
+      "operationId": "number_to_words_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-utilities/number-to-words",
+      "category": "Text Utilities",
+      "name": "number to words",
+      "description": "number to words",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "text-utilities/number-to-words"
+      ]
+    },
+    "words_to_number_post": {
+      "operationId": "words_to_number_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-utilities/words-to-number",
+      "category": "Text Utilities",
+      "name": "words to number",
+      "description": "words to number",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "text-utilities/words-to-number"
+      ]
+    },
+    "compare_texts_post": {
+      "operationId": "compare_texts_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-utilities/compare-texts",
+      "category": "Text Utilities",
+      "name": "compare texts",
+      "description": "compare texts",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "text-utilities/compare-texts"
+      ]
+    },
+    "text_stats_post": {
+      "operationId": "text_stats_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-utilities/text-stats",
+      "category": "Text Utilities",
+      "name": "text stats",
+      "description": "text stats",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "text-utilities/text-stats"
+      ]
+    },
+    "convert_to_xml_tags_post": {
+      "operationId": "convert_to_xml_tags_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-utilities/convert-to-xml-tags",
+      "category": "Text Utilities",
+      "name": "convert to xml tags",
+      "description": "convert to xml tags",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "text-utilities/convert-to-xml-tags"
+      ]
+    },
+    "seoAnalyze": {
+      "operationId": "seoAnalyze",
+      "method": "POST",
+      "gatewayPath": "/api/v1/seo-tools/analyze",
+      "category": "SEO Tools",
+      "name": "Analyze URL SEO",
+      "description": "Analyze URL SEO",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-tools/analyze"
+      ]
+    },
+    "seoCompare": {
+      "operationId": "seoCompare",
+      "method": "POST",
+      "gatewayPath": "/api/v1/seo-tools/compare",
+      "category": "SEO Tools",
+      "name": "Compare two URLs",
+      "description": "Compare two URLs",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-tools/compare"
+      ]
+    },
+    "rankCheckerKeywords": {
+      "operationId": "rankCheckerKeywords",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/rank-checker/keywords",
+      "category": "SEO APIs",
+      "name": "Rank checker keywords",
+      "description": "Rank checker keywords",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/rank-checker/keywords"
+      ]
+    },
+    "socialMediaIntegration": {
+      "operationId": "socialMediaIntegration",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/social-media-integration",
+      "category": "SEO APIs",
+      "name": "Social media integration check",
+      "description": "Social media integration check",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/social-media-integration"
+      ]
+    },
+    "pageSpeedAnalyzer": {
+      "operationId": "pageSpeedAnalyzer",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/page-speed-analyzer",
+      "category": "SEO APIs",
+      "name": "Page speed analysis",
+      "description": "Page speed analysis",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/page-speed-analyzer"
+      ]
+    },
+    "contentOptimization": {
+      "operationId": "contentOptimization",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/content-optimization",
+      "category": "SEO APIs",
+      "name": "Content optimization",
+      "description": "Content optimization",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/content-optimization"
+      ]
+    },
+    "internalLinking": {
+      "operationId": "internalLinking",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/internal-linking",
+      "category": "SEO APIs",
+      "name": "Internal linking analysis",
+      "description": "Internal linking analysis",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/internal-linking"
+      ]
+    },
+    "linkExtractor": {
+      "operationId": "linkExtractor",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/link-extractor",
+      "category": "SEO APIs",
+      "name": "Extract links from URL",
+      "description": "Extract links from URL",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/link-extractor"
+      ]
+    },
+    "gst_calculator_post": {
+      "operationId": "gst_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/gst-calculator",
+      "category": "Calculators",
+      "name": "gst calculator",
+      "description": "gst calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/gst-calculator"
+      ]
+    },
+    "vat_calculator_post": {
+      "operationId": "vat_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/vat-calculator",
+      "category": "Calculators",
+      "name": "vat calculator",
+      "description": "vat calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/vat-calculator"
+      ]
+    },
+    "invoice_total_calculator_post": {
+      "operationId": "invoice_total_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/invoice-total-calculator",
+      "category": "Calculators",
+      "name": "invoice total calculator",
+      "description": "invoice total calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/invoice-total-calculator"
+      ]
+    },
+    "discount_calculator_post": {
+      "operationId": "discount_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/discount-calculator",
+      "category": "Calculators",
+      "name": "discount calculator",
+      "description": "discount calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/discount-calculator"
+      ]
+    },
+    "profit_margin_calculator_post": {
+      "operationId": "profit_margin_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/profit-margin-calculator",
+      "category": "Calculators",
+      "name": "profit margin calculator",
+      "description": "profit margin calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/profit-margin-calculator"
+      ]
+    },
+    "markup_calculator_post": {
+      "operationId": "markup_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/markup-calculator",
+      "category": "Calculators",
+      "name": "markup calculator",
+      "description": "markup calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/markup-calculator"
+      ]
+    },
+    "freelancer_hourly_rate_calculator_post": {
+      "operationId": "freelancer_hourly_rate_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/freelancer-hourly-rate-calculator",
+      "category": "Calculators",
+      "name": "freelancer hourly rate calculator",
+      "description": "freelancer hourly rate calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/freelancer-hourly-rate-calculator"
+      ]
+    },
+    "salary_to_hourly_converter_post": {
+      "operationId": "salary_to_hourly_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/salary-to-hourly-converter",
+      "category": "Calculators",
+      "name": "salary to hourly converter",
+      "description": "salary to hourly converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/salary-to-hourly-converter"
+      ]
+    },
+    "payment_due_date_calculator_post": {
+      "operationId": "payment_due_date_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/payment-due-date-calculator",
+      "category": "Calculators",
+      "name": "payment due date calculator",
+      "description": "payment due date calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/payment-due-date-calculator"
+      ]
+    },
+    "emi_calculator_post": {
+      "operationId": "emi_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/emi-calculator",
+      "category": "Calculators",
+      "name": "emi calculator",
+      "description": "emi calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/emi-calculator"
+      ]
+    },
+    "simple_interest_calculator_post": {
+      "operationId": "simple_interest_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/simple-interest-calculator",
+      "category": "Calculators",
+      "name": "simple interest calculator",
+      "description": "simple interest calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/simple-interest-calculator"
+      ]
+    },
+    "compound_interest_calculator_post": {
+      "operationId": "compound_interest_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/compound-interest-calculator",
+      "category": "Calculators",
+      "name": "compound interest calculator",
+      "description": "compound interest calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/compound-interest-calculator"
+      ]
+    },
+    "break_even_calculator_post": {
+      "operationId": "break_even_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/break-even-calculator",
+      "category": "Calculators",
+      "name": "break even calculator",
+      "description": "break even calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/break-even-calculator"
+      ]
+    },
+    "cost_plus_pricing_calculator_post": {
+      "operationId": "cost_plus_pricing_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/cost-plus-pricing-calculator",
+      "category": "Calculators",
+      "name": "cost plus pricing calculator",
+      "description": "cost plus pricing calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/cost-plus-pricing-calculator"
+      ]
+    },
+    "currency_converter_post": {
+      "operationId": "currency_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/currency-converter",
+      "category": "Calculators",
+      "name": "currency converter",
+      "description": "currency converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/currency-converter"
+      ]
+    },
+    "tax_compliant_invoice_calculator_post": {
+      "operationId": "tax_compliant_invoice_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/tax-compliant-invoice-calculator",
+      "category": "Calculators",
+      "name": "tax compliant invoice calculator",
+      "description": "tax compliant invoice calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/tax-compliant-invoice-calculator"
+      ]
+    },
+    "credit_note_calculator_post": {
+      "operationId": "credit_note_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/credit-note-calculator",
+      "category": "Calculators",
+      "name": "credit note calculator",
+      "description": "credit note calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/credit-note-calculator"
+      ]
+    },
+    "debit_note_calculator_post": {
+      "operationId": "debit_note_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/debit-note-calculator",
+      "category": "Calculators",
+      "name": "debit note calculator",
+      "description": "debit note calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/debit-note-calculator"
+      ]
+    },
+    "recurring_invoice_calculator_post": {
+      "operationId": "recurring_invoice_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/recurring-invoice-calculator",
+      "category": "Calculators",
+      "name": "recurring invoice calculator",
+      "description": "recurring invoice calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/recurring-invoice-calculator"
+      ]
+    },
+    "timesheet_invoice_calculator_post": {
+      "operationId": "timesheet_invoice_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/calculators/timesheet-invoice-calculator",
+      "category": "Calculators",
+      "name": "timesheet invoice calculator",
+      "description": "timesheet invoice calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "calculators/timesheet-invoice-calculator"
+      ]
+    },
+    "length_converter_post": {
+      "operationId": "length_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/length-converter",
+      "category": "Unit Conversions",
+      "name": "length converter",
+      "description": "length converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/length-converter"
+      ]
+    },
+    "area_converter_post": {
+      "operationId": "area_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/area-converter",
+      "category": "Unit Conversions",
+      "name": "area converter",
+      "description": "area converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/area-converter"
+      ]
+    },
+    "mass_converter_post": {
+      "operationId": "mass_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/mass-converter",
+      "category": "Unit Conversions",
+      "name": "mass converter",
+      "description": "mass converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/mass-converter"
+      ]
+    },
+    "volume_converter_post": {
+      "operationId": "volume_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/volume-converter",
+      "category": "Unit Conversions",
+      "name": "volume converter",
+      "description": "volume converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/volume-converter"
+      ]
+    },
+    "each_converter_post": {
+      "operationId": "each_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/each-converter",
+      "category": "Unit Conversions",
+      "name": "each converter",
+      "description": "each converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/each-converter"
+      ]
+    },
+    "temperature_converter_post": {
+      "operationId": "temperature_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/temperature-converter",
+      "category": "Unit Conversions",
+      "name": "temperature converter",
+      "description": "temperature converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/temperature-converter"
+      ]
+    },
+    "time_converter_post": {
+      "operationId": "time_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/time-converter",
+      "category": "Unit Conversions",
+      "name": "time converter",
+      "description": "time converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/time-converter"
+      ]
+    },
+    "digital_converter_post": {
+      "operationId": "digital_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/digital-converter",
+      "category": "Unit Conversions",
+      "name": "digital converter",
+      "description": "digital converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/digital-converter"
+      ]
+    },
+    "parts_per_converter_post": {
+      "operationId": "parts_per_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/parts-per-converter",
+      "category": "Unit Conversions",
+      "name": "parts per converter",
+      "description": "parts per converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/parts-per-converter"
+      ]
+    },
+    "speed_converter_post": {
+      "operationId": "speed_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/speed-converter",
+      "category": "Unit Conversions",
+      "name": "speed converter",
+      "description": "speed converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/speed-converter"
+      ]
+    },
+    "pace_converter_post": {
+      "operationId": "pace_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/pace-converter",
+      "category": "Unit Conversions",
+      "name": "pace converter",
+      "description": "pace converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/pace-converter"
+      ]
+    },
+    "pressure_converter_post": {
+      "operationId": "pressure_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/pressure-converter",
+      "category": "Unit Conversions",
+      "name": "pressure converter",
+      "description": "pressure converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/pressure-converter"
+      ]
+    },
+    "current_converter_post": {
+      "operationId": "current_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/current-converter",
+      "category": "Unit Conversions",
+      "name": "current converter",
+      "description": "current converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/current-converter"
+      ]
+    },
+    "voltage_converter_post": {
+      "operationId": "voltage_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/voltage-converter",
+      "category": "Unit Conversions",
+      "name": "voltage converter",
+      "description": "voltage converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/voltage-converter"
+      ]
+    },
+    "power_converter_post": {
+      "operationId": "power_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/power-converter",
+      "category": "Unit Conversions",
+      "name": "power converter",
+      "description": "power converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/power-converter"
+      ]
+    },
+    "reactive_power_converter_post": {
+      "operationId": "reactive_power_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/reactive-power-converter",
+      "category": "Unit Conversions",
+      "name": "reactive power converter",
+      "description": "reactive power converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/reactive-power-converter"
+      ]
+    },
+    "apparent_power_converter_post": {
+      "operationId": "apparent_power_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/apparent-power-converter",
+      "category": "Unit Conversions",
+      "name": "apparent power converter",
+      "description": "apparent power converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/apparent-power-converter"
+      ]
+    },
+    "energy_converter_post": {
+      "operationId": "energy_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/energy-converter",
+      "category": "Unit Conversions",
+      "name": "energy converter",
+      "description": "energy converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/energy-converter"
+      ]
+    },
+    "reactive_energy_converter_post": {
+      "operationId": "reactive_energy_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/reactive-energy-converter",
+      "category": "Unit Conversions",
+      "name": "reactive energy converter",
+      "description": "reactive energy converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/reactive-energy-converter"
+      ]
+    },
+    "volume_flow_rate_converter_post": {
+      "operationId": "volume_flow_rate_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/volume-flow-rate-converter",
+      "category": "Unit Conversions",
+      "name": "volume flow rate converter",
+      "description": "volume flow rate converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/volume-flow-rate-converter"
+      ]
+    },
+    "illuminance_converter_post": {
+      "operationId": "illuminance_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/illuminance-converter",
+      "category": "Unit Conversions",
+      "name": "illuminance converter",
+      "description": "illuminance converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/illuminance-converter"
+      ]
+    },
+    "frequency_converter_post": {
+      "operationId": "frequency_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/frequency-converter",
+      "category": "Unit Conversions",
+      "name": "frequency converter",
+      "description": "frequency converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/frequency-converter"
+      ]
+    },
+    "angle_converter_post": {
+      "operationId": "angle_converter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/unit-conversions/angle-converter",
+      "category": "Unit Conversions",
+      "name": "angle converter",
+      "description": "angle converter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "unit-conversions/angle-converter"
+      ]
+    },
+    "youtube_url_parser_post": {
+      "operationId": "youtube_url_parser_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/youtube-tools/youtube-url-parser",
+      "category": "YouTube Tools",
+      "name": "youtube url parser",
+      "description": "youtube url parser",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "youtube-tools/youtube-url-parser"
+      ]
+    },
+    "youtube_title_optimizer_post": {
+      "operationId": "youtube_title_optimizer_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/youtube-tools/youtube-title-optimizer",
+      "category": "YouTube Tools",
+      "name": "youtube title optimizer",
+      "description": "youtube title optimizer",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "youtube-tools/youtube-title-optimizer"
+      ]
+    },
+    "youtube_description_optimizer_post": {
+      "operationId": "youtube_description_optimizer_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/youtube-tools/youtube-description-optimizer",
+      "category": "YouTube Tools",
+      "name": "youtube description optimizer",
+      "description": "youtube description optimizer",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "youtube-tools/youtube-description-optimizer"
+      ]
+    },
+    "youtube_engagement_calculator_post": {
+      "operationId": "youtube_engagement_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/youtube-tools/youtube-engagement-calculator",
+      "category": "YouTube Tools",
+      "name": "youtube engagement calculator",
+      "description": "youtube engagement calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "youtube-tools/youtube-engagement-calculator"
+      ]
+    },
+    "youtube_rpm_calculator_post": {
+      "operationId": "youtube_rpm_calculator_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/youtube-tools/youtube-rpm-calculator",
+      "category": "YouTube Tools",
+      "name": "youtube rpm calculator",
+      "description": "youtube rpm calculator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "youtube-tools/youtube-rpm-calculator"
+      ]
+    },
+    "youtube_caption_formatter_post": {
+      "operationId": "youtube_caption_formatter_post",
+      "method": "POST",
+      "gatewayPath": "/api/v1/youtube-tools/youtube-caption-formatter",
+      "category": "YouTube Tools",
+      "name": "youtube caption formatter",
+      "description": "youtube caption formatter",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "youtube-tools/youtube-caption-formatter"
+      ]
+    },
+    "piiScrub": {
+      "operationId": "piiScrub",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-intelligence/pii-scrub",
+      "category": "Text Intelligence",
+      "name": "Scrub PII from text",
+      "description": "Scrub PII from text",
+      "backend": "python",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Python API envelope JSON",
+      "validatePaths": [
+        "text-intelligence/pii-scrub"
+      ]
+    },
+    "piiScrubFile": {
+      "operationId": "piiScrubFile",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-intelligence/pii-scrub-file",
+      "category": "Text Intelligence",
+      "name": "Scrub PII from uploaded file",
+      "description": "Scrub PII from uploaded file",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns Python API envelope JSON",
+      "validatePaths": [
+        "text-intelligence/pii-scrub-file"
+      ]
+    },
+    "jargonBuster": {
+      "operationId": "jargonBuster",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-intelligence/jargon-buster",
+      "category": "Text Intelligence",
+      "name": "Simplify jargon in text",
+      "description": "Simplify jargon in text",
+      "backend": "python",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Python API envelope JSON",
+      "validatePaths": [
+        "text-intelligence/jargon-buster"
+      ]
+    },
+    "snippetMaker": {
+      "operationId": "snippetMaker",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-intelligence/snippet-maker",
+      "category": "Text Intelligence",
+      "name": "Generate text snippets",
+      "description": "Generate text snippets",
+      "backend": "python",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Python API envelope JSON",
+      "validatePaths": [
+        "text-intelligence/snippet-maker"
+      ]
+    },
+    "headlineRestructurer": {
+      "operationId": "headlineRestructurer",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-intelligence/headline-restructurer",
+      "category": "Text Intelligence",
+      "name": "Restructure headlines",
+      "description": "Restructure headlines",
+      "backend": "python",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Python API envelope JSON",
+      "validatePaths": [
+        "text-intelligence/headline-restructurer"
+      ]
+    },
+    "atsGap": {
+      "operationId": "atsGap",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-intelligence/ats-gap",
+      "category": "Text Intelligence",
+      "name": "ATS keyword gap analysis",
+      "description": "ATS keyword gap analysis",
+      "backend": "python",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Python API envelope JSON",
+      "validatePaths": [
+        "text-intelligence/ats-gap"
+      ]
+    },
+    "atsGapFile": {
+      "operationId": "atsGapFile",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-intelligence/ats-gap-file",
+      "category": "Text Intelligence",
+      "name": "ATS gap from resume file",
+      "description": "ATS gap from resume file",
+      "backend": "python",
+      "multipart": true,
+      "jsonBody": false,
+      "responseHint": "Returns Python API envelope JSON",
+      "validatePaths": [
+        "text-intelligence/ats-gap-file"
+      ]
+    },
+    "expenseCategorizer": {
+      "operationId": "expenseCategorizer",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-intelligence/expense-categorizer",
+      "category": "Text Intelligence",
+      "name": "Categorize expenses from text",
+      "description": "Categorize expenses from text",
+      "backend": "python",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Python API envelope JSON",
+      "validatePaths": [
+        "text-intelligence/expense-categorizer"
+      ]
+    },
+    "expenseCategorizerFile": {
+      "operationId": "expenseCategorizerFile",
+      "method": "POST",
+      "gatewayPath": "/api/v1/text-intelligence/expense-categorizer-file",
+      "category": "Text Intelligence",
+      "name": "Categorize expenses from file",
+      "description": "Categorize expenses from file",
+      "backend": "python",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns Python API envelope JSON",
+      "validatePaths": [
+        "text-intelligence/expense-categorizer-file"
+      ]
+    },
+    "aiFileInsights": {
+      "operationId": "aiFileInsights",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ai-models/file-insights",
+      "category": "AI Models",
+      "name": "Analyze uploaded file with AI",
+      "description": "Analyze uploaded file with AI",
+      "backend": "node",
+      "multipart": true,
+      "jsonBody": false,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "ai-models/file-insights"
+      ]
+    },
+    "aiTextAi": {
+      "operationId": "aiTextAi",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ai-models/text-ai",
+      "category": "AI Models",
+      "name": "Text generation and analysis",
+      "description": "Text generation and analysis",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "ai-models/text-ai"
+      ]
+    },
+    "aiYoutubeInsight": {
+      "operationId": "aiYoutubeInsight",
+      "method": "POST",
+      "gatewayPath": "/api/v1/ai-models/youtube-insight",
+      "category": "AI Models",
+      "name": "YouTube video insights",
+      "description": "YouTube video insights",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "ai-models/youtube-insight"
+      ]
+    }
+  }
+}

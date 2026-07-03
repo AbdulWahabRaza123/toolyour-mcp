@@ -1,0 +1,12 @@
+{
+  "operationId": "apparent_power_converter_post",
+  "gatewayPath": "/api/v1/unit-conversions/apparent-power-converter",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns Node API envelope JSON"
+}

@@ -1,0 +1,12 @@
+{
+  "operationId": "azw_to_mobi",
+  "gatewayPath": "/api/v1/ebook/azw-to-mobi",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns ToolFileResponse with downloadUrl"
+}

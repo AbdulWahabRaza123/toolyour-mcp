@@ -1,0 +1,12 @@
+{
+  "operationId": "convertToTiff",
+  "gatewayPath": "/api/v1/convertors/to-tiff",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns ToolFileResponse with downloadUrl"
+}

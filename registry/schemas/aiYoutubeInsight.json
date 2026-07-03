@@ -1,0 +1,70 @@
+{
+  "operationId": "aiYoutubeInsight",
+  "gatewayPath": "/api/v1/ai-models/youtube-insight",
+  "method": "POST",
+  "request": {
+    "oneOf": [
+      {
+        "type": "object",
+        "required": [
+          "youtubeUrl",
+          "prompt"
+        ],
+        "properties": {
+          "youtubeUrl": {
+            "type": "string",
+            "example": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+          },
+          "prompt": {
+            "type": "string",
+            "example": "What are the main themes discussed?"
+          }
+        }
+      },
+      {
+        "type": "object",
+        "required": [
+          "inputs"
+        ],
+        "properties": {
+          "inputs": {
+            "type": "object",
+            "required": [
+              "youtubeUrl",
+              "prompt"
+            ],
+            "properties": {
+              "youtubeUrl": {
+                "type": "string",
+                "example": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+              },
+              "prompt": {
+                "type": "string",
+                "example": "What are the main themes discussed?"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "description": "Send fields at the top level, or nested under `inputs`."
+  },
+  "response": {
+    "type": "object",
+    "required": [
+      "youtubeUrl",
+      "prompt"
+    ],
+    "properties": {
+      "youtubeUrl": {
+        "type": "string",
+        "example": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      },
+      "prompt": {
+        "type": "string",
+        "example": "What are the main themes discussed?"
+      }
+    }
+  },
+  "responseHint": "Returns Node API envelope JSON"
+}

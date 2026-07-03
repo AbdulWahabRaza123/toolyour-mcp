@@ -1,0 +1,12 @@
+{
+  "operationId": "credit_note_calculator_post",
+  "gatewayPath": "/api/v1/calculators/credit-note-calculator",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns Node API envelope JSON"
+}

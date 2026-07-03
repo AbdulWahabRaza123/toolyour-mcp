@@ -1,0 +1,12 @@
+{
+  "operationId": "odp_to_pdf",
+  "gatewayPath": "/api/v1/office/odp-to-pdf",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns ToolFileResponse with downloadUrl"
+}

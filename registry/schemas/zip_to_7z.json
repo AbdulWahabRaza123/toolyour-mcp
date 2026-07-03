@@ -1,0 +1,12 @@
+{
+  "operationId": "zip_to_7z",
+  "gatewayPath": "/api/v1/archive/zip-to-7z",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns ToolFileResponse with downloadUrl"
+}

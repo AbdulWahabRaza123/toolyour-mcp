@@ -1,0 +1,12 @@
+{
+  "operationId": "remove_spaces_post",
+  "gatewayPath": "/api/v1/text-utilities/remove-spaces",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns Node API envelope JSON"
+}

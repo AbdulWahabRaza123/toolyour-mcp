@@ -1,0 +1,12 @@
+{
+  "operationId": "html_to_md",
+  "gatewayPath": "/api/v1/web/html-to-md",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns ToolFileResponse with downloadUrl"
+}

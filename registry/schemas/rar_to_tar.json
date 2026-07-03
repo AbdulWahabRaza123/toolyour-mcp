@@ -1,0 +1,12 @@
+{
+  "operationId": "rar_to_tar",
+  "gatewayPath": "/api/v1/archive/rar-to-tar",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns ToolFileResponse with downloadUrl"
+}

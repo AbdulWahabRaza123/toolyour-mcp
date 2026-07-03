@@ -1,0 +1,12 @@
+{
+  "operationId": "convertToGif",
+  "gatewayPath": "/api/v1/convertors/to-gif",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns ToolFileResponse with downloadUrl"
+}

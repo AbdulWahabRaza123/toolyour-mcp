@@ -1,0 +1,12 @@
+{
+  "operationId": "zip_to_rar",
+  "gatewayPath": "/api/v1/archive/zip-to-rar",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns ToolFileResponse with downloadUrl"
+}

@@ -1,0 +1,12 @@
+{
+  "operationId": "txt_to_html",
+  "gatewayPath": "/api/v1/documents/txt-to-html",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns ToolFileResponse with downloadUrl"
+}

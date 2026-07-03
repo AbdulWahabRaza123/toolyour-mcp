@@ -1,0 +1,25 @@
+{
+  "workflows": [
+    {
+      "id": "full-seo-audit",
+      "title": "Full SEO Audit",
+      "description": "Analyze URL SEO then page speed.",
+      "steps": [
+        { "id": "seo", "operationId": "seoAnalyze" },
+        { "id": "speed", "operationId": "pageSpeedAnalyzer" }
+      ]
+    },
+    {
+      "id": "content-optimization",
+      "title": "Content Optimization",
+      "description": "SEO content optimization API.",
+      "steps": [{ "id": "content", "operationId": "contentOptimization" }]
+    },
+    {
+      "id": "document-convert-pipeline",
+      "title": "Document Convert Pipeline",
+      "description": "Convert DOCX to PDF.",
+      "steps": [{ "id": "convert", "operationId": "docx_to_pdf" }]
+    }
+  ]
+}
