@@ -3,6 +3,7 @@ import path from "path";
 import { constants, getEnv, loadManifestFile } from "../config";
 import type { McpRegistryManifest, McpToolRoute } from "../contracts";
 import type { Logger } from "../observability/logger";
+import { scoreFuzzyQuery } from "../search/fuzzy-search";
 
 export class RegistryLoader {
   private manifest: McpRegistryManifest | null = null;
@@ -79,7 +80,7 @@ export function searchTools(
   category?: string,
   limit = constants.defaultDiscoverLimit
 ) {
-  const q = query.trim().toLowerCase();
+  const q = query.trim();
   const max = Math.min(limit, constants.maxDiscoverLimit);
   let items = registry.tools;
 
@@ -88,15 +89,21 @@ export function searchTools(
     items = items.filter((t) => t.category.toLowerCase() === c);
   }
 
-  if (q) {
-    items = items.filter(
-      (t) =>
-        t.operationId.toLowerCase().includes(q) ||
-        t.name.toLowerCase().includes(q) ||
-        t.description.toLowerCase().includes(q) ||
-        t.category.toLowerCase().includes(q)
-    );
+  if (!q) {
+    return items.slice(0, max);
   }
 
-  return items.slice(0, max);
+  return items
+    .map((tool) => ({
+      tool,
+      score: scoreFuzzyQuery(
+        q,
+        [tool.operationId, tool.name, tool.description, tool.category],
+        [2.2, 2, 1, 0.8]
+      ),
+    }))
+    .filter((row) => row.score > 0)
+    .sort((a, b) => b.score - a.score || a.tool.name.localeCompare(b.tool.name))
+    .slice(0, max)
+    .map((row) => row.tool);
 }
