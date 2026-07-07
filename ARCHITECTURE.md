@@ -151,7 +151,7 @@ flowchart LR
 
 | Tool | Bills quota? | What it does |
 |------|--------------|--------------|
-| `solve_task` | Only when a backend runs | Natural-language router → workflow, tool, or content bridge |
+| `solve_task` | Only when a backend runs | Natural-language router → workflow, tool, or content bridge (**early phase** — improving regularly) |
 | `discover_tools` | No | Keyword search over 231 tool cards |
 | `list_categories` | No | List tool families |
 | `get_tool_schema` | No | Request/response schema for one `operationId` |
