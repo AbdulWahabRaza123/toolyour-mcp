@@ -26,7 +26,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
 
   server.tool(
     "solve_task",
-    "Primary entry point (early phase): describe what the user wants in natural language. Server attempts to auto-pick workflow or tool, extracts URLs from the goal, and runs it. Routing and workflows are improving regularly as tools upgrade and new MCP workflows ship. For production-critical flows, prefer discover_tools → get_tool_schema → invoke_tool. For local/unpublished work, pass input.html, input.text, or input.code from the workspace — MCP runs free local analysis and text-based tools without a deployed URL. Set input.enhance=false to skip billed API text tools. If status is suggest, review toolSuggestions in the response or call discover_tools with a specific query. Suggestions are free; bills quota only when a backend tool/workflow executes.",
+    "Primary entry point: describe what the user wants in natural language. Server auto-picks workflow or tool, extracts URLs from the goal, and runs it. For local/unpublished work, pass input.html, input.text, or input.code from the workspace — MCP runs free local analysis and text-based tools without a deployed URL. Set input.enhance=false to skip billed API text tools. If status is suggest, review toolSuggestions in the response or call discover_tools with a specific query. Suggestions are free; bills quota only when a backend tool/workflow executes.",
     {
       goal: z
         .string()
