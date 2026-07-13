@@ -4,6 +4,8 @@ How AI agents (Cursor, Claude Desktop, custom clients) communicate with ToolYour
 
 **Platform coupling:** when MCP behavior, endpoints, or quota rules change, update marketing, docs, and blog fact packs — see [`docs/PLATFORM-COUPLING.md`](../docs/PLATFORM-COUPLING.md) and Cursor rule `mcp-surface-sync`.
 
+**Jobs roadmap (solve_task workflows):** execution plan for job-first MCP — [`docs/MCP-JOBS-ROADMAP.md`](docs/MCP-JOBS-ROADMAP.md).
+
 > **Viewing diagrams:** Sections include **ASCII diagrams** (work everywhere) plus **Mermaid** blocks (GitHub, [mermaid.live](https://mermaid.live)). If Mermaid does not render in Cursor, open this file on GitHub or paste a `mermaid` block into mermaid.live.
 
 ---

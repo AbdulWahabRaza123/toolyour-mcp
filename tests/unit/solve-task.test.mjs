@@ -48,4 +48,54 @@ describe("solve_task matching", () => {
     const score = scoreTask("convert my docx file to pdf", task);
     assert.ok(score >= 2);
   });
+
+  it("matches core web vitals goal to workflow", () => {
+    const match = matchTask("fix core web vitals for https://example.com", tasks);
+    assert.ok(match);
+    assert.equal(match.task.id, "improve-core-web-vitals");
+    assert.equal(match.task.target, "core-web-vitals-job");
+  });
+
+  it("matches full SEO optimization goal", () => {
+    const match = matchTask("optimize this page for SEO https://example.com", tasks);
+    assert.ok(match);
+    assert.equal(match.task.id, "full-seo-optimization");
+    assert.equal(match.task.target, "full-seo-optimization-job");
+  });
+
+  it("keeps seo audit for explicit audit phrasing", () => {
+    const match = matchTask("full seo audit https://example.com", tasks);
+    assert.ok(match);
+    assert.equal(match.task.id, "seo-audit");
+  });
+
+  it("matches internal link architecture goals", () => {
+    const improve = matchTask("improve internal linking https://example.com", tasks);
+    assert.ok(improve);
+    assert.equal(improve.task.id, "internal-link-architecture");
+
+    const orphan = matchTask("find orphan pages on https://example.com", tasks);
+    assert.ok(orphan);
+    assert.equal(orphan.task.id, "internal-link-architecture");
+  });
+
+  it("matches technical and social audit goals", () => {
+    const tech = matchTask("run technical seo audit on https://example.com", tasks);
+    assert.ok(tech);
+    assert.equal(tech.task.id, "technical-seo-audit");
+
+    const social = matchTask("audit social preview for https://example.com", tasks);
+    assert.ok(social);
+    assert.equal(social.task.id, "social-preview-audit");
+  });
+
+  it("matches content quality and keyword goals", () => {
+    const content = matchTask("content quality audit for https://example.com", tasks);
+    assert.ok(content);
+    assert.equal(content.task.id, "content-quality-audit");
+
+    const keywords = matchTask("keyword opportunity review https://example.com", tasks);
+    assert.ok(keywords);
+    assert.equal(keywords.task.id, "keyword-opportunity-review");
+  });
 });

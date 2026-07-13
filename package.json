@@ -14,6 +14,9 @@
     "test:mcp:contract": "node --test tests/contract/*.test.mjs",
     "test:mcp:integration": "node --test tests/integration/*.test.mjs",
     "test:mcp": "npm run test:mcp:unit && npm run test:mcp:contract && npm run test:mcp:integration",
+    "validate:jobs": "npm run build && npm run lint:skills && npm run test:mcp:unit && node scripts/smoke-jobs-offline.mjs",
+    "smoke:jobs:offline": "npm run build && node scripts/smoke-jobs-offline.mjs",
+    "smoke:jobs:live": "node scripts/test-mcp-use-cases.mjs",
     "smoke:staging": "node scripts/smoke-staging.mjs"
   },
   "dependencies": {

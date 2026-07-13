@@ -1,0 +1,16 @@
+{"goal":"fix core web vitals for https://example.com","expectedJobId":"improve-core-web-vitals","requiredJobFields":["scores","prioritizedActions"],"category":"cwv"}
+{"goal":"why is LCP slow on https://example.com","expectedJobId":"improve-core-web-vitals","requiredJobFields":["scores.LCP","findings"],"category":"cwv"}
+{"goal":"improve CLS on my landing page https://example.com","expectedJobId":"improve-core-web-vitals","requiredJobFields":["scores.CLS"],"category":"cwv"}
+{"goal":"optimize this page for SEO https://example.com","expectedJobId":"full-seo-optimization","requiredJobFields":["workstreams","prioritizedActions"],"category":"seo"}
+{"goal":"full seo audit https://example.com","expectedJobId":"seo-audit","requiredJobFields":["steps"],"category":"seo"}
+{"goal":"improve internal linking https://example.com","expectedJobId":"internal-link-architecture","requiredJobFields":["prioritizedActions"],"category":"links"}
+{"goal":"find orphan pages on https://example.com","expectedJobId":"internal-link-architecture","requiredJobFields":["findings"],"category":"links"}
+{"goal":"run technical seo audit on https://example.com","expectedJobId":"technical-seo-audit","requiredJobFields":["workstreams","scores"],"category":"seo"}
+{"goal":"audit social preview for https://example.com","expectedJobId":"social-preview-audit","requiredJobFields":["scores","prioritizedActions"],"category":"social"}
+{"goal":"check open graph tags https://example.com","expectedJobId":"social-preview-audit","requiredJobFields":["findings"],"category":"social"}
+{"goal":"content quality audit for https://example.com","expectedJobId":"content-quality-audit","requiredJobFields":["workstreams","prioritizedActions"],"category":"content"}
+{"goal":"keyword opportunity review https://example.com","expectedJobId":"keyword-opportunity-review","requiredJobFields":["scores","findings"],"category":"keywords"}
+{"goal":"local page seo for my html","expectedJobId":"local-page-seo","requiredInput":{"html":"<html></html>"},"category":"local"}
+{"goal":"audit this html before deploy","expectedJobId":"seo-audit-local","requiredInput":{"html":"<html></html>"},"category":"local"}
+{"goal":"convert docx to pdf","expectedJobId":"docx-to-pdf","category":"document"}
+{"goal":"write me a poem about cats","expectedStatus":"suggest","category":"negative"}

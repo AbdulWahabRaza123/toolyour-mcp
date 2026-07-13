@@ -79,6 +79,8 @@ export interface McpWorkflowDef {
   id: string;
   title: string;
   description: string;
+  /** Merges multi-step outputs into toolyour.jobReport@1 for agents */
+  synthesizer?: string;
   steps: McpWorkflowStep[];
 }
 

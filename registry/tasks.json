@@ -12,10 +12,7 @@
         "seo analysis",
         "check seo",
         "lighthouse audit",
-        "full seo",
-        "improve seo",
-        "fix seo",
-        "optimize seo",
+        "full seo audit",
         "local",
         "my code",
         "before deploy",
@@ -66,7 +63,6 @@
       "description": "Pull internal and external links from page HTML without fetching a URL.",
       "keywords": [
         "extract links",
-        "internal links",
         "link audit",
         "links in my page",
         "html links"
@@ -78,7 +74,7 @@
     {
       "id": "content-optimization",
       "title": "Content optimization",
-      "description": "Optimize page content for SEO.",
+      "description": "Optimize page content for SEO (routes to full optimization workflow).",
       "keywords": [
         "content optimization",
         "optimize content",
@@ -87,7 +83,7 @@
         "content refresh"
       ],
       "type": "workflow",
-      "target": "content-optimization",
+      "target": "full-seo-optimization-job",
       "requiredInput": ["url"]
     },
     {
@@ -122,6 +118,160 @@
       "type": "tool",
       "target": "pageSpeedAnalyzer",
       "requiredInput": ["url"]
+    },
+    {
+      "id": "improve-core-web-vitals",
+      "title": "Improve Core Web Vitals",
+      "description": "Diagnose LCP, TTFB, INP/TBT, and CLS with prioritized fixes.",
+      "keywords": [
+        "core web vitals",
+        "cwv",
+        "lcp",
+        "cls",
+        "inp",
+        "ttfb",
+        "largest contentful paint",
+        "cumulative layout shift",
+        "interaction to next paint",
+        "fix performance",
+        "improve performance",
+        "speed up page",
+        "pagespeed insights"
+      ],
+      "type": "workflow",
+      "target": "core-web-vitals-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "full-seo-optimization",
+      "title": "Full SEO optimization",
+      "description": "End-to-end on-page SEO: technical, content, speed, links, and social preview.",
+      "keywords": [
+        "full seo optimization",
+        "optimize seo",
+        "seo optimization",
+        "on-page seo",
+        "improve seo",
+        "fix seo issues",
+        "rank higher",
+        "optimize page for seo",
+        "optimize this page",
+        "page for seo",
+        "fix seo"
+      ],
+      "type": "workflow",
+      "target": "full-seo-optimization-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "internal-link-architecture",
+      "title": "Internal link architecture",
+      "description": "Map orphans, broken links, hub pages, and recommended internal links for a URL.",
+      "keywords": [
+        "internal link architecture",
+        "improve internal linking",
+        "internal links",
+        "orphan pages",
+        "find orphan pages",
+        "link structure",
+        "site architecture",
+        "hub pages",
+        "broken internal links",
+        "internal linking strategy"
+      ],
+      "type": "workflow",
+      "target": "internal-link-architecture-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "technical-seo-audit",
+      "title": "Technical SEO audit",
+      "description": "Lite technical audit: on-page SEO, link profile, and speed for a URL.",
+      "keywords": [
+        "technical seo",
+        "technical seo audit",
+        "technical audit",
+        "crawlability",
+        "indexability",
+        "robots",
+        "canonical",
+        "structured data",
+        "check technical seo"
+      ],
+      "type": "workflow",
+      "target": "technical-seo-audit-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "social-preview-audit",
+      "title": "Social preview audit",
+      "description": "Audit Open Graph and Twitter Card tags for social link previews.",
+      "keywords": [
+        "social preview",
+        "open graph",
+        "og tags",
+        "og:image",
+        "twitter card",
+        "social sharing",
+        "link preview",
+        "facebook preview",
+        "linkedin preview",
+        "share preview"
+      ],
+      "type": "workflow",
+      "target": "social-preview-audit-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "content-quality-audit",
+      "title": "Content quality audit",
+      "description": "Audit content structure, readability, and keyword signals for a URL.",
+      "keywords": [
+        "content quality",
+        "content quality audit",
+        "audit content",
+        "thin content",
+        "readability",
+        "heading structure",
+        "content score"
+      ],
+      "type": "workflow",
+      "target": "content-quality-audit-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "keyword-opportunity-review",
+      "title": "Keyword opportunity review",
+      "description": "Find keyword gaps and content opportunities from on-page signals.",
+      "keywords": [
+        "keyword opportunity",
+        "keyword opportunities",
+        "keyword gaps",
+        "keyword research",
+        "rank keywords",
+        "target keywords",
+        "what keywords",
+        "keyword review"
+      ],
+      "type": "workflow",
+      "target": "keyword-opportunity-review-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "local-page-seo",
+      "title": "Local page SEO",
+      "description": "Audit HTML from your repo without a deployed URL (free MCP bridge).",
+      "keywords": [
+        "local page seo",
+        "page html seo",
+        "seo my html",
+        "unpublished page",
+        "staging html",
+        "preview page seo"
+      ],
+      "type": "local",
+      "target": "html-seo-audit",
+      "requiredInput": ["html"]
     }
   ]
 }

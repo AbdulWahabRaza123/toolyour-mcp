@@ -20,7 +20,10 @@ Use this playbook when the user wants a **site or page SEO audit**.
    - `input.code` — TSX/JSX/HTML source; MCP extracts text automatically
    - Set `input.enhance: false` to skip billed API text tools (local analysis only)
 4. **Deployed or staging sites:** `solve_task` with a public URL, or `invoke_tool` after schema lookup.
-5. Summarize **top issues**, **metrics**, and **fix priorities** for the user.
+   - *"full seo audit {url}"* → `full-seo-audit` (2-step)
+   - *"optimize this page for SEO {url}"* → `full-seo-optimization-job` (6-step `jobReport`)
+   - *"technical seo audit {url}"* → `technical-seo-audit-job` (lite: SEO + links + speed)
+5. Summarize **top issues**, **metrics**, and **fix priorities** for the user from `jobReport` when present (workflow jobs), else from step outputs.
 6. Do not paste raw HTML — use summarized MCP responses only.
 
 ## Output format

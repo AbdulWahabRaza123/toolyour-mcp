@@ -8,6 +8,8 @@ import { RegistryLoader } from "../registry/loader";
 import { shapeResponseForLlm } from "../summarize/registry";
 import type { Logger } from "../observability/logger";
 import { randomUUID } from "crypto";
+import { synthesizeJobReport } from "../jobs/synthesize";
+import type { WorkflowStepMeta } from "../jobs/types";
 
 export function loadWorkflows(): McpWorkflowDef[] {
   const env = getEnv();
@@ -23,11 +25,24 @@ export interface WorkflowRunContext {
   logger: Logger;
 }
 
+export interface WorkflowRunResult {
+  status: "completed" | "partial";
+  workflowId: string;
+  completedSteps: string[];
+  failedStep?: string;
+  error?: unknown;
+  steps: Record<string, unknown>;
+  /** Last step shaped output (legacy) */
+  result: unknown;
+  jobReport?: ReturnType<typeof synthesizeJobReport>;
+  partialResult?: Record<string, unknown>;
+}
+
 export async function runWorkflow(
   workflowId: string,
   input: Record<string, unknown>,
   ctx: WorkflowRunContext
-) {
+): Promise<WorkflowRunResult> {
   const workflows = loadWorkflows();
   const wf = workflows.find((w) => w.id === workflowId);
   if (!wf) {
@@ -38,10 +53,12 @@ export async function runWorkflow(
 
   const completedSteps: string[] = [];
   const stepResults: Record<string, unknown> = {};
+  const stepMeta: WorkflowStepMeta[] = [];
   let lastOutput: unknown = input;
 
   for (const step of wf.steps) {
     const route = ctx.registry.getRoute(step.operationId);
+    stepMeta.push({ id: step.id, operationId: step.operationId });
     if (!route) {
       return {
         status: "partial",
@@ -49,6 +66,8 @@ export async function runWorkflow(
         completedSteps,
         failedStep: step.id,
         error: { code: "tool_not_api_backed", operationId: step.operationId },
+        steps: stepResults,
+        result: lastOutput,
         partialResult: stepResults,
       };
     }
@@ -106,6 +125,8 @@ export async function runWorkflow(
           completedSteps,
           failedStep: step.id,
           error: shaped,
+          steps: stepResults,
+          result: lastOutput,
           partialResult: stepResults,
         };
       }
@@ -116,15 +137,30 @@ export async function runWorkflow(
         completedSteps,
         failedStep: step.id,
         error: e instanceof Error ? e.message : String(e),
+        steps: stepResults,
+        result: lastOutput,
         partialResult: stepResults,
       };
     }
   }
 
+  const jobReport = wf.synthesizer
+    ? synthesizeJobReport({
+        synthesizerId: wf.synthesizer,
+        workflowId: wf.id,
+        jobId: wf.id,
+        input,
+        steps: stepMeta,
+        stepResults,
+      })
+    : null;
+
   return {
     status: "completed",
     workflowId,
     completedSteps,
-    result: lastOutput,
+    steps: stepResults,
+    result: jobReport || lastOutput,
+    jobReport: jobReport || undefined,
   };
 }

@@ -2,15 +2,16 @@
 id: page-performance
 title: Page Performance
 category: seo
-description: Analyze page performance and Core Web Vitals related signals.
-operationIds: pageSpeedAnalyzer
+description: Diagnose Core Web Vitals proxy metrics and prioritized fixes for a URL.
+operationIds: pageSpeedAnalyzer, seoAnalyze, socialMediaIntegration
 ---
 
 # Page Performance Skill
 
-For **performance / Core Web Vitals** requests:
+For **Core Web Vitals / performance** requests:
 
-1. `discover_tools("page speed performance")`
-2. Invoke the best-matching API-backed tool with the page URL.
-3. Return scores, bottlenecks, and 3 actionable fixes.
-4. Prefer `run_workflow` with `page-performance-audit` when available.
+1. Prefer `solve_task` with goal like *"improve core web vitals for {url}"* → workflow `core-web-vitals-job`.
+2. Read `jobReport.scores` for **LCP**, **TTFB**, **INP** (TBT proxy), and **CLS**.
+3. Use `jobReport.prioritizedActions` for ranked fixes; cite `limitations` when explaining proxy vs field data.
+4. Fallback: `discover_tools("page speed")` → `get_tool_schema` → `invoke_tool` with URL.
+5. Do not paste raw HTML — summarize findings for the user.

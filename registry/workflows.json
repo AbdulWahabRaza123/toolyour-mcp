@@ -3,10 +3,36 @@
     {
       "id": "full-seo-audit",
       "title": "Full SEO Audit",
-      "description": "Analyze URL SEO then page speed.",
+      "description": "Analyze URL SEO then page speed; returns merged job report.",
+      "synthesizer": "full-seo-audit",
       "steps": [
         { "id": "seo", "operationId": "seoAnalyze" },
         { "id": "speed", "operationId": "pageSpeedAnalyzer" }
+      ]
+    },
+    {
+      "id": "core-web-vitals-job",
+      "title": "Improve Core Web Vitals",
+      "description": "Diagnose LCP, TTFB, INP/TBT, and CLS with prioritized fixes.",
+      "synthesizer": "core-web-vitals",
+      "steps": [
+        { "id": "speed", "operationId": "pageSpeedAnalyzer" },
+        { "id": "seo", "operationId": "seoAnalyze" },
+        { "id": "social", "operationId": "socialMediaIntegration" }
+      ]
+    },
+    {
+      "id": "full-seo-optimization-job",
+      "title": "Full SEO Optimization",
+      "description": "Technical SEO, content, speed, internal links, link profile, and social preview.",
+      "synthesizer": "full-seo-optimization",
+      "steps": [
+        { "id": "seo", "operationId": "seoAnalyze" },
+        { "id": "content", "operationId": "contentOptimization" },
+        { "id": "speed", "operationId": "pageSpeedAnalyzer" },
+        { "id": "links", "operationId": "internalLinking" },
+        { "id": "extract", "operationId": "linkExtractor" },
+        { "id": "social", "operationId": "socialMediaIntegration" }
       ]
     },
     {
@@ -20,6 +46,55 @@
       "title": "Document Convert Pipeline",
       "description": "Convert DOCX to PDF.",
       "steps": [{ "id": "convert", "operationId": "docx_to_pdf" }]
+    },
+    {
+      "id": "internal-link-architecture-job",
+      "title": "Internal Link Architecture",
+      "description": "Crawl internal link graph, analyze seed link profile, and audit hub page SEO.",
+      "synthesizer": "internal-link-architecture",
+      "steps": [
+        { "id": "graph", "operationId": "internalLinking" },
+        { "id": "hub", "operationId": "linkExtractor" },
+        { "id": "seo", "operationId": "seoAnalyze" }
+      ]
+    },
+    {
+      "id": "technical-seo-audit-job",
+      "title": "Technical SEO Audit (lite)",
+      "description": "On-page technical SEO, single-page link profile, and speed proxies.",
+      "synthesizer": "technical-seo-audit",
+      "steps": [
+        { "id": "seo", "operationId": "seoAnalyze" },
+        { "id": "extract", "operationId": "linkExtractor" },
+        { "id": "speed", "operationId": "pageSpeedAnalyzer" }
+      ]
+    },
+    {
+      "id": "social-preview-audit-job",
+      "title": "Social Preview Audit",
+      "description": "Open Graph and Twitter Card audit for link previews.",
+      "synthesizer": "social-preview-audit",
+      "steps": [{ "id": "social", "operationId": "socialMediaIntegration" }]
+    },
+    {
+      "id": "content-quality-audit-job",
+      "title": "Content Quality Audit",
+      "description": "Content optimization plus keyword/meta signals for a URL.",
+      "synthesizer": "content-quality-audit",
+      "steps": [
+        { "id": "content", "operationId": "contentOptimization" },
+        { "id": "keywords", "operationId": "rankCheckerKeywords" }
+      ]
+    },
+    {
+      "id": "keyword-opportunity-review-job",
+      "title": "Keyword Opportunity Review",
+      "description": "Keyword signals and content gaps with prioritized opportunities.",
+      "synthesizer": "keyword-opportunity-review",
+      "steps": [
+        { "id": "keywords", "operationId": "rankCheckerKeywords" },
+        { "id": "content", "operationId": "contentOptimization" }
+      ]
     }
   ]
 }

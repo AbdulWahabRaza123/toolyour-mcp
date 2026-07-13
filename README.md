@@ -36,5 +36,27 @@ TOOLS_MONGO_URI=mongodb://... npm run build:registry --prefix ../docs
 ## Tests
 
 ```bash
-npm test
+npm run validate:jobs    # build + lint + unit + offline job parity
+npm run smoke:jobs:live  # requires MCP_API_KEY + gateway at :8888
+npm test                 # alias: test:mcp
 ```
+
+See [`docs/DEPLOY-CHECKLIST.md`](docs/DEPLOY-CHECKLIST.md) for deploy order and live smoke steps.
+
+## Job workflows (`solve_task`)
+
+Shipped synthesizer workflows (return `toolyour.jobReport@1` when matched):
+
+| Workflow ID | Purpose |
+|-------------|---------|
+| `full-seo-audit` | SEO + page speed |
+| `core-web-vitals-job` | CWV diagnosis |
+| `full-seo-optimization-job` | Full on-page optimization (6 tools) |
+| `internal-link-architecture-job` | Orphans, broken links, hub pages |
+| `technical-seo-audit-job` | Lite technical audit |
+| `social-preview-audit-job` | Open Graph / Twitter Card |
+| `content-quality-audit-job` | Content + keyword signals |
+| `keyword-opportunity-review-job` | Keyword gaps + opportunities |
+| `document-convert-pipeline` | DOCX → PDF |
+
+Registry: `registry/workflows.json`, `registry/tasks.json`. Roadmap: [`docs/MCP-JOBS-ROADMAP.md`](docs/MCP-JOBS-ROADMAP.md).

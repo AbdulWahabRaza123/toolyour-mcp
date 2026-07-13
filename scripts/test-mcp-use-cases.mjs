@@ -138,6 +138,28 @@ const cases = [
       }),
   },
   {
+    name: "solve_task: jobReport on technical SEO audit",
+    run: async () => {
+      const r = await call("solve_task", {
+        goal: "run technical seo audit on https://example.com",
+        input: {},
+      });
+      const report =
+        r.data?.execution?.jobReport || r.data?.execution?.result?.jobReport || r.data?.jobReport;
+      return (
+        !r.isError &&
+        r.data?.status === "completed" &&
+        report?.schemaVersion === "toolyour.jobReport@1" &&
+        Array.isArray(report?.prioritizedActions)
+      );
+    },
+    sample: async () =>
+      call("solve_task", {
+        goal: "run technical seo audit on https://example.com",
+        input: {},
+      }),
+  },
+  {
     name: "solve_task: local HTML SEO (free)",
     run: async () => {
       const r = await call("solve_task", {
