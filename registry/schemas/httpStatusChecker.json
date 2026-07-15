@@ -1,0 +1,12 @@
+{
+  "operationId": "httpStatusChecker",
+  "gatewayPath": "/api/v1/seo-apis/http-status-checker",
+  "method": "GET",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

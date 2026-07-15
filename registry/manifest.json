@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-07-02T18:47:48.631Z",
+  "generatedAt": "2026-07-14T18:08:38.499Z",
   "stats": {
-    "totalOpenApiRoutes": 231,
-    "hasApiIncluded": 231,
+    "totalOpenApiRoutes": 239,
+    "hasApiIncluded": 239,
     "excluded": 0
   },
   "categories": [
@@ -1381,6 +1381,70 @@
       "name": "Extract links from URL",
       "category": "SEO APIs",
       "description": "Extract links from URL",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "metaTagsAnalyzer",
+      "name": "Meta tags analysis",
+      "category": "SEO APIs",
+      "description": "Meta tags analysis",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "robotsTxtChecker",
+      "name": "Robots.txt checker",
+      "category": "SEO APIs",
+      "description": "Robots.txt checker",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "sitemapXmlValidator",
+      "name": "Sitemap XML validator",
+      "category": "SEO APIs",
+      "description": "Sitemap XML validator",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "canonicalUrlChecker",
+      "name": "Canonical URL checker",
+      "category": "SEO APIs",
+      "description": "Canonical URL checker",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "httpStatusChecker",
+      "name": "HTTP status checker",
+      "category": "SEO APIs",
+      "description": "HTTP status checker",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "redirectChainAnalyzer",
+      "name": "Redirect chain analyzer",
+      "category": "SEO APIs",
+      "description": "Redirect chain analyzer",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "brokenLinkChecker",
+      "name": "Broken link checker",
+      "category": "SEO APIs",
+      "description": "Broken link checker",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "mixedContentChecker",
+      "name": "Mixed content checker",
+      "category": "SEO APIs",
+      "description": "Mixed content checker",
       "inputShape": "query",
       "backend": "node"
     },
@@ -4545,6 +4609,126 @@
       "responseHint": "Returns JSON response",
       "validatePaths": [
         "seo-apis/link-extractor"
+      ]
+    },
+    "metaTagsAnalyzer": {
+      "operationId": "metaTagsAnalyzer",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/meta-tags-analyzer",
+      "category": "SEO APIs",
+      "name": "Meta tags analysis",
+      "description": "Meta tags analysis",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/meta-tags-analyzer"
+      ]
+    },
+    "robotsTxtChecker": {
+      "operationId": "robotsTxtChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/robots-txt-checker",
+      "category": "SEO APIs",
+      "name": "Robots.txt checker",
+      "description": "Robots.txt checker",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/robots-txt-checker"
+      ]
+    },
+    "sitemapXmlValidator": {
+      "operationId": "sitemapXmlValidator",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/sitemap-xml-validator",
+      "category": "SEO APIs",
+      "name": "Sitemap XML validator",
+      "description": "Sitemap XML validator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/sitemap-xml-validator"
+      ]
+    },
+    "canonicalUrlChecker": {
+      "operationId": "canonicalUrlChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/canonical-url-checker",
+      "category": "SEO APIs",
+      "name": "Canonical URL checker",
+      "description": "Canonical URL checker",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/canonical-url-checker"
+      ]
+    },
+    "httpStatusChecker": {
+      "operationId": "httpStatusChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/http-status-checker",
+      "category": "SEO APIs",
+      "name": "HTTP status checker",
+      "description": "HTTP status checker",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/http-status-checker"
+      ]
+    },
+    "redirectChainAnalyzer": {
+      "operationId": "redirectChainAnalyzer",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/redirect-chain-analyzer",
+      "category": "SEO APIs",
+      "name": "Redirect chain analyzer",
+      "description": "Redirect chain analyzer",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/redirect-chain-analyzer"
+      ]
+    },
+    "brokenLinkChecker": {
+      "operationId": "brokenLinkChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/broken-link-checker",
+      "category": "SEO APIs",
+      "name": "Broken link checker",
+      "description": "Broken link checker",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/broken-link-checker"
+      ]
+    },
+    "mixedContentChecker": {
+      "operationId": "mixedContentChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/mixed-content-checker",
+      "category": "SEO APIs",
+      "name": "Mixed content checker",
+      "description": "Mixed content checker",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/mixed-content-checker"
       ]
     },
     "gst_calculator_post": {

@@ -1,0 +1,12 @@
+{
+  "operationId": "sitemapXmlValidator",
+  "gatewayPath": "/api/v1/seo-apis/sitemap-xml-validator",
+  "method": "GET",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}
