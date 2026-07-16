@@ -1,0 +1,12 @@
+{
+  "operationId": "schemaMarkupValidator",
+  "gatewayPath": "/api/v1/seo-apis/schema-markup-validator",
+  "method": "GET",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

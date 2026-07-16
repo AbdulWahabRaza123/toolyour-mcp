@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-07-14T18:08:38.499Z",
+  "generatedAt": "2026-07-16T18:57:16.035Z",
   "stats": {
-    "totalOpenApiRoutes": 239,
-    "hasApiIncluded": 239,
+    "totalOpenApiRoutes": 244,
+    "hasApiIncluded": 244,
     "excluded": 0
   },
   "categories": [
@@ -1446,6 +1446,46 @@
       "category": "SEO APIs",
       "description": "Mixed content checker",
       "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "schemaMarkupValidator",
+      "name": "Schema markup validator",
+      "category": "SEO APIs",
+      "description": "Schema markup validator",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "serpSnippetPreview",
+      "name": "SERP snippet preview",
+      "category": "SEO APIs",
+      "description": "SERP snippet preview",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "headingStructureAnalyzer",
+      "name": "Heading structure analyzer",
+      "category": "SEO APIs",
+      "description": "Heading structure analyzer",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "imageAltTextChecker",
+      "name": "Image alt text checker",
+      "category": "SEO APIs",
+      "description": "Image alt text checker",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "competitorPageCompare",
+      "name": "Competitor page compare",
+      "category": "SEO APIs",
+      "description": "Competitor page compare",
+      "inputShape": "json",
       "backend": "node"
     },
     {
@@ -4729,6 +4769,81 @@
       "responseHint": "Returns JSON response",
       "validatePaths": [
         "seo-apis/mixed-content-checker"
+      ]
+    },
+    "schemaMarkupValidator": {
+      "operationId": "schemaMarkupValidator",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/schema-markup-validator",
+      "category": "SEO APIs",
+      "name": "Schema markup validator",
+      "description": "Schema markup validator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/schema-markup-validator"
+      ]
+    },
+    "serpSnippetPreview": {
+      "operationId": "serpSnippetPreview",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/serp-snippet-preview",
+      "category": "SEO APIs",
+      "name": "SERP snippet preview",
+      "description": "SERP snippet preview",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/serp-snippet-preview"
+      ]
+    },
+    "headingStructureAnalyzer": {
+      "operationId": "headingStructureAnalyzer",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/heading-structure-analyzer",
+      "category": "SEO APIs",
+      "name": "Heading structure analyzer",
+      "description": "Heading structure analyzer",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/heading-structure-analyzer"
+      ]
+    },
+    "imageAltTextChecker": {
+      "operationId": "imageAltTextChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/image-alt-text-checker",
+      "category": "SEO APIs",
+      "name": "Image alt text checker",
+      "description": "Image alt text checker",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/image-alt-text-checker"
+      ]
+    },
+    "competitorPageCompare": {
+      "operationId": "competitorPageCompare",
+      "method": "POST",
+      "gatewayPath": "/api/v1/seo-apis/competitor-page-compare",
+      "category": "SEO APIs",
+      "name": "Competitor page compare",
+      "description": "Competitor page compare",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/competitor-page-compare"
       ]
     },
     "gst_calculator_post": {
