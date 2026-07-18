@@ -1,0 +1,12 @@
+{
+  "operationId": "aiOverviewReadinessChecker",
+  "gatewayPath": "/api/v1/seo-apis/ai-overview-readiness-checker",
+  "method": "GET",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

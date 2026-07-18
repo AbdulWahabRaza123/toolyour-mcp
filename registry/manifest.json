@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-07-16T18:57:16.035Z",
+  "generatedAt": "2026-07-18T12:44:58.352Z",
   "stats": {
-    "totalOpenApiRoutes": 244,
-    "hasApiIncluded": 244,
+    "totalOpenApiRoutes": 249,
+    "hasApiIncluded": 249,
     "excluded": 0
   },
   "categories": [
@@ -1485,6 +1485,46 @@
       "name": "Competitor page compare",
       "category": "SEO APIs",
       "description": "Competitor page compare",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "hreflangChecker",
+      "name": "Hreflang checker",
+      "category": "SEO APIs",
+      "description": "Hreflang checker",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "llmsTxtBuilder",
+      "name": "llms.txt builder (deterministic stub)",
+      "category": "SEO APIs",
+      "description": "llms.txt builder (deterministic stub)",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "llmsTxtValidator",
+      "name": "llms.txt validator",
+      "category": "SEO APIs",
+      "description": "llms.txt validator",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "aiOverviewReadinessChecker",
+      "name": "AI Overview readiness checker (structural heuristics)",
+      "category": "SEO APIs",
+      "description": "AI Overview readiness checker (structural heuristics)",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "seoChangeDiff",
+      "name": "SEO change diff between two URLs",
+      "category": "SEO APIs",
+      "description": "SEO change diff between two URLs",
       "inputShape": "json",
       "backend": "node"
     },
@@ -4844,6 +4884,81 @@
       "responseHint": "Returns JSON response",
       "validatePaths": [
         "seo-apis/competitor-page-compare"
+      ]
+    },
+    "hreflangChecker": {
+      "operationId": "hreflangChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/hreflang-checker",
+      "category": "SEO APIs",
+      "name": "Hreflang checker",
+      "description": "Hreflang checker",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/hreflang-checker"
+      ]
+    },
+    "llmsTxtBuilder": {
+      "operationId": "llmsTxtBuilder",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/llms-txt-builder",
+      "category": "SEO APIs",
+      "name": "llms.txt builder (deterministic stub)",
+      "description": "llms.txt builder (deterministic stub)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/llms-txt-builder"
+      ]
+    },
+    "llmsTxtValidator": {
+      "operationId": "llmsTxtValidator",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/llms-txt-validator",
+      "category": "SEO APIs",
+      "name": "llms.txt validator",
+      "description": "llms.txt validator",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/llms-txt-validator"
+      ]
+    },
+    "aiOverviewReadinessChecker": {
+      "operationId": "aiOverviewReadinessChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/ai-overview-readiness-checker",
+      "category": "SEO APIs",
+      "name": "AI Overview readiness checker (structural heuristics)",
+      "description": "AI Overview readiness checker (structural heuristics)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/ai-overview-readiness-checker"
+      ]
+    },
+    "seoChangeDiff": {
+      "operationId": "seoChangeDiff",
+      "method": "POST",
+      "gatewayPath": "/api/v1/seo-apis/seo-change-diff",
+      "category": "SEO APIs",
+      "name": "SEO change diff between two URLs",
+      "description": "SEO change diff between two URLs",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/seo-change-diff"
       ]
     },
     "gst_calculator_post": {

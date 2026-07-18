@@ -1,0 +1,76 @@
+{
+  "operationId": "seoChangeDiff",
+  "gatewayPath": "/api/v1/seo-apis/seo-change-diff",
+  "method": "POST",
+  "request": {
+    "oneOf": [
+      {
+        "type": "object",
+        "required": [
+          "urlA",
+          "urlB"
+        ],
+        "properties": {
+          "urlA": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://example.com/page-v1"
+          },
+          "urlB": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://example.com/page-v2"
+          }
+        }
+      },
+      {
+        "type": "object",
+        "required": [
+          "inputs"
+        ],
+        "properties": {
+          "inputs": {
+            "type": "object",
+            "required": [
+              "urlA",
+              "urlB"
+            ],
+            "properties": {
+              "urlA": {
+                "type": "string",
+                "format": "uri",
+                "example": "https://example.com/page-v1"
+              },
+              "urlB": {
+                "type": "string",
+                "format": "uri",
+                "example": "https://example.com/page-v2"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "description": "Send fields at the top level, or nested under `inputs`."
+  },
+  "response": {
+    "type": "object",
+    "required": [
+      "urlA",
+      "urlB"
+    ],
+    "properties": {
+      "urlA": {
+        "type": "string",
+        "format": "uri",
+        "example": "https://example.com/page-v1"
+      },
+      "urlB": {
+        "type": "string",
+        "format": "uri",
+        "example": "https://example.com/page-v2"
+      }
+    }
+  },
+  "responseHint": "Returns JSON response"
+}

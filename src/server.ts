@@ -6,6 +6,7 @@ import { getEnv } from "./config";
 import { createLogger } from "./observability/logger";
 import { RegistryLoader } from "./registry/loader";
 import { registerHealthRoutes } from "./health/routes";
+import { registerDiscoveryRoutes } from "./discovery/routes";
 import { createToolYourMcpServer } from "./tools/mcp-tools";
 
 const env = getEnv();
@@ -22,6 +23,7 @@ app.use((req, res, next) => {
 });
 
 registerHealthRoutes(app, registry);
+registerDiscoveryRoutes(app);
 
 const transports = new Map<string, SSEServerTransport>();
 
