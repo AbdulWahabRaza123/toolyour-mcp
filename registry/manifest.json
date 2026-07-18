@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-07-18T12:44:58.352Z",
+  "generatedAt": "2026-07-18T17:01:42.388Z",
   "stats": {
-    "totalOpenApiRoutes": 249,
-    "hasApiIncluded": 249,
+    "totalOpenApiRoutes": 250,
+    "hasApiIncluded": 250,
     "excluded": 0
   },
   "categories": [
@@ -1525,6 +1525,14 @@
       "name": "SEO change diff between two URLs",
       "category": "SEO APIs",
       "description": "SEO change diff between two URLs",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "duplicateContentChecker",
+      "name": "Duplicate content checker (URLs or texts)",
+      "category": "SEO APIs",
+      "description": "Duplicate content checker (URLs or texts)",
       "inputShape": "json",
       "backend": "node"
     },
@@ -4959,6 +4967,21 @@
       "responseHint": "Returns JSON response",
       "validatePaths": [
         "seo-apis/seo-change-diff"
+      ]
+    },
+    "duplicateContentChecker": {
+      "operationId": "duplicateContentChecker",
+      "method": "POST",
+      "gatewayPath": "/api/v1/seo-apis/duplicate-content-checker",
+      "category": "SEO APIs",
+      "name": "Duplicate content checker (URLs or texts)",
+      "description": "Duplicate content checker (URLs or texts)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/duplicate-content-checker"
       ]
     },
     "gst_calculator_post": {
