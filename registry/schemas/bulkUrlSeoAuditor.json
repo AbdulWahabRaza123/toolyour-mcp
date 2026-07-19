@@ -1,0 +1,91 @@
+{
+  "operationId": "bulkUrlSeoAuditor",
+  "gatewayPath": "/api/v1/seo-apis/bulk-url-seo-auditor",
+  "method": "POST",
+  "request": {
+    "oneOf": [
+      {
+        "type": "object",
+        "description": "Lite per-URL scorecard (status, title, meta, canonical, H1). Free plans cap at 5 URLs; paid at 20. Provide urls[] and/or urlsText.",
+        "properties": {
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            },
+            "maxItems": 20,
+            "example": [
+              "https://example.com/",
+              "https://example.com/about"
+            ]
+          },
+          "urlsText": {
+            "type": "string",
+            "maxLength": 20000,
+            "description": "Newline- or comma-separated absolute http(s) URLs",
+            "example": "https://example.com/\nhttps://example.com/about"
+          }
+        }
+      },
+      {
+        "type": "object",
+        "required": [
+          "inputs"
+        ],
+        "properties": {
+          "inputs": {
+            "type": "object",
+            "description": "Lite per-URL scorecard (status, title, meta, canonical, H1). Free plans cap at 5 URLs; paid at 20. Provide urls[] and/or urlsText.",
+            "properties": {
+              "urls": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "maxItems": 20,
+                "example": [
+                  "https://example.com/",
+                  "https://example.com/about"
+                ]
+              },
+              "urlsText": {
+                "type": "string",
+                "maxLength": 20000,
+                "description": "Newline- or comma-separated absolute http(s) URLs",
+                "example": "https://example.com/\nhttps://example.com/about"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "description": "Send fields at the top level, or nested under `inputs`."
+  },
+  "response": {
+    "type": "object",
+    "description": "Lite per-URL scorecard (status, title, meta, canonical, H1). Free plans cap at 5 URLs; paid at 20. Provide urls[] and/or urlsText.",
+    "properties": {
+      "urls": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uri"
+        },
+        "maxItems": 20,
+        "example": [
+          "https://example.com/",
+          "https://example.com/about"
+        ]
+      },
+      "urlsText": {
+        "type": "string",
+        "maxLength": 20000,
+        "description": "Newline- or comma-separated absolute http(s) URLs",
+        "example": "https://example.com/\nhttps://example.com/about"
+      }
+    }
+  },
+  "responseHint": "Returns JSON response"
+}

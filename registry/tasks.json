@@ -120,6 +120,22 @@
       "requiredInput": ["url"]
     },
     {
+      "id": "bulk-url-seo-audit",
+      "title": "Bulk URL SEO triage",
+      "description": "Lite multi-URL SEO scorecard (status, title, meta, canonical, H1) with plan caps.",
+      "keywords": [
+        "bulk url seo",
+        "batch seo audit",
+        "multi url seo",
+        "audit many urls",
+        "bulk seo checker",
+        "site page scorecard"
+      ],
+      "type": "tool",
+      "target": "bulkUrlSeoAuditor",
+      "requiredInput": ["urls"]
+    },
+    {
       "id": "improve-core-web-vitals",
       "title": "Improve Core Web Vitals",
       "description": "Diagnose LCP, TTFB, INP/TBT, and CLS with prioritized fixes.",

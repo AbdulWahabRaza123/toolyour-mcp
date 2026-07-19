@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-07-18T17:31:32.469Z",
+  "generatedAt": "2026-07-19T15:31:41.755Z",
   "stats": {
-    "totalOpenApiRoutes": 250,
-    "hasApiIncluded": 250,
+    "totalOpenApiRoutes": 251,
+    "hasApiIncluded": 251,
     "excluded": 0
   },
   "categories": [
@@ -1533,6 +1533,14 @@
       "name": "Duplicate content checker (URLs or texts)",
       "category": "SEO APIs",
       "description": "Duplicate content checker (URLs or texts)",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "bulkUrlSeoAuditor",
+      "name": "Bulk URL SEO auditor (lite scorecard, plan-capped)",
+      "category": "SEO APIs",
+      "description": "Bulk URL SEO auditor (lite scorecard, plan-capped)",
       "inputShape": "json",
       "backend": "node"
     },
@@ -4982,6 +4990,21 @@
       "responseHint": "Returns JSON response",
       "validatePaths": [
         "seo-apis/duplicate-content-checker"
+      ]
+    },
+    "bulkUrlSeoAuditor": {
+      "operationId": "bulkUrlSeoAuditor",
+      "method": "POST",
+      "gatewayPath": "/api/v1/seo-apis/bulk-url-seo-auditor",
+      "category": "SEO APIs",
+      "name": "Bulk URL SEO auditor (lite scorecard, plan-capped)",
+      "description": "Bulk URL SEO auditor (lite scorecard, plan-capped)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/bulk-url-seo-auditor"
       ]
     },
     "gst_calculator_post": {
