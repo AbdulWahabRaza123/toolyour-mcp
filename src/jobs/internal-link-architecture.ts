@@ -133,21 +133,48 @@ export function synthesizeInternalLinkArchitecture(params: SynthesizeJobParams):
       value: typeof hubSeoScore === "number" ? hubSeoScore : "—",
       status: scoreFromProxy(hubSeoScore),
     },
+    orphanPages: {
+      label: "Orphan pages in crawl window",
+      value: orphanPages.length,
+      status:
+        orphanPages.length === 0
+          ? "good"
+          : orphanPages.length <= 3
+            ? "needs_improvement"
+            : "poor",
+    },
+    brokenLinks: {
+      label: "Broken internal links",
+      value: brokenLinks.length,
+      status:
+        brokenLinks.length === 0
+          ? "good"
+          : brokenLinks.length <= 2
+            ? "needs_improvement"
+            : "poor",
+    },
+    hubPages: {
+      label: "Hub candidates discovered",
+      value: hubPages.length,
+      status: hubPages.length > 0 ? "good" : "unknown",
+      primaryCause: hubPages[0] ? hubPages[0].url : undefined,
+    },
   };
 
   const summary = [
-    url ? `Internal link architecture review for ${url}.` : "Internal link architecture review complete.",
-    orphanPages.length
-      ? `${orphanPages.length} orphan page(s) detected — top ${Math.min(10, orphanPages.length)} listed in findings.`
-      : "No orphan pages detected in this crawl window.",
+    url
+      ? `Internal link architecture review for ${url}.`
+      : "Internal link architecture review complete.",
+    `${orphanPages.length} orphan page(s); ${brokenLinks.length} broken internal link(s); ${hubPages.length} hub candidate(s).`,
     brokenLinks.length
-      ? `${brokenLinks.length} broken internal link(s) need fixes.`
-      : "No broken internal links detected.",
-    hubPages[0]
-      ? `Strongest hub candidate: ${hubPages[0].url}.`
-      : actions[0]
-        ? `Top action: ${actions[0].action}`
-        : "Review link graph details for next steps.",
+      ? `Fix broken links first (${brokenLinks[0].from} → ${brokenLinks[0].to}).`
+      : orphanPages.length
+        ? `${orphanPages.length} orphan page(s) need inbound links — top listed in findings.`
+        : hubPages[0]
+          ? `Strongest hub candidate: ${hubPages[0].url}.`
+          : actions[0]
+            ? `Top action: ${actions[0].action}`
+            : "Review link graph details for next steps.",
   ];
 
   return {

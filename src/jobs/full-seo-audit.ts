@@ -1,9 +1,12 @@
 import type { JobReport, SynthesizeJobParams } from "./types";
 import {
+  assetActionsFromSpeedReport,
+  extractAssetOptimizer,
   extractReport,
   extractUrl,
   findingsFromReport,
   mergeFindings,
+  mergePrioritizedActions,
   operationIdsFromSteps,
   rankActions,
   scoreFromProxy,
@@ -20,6 +23,7 @@ export function synthesizeFullSeoAudit(params: SynthesizeJobParams): JobReport {
   const speedReport = extractReport(speedShaped);
   const seoPayload = unwrapToolPayload(seoShaped);
   const speedPayload = unwrapToolPayload(speedShaped);
+  const assetOptimizer = extractAssetOptimizer(speedReport);
 
   const seoFindings = findingsFromReport(seoReport, "technicalSeo");
   const speedFindings = findingsFromReport(speedReport, "performance");
@@ -37,6 +41,12 @@ export function synthesizeFullSeoAudit(params: SynthesizeJobParams): JobReport {
     speedReport?.metrics && typeof speedReport.metrics === "object"
       ? ((speedReport.metrics as Record<string, unknown>).proxies as Record<string, unknown>)
       : {};
+
+  const speedWeak =
+    typeof speedScore === "number"
+      ? speedScore < 80
+      : scoreFromProxy(proxies.lcpScore) !== "good" ||
+        scoreFromProxy(proxies.clsScore) !== "good";
 
   const scores: JobReport["scores"] = {
     overall: {
@@ -79,15 +89,27 @@ export function synthesizeFullSeoAudit(params: SynthesizeJobParams): JobReport {
     },
   };
 
-  const prioritizedActions = rankActions(findings);
+  const seoActions = rankActions(seoFindings, 10);
+  const speedFindingActions = rankActions(speedFindings, 6);
+  const assetActions = speedWeak ? assetActionsFromSpeedReport(speedReport, 3) : [];
+  const prioritizedActions = mergePrioritizedActions(
+    seoActions,
+    assetActions,
+    speedFindingActions
+  ).slice(0, 12);
+
   const summary = [
-    url ? `Audited ${url} with on-page SEO and page speed proxies.` : "Completed on-page SEO and page speed audit.",
+    url
+      ? `Audited ${url} with on-page SEO and page speed proxies.`
+      : "Completed on-page SEO and page speed audit.",
     findings.length
       ? `${findings.filter((f) => f.severity === "high").length} high-severity issues need attention first.`
       : "No high-severity issues detected in this pass.",
-    prioritizedActions[0]
-      ? `Top fix: ${prioritizedActions[0].action}`
-      : "Review step details for optimization opportunities.",
+    assetActions[0]
+      ? `Speed asset priority: ${assetActions[0].action}`
+      : prioritizedActions[0]
+        ? `Top fix: ${prioritizedActions[0].action}`
+        : "Review step details for optimization opportunities.",
   ];
 
   return {
@@ -102,12 +124,16 @@ export function synthesizeFullSeoAudit(params: SynthesizeJobParams): JobReport {
     workstreams: {
       technicalSeo: { report: seoReport, data: seoPayload },
       performance: { report: speedReport, data: speedPayload },
+      assets: assetOptimizer
+        ? { assetOptimizer, includedBecauseSpeedWeak: speedWeak }
+        : { assetOptimizer: null },
     },
     toolsUsed: operationIdsFromSteps(steps),
     steps: stepResults,
     limitations: [
       "Speed metrics are HTML-based proxies, not Chrome UX Report field data.",
       "Run improve-core-web-vitals for a deeper CWV-focused diagnosis.",
+      "Asset optimizer hints come from pageSpeedAnalyzer evidence when speed proxies are weak.",
     ],
   };
 }

@@ -26,18 +26,20 @@ This document is the execution plan. Coupling rules: [`docs/PLATFORM-COUPLING.md
 
 ---
 
-## Current baseline (gaps)
+## Current baseline (status)
 
-| Area | Today | Problem |
-|------|-------|---------|
-| Tasks | 9 in `registry/tasks.json` | Most goals → `suggest` |
-| Workflows | 3 in `registry/workflows.json` | Shallow; `content-optimization` = 1 step |
-| Workflow engine | `src/workflow/engine.ts` | **Returns `result: lastOutput` only** — drops earlier steps |
-| Skills | 5 in `skills/` | `page-performance.md` references non-existent workflow `page-performance-audit` |
-| `pageSpeedAnalyzer` | Proxy LCP/TBT/FCP/CLS + findings | No real TTFB; INP is TBT proxy; not labeled as field CWV |
-| `contentOptimization` | Word count, title/meta length, density | Not “advanced content score” with intent/structure |
-| `internalLinking` | Graph + `suggestedLinks` | Needs stronger prioritization for agents |
-| Summarize | 8KB threshold in `summarize/registry.ts` | Large SEO payloads truncate before synthesis |
+| Area | Today | Notes |
+|------|-------|-------|
+| Tasks | Expanded in `registry/tasks.json` | Keyword match → workflow / tool / local |
+| Workflows | Flagship jobs in `registry/workflows.json` | Most multi-step jobs have synthesizers |
+| Workflow engine | `src/workflow/engine.ts` | Returns `stepResults` + optional `jobReport` via synthesizer |
+| Skills | Playbooks in `skills/` | `page-performance` → `core-web-vitals-job` |
+| `pageSpeedAnalyzer` | Proxy LCP/TBT/FCP/CLS + **`evidence.assetOptimizer`** | Compress/defer/dimension/preload URL lists for agents; still not CrUX field CWV |
+| Synthesizers | Phase 0 shipped (`src/jobs/*`) | CWV / full SEO / internal-link consume asset + link priorities |
+| `contentOptimization` | Word count, title/meta, readability | Further intent/structure depth still open |
+| Summarize | 8KB threshold in `summarize/registry.ts` | Large SEO payloads may truncate before synthesis |
+
+**Phase 0 (workflow + synthesizer infrastructure): shipped.** Asset optimizer hints live **inside** `pageSpeedAnalyzer` — no separate `pageAssetOptimizer` operationId.
 
 ---
 
@@ -423,7 +425,7 @@ Minimum 40 goals before Phase 2 ships:
 | Content intent audit | `contentIntentAudit` | SEO, content jobs | Content v2 still too shallow |
 | Schema markup checker | `schemaMarkupChecker` | Technical SEO | Repeated seoAnalyze gap |
 | Heading/accessibility audit | `headingStructureAudit` | Content job | If not merged into content v2 |
-| Page asset optimizer hints | `pageAssetOptimizer` | CWV job | Actionable compress URLs list |
+| Page asset optimizer hints | ~~`pageAssetOptimizer`~~ | CWV / full SEO jobs | **Done inside `pageSpeedAnalyzer.evidence.assetOptimizer`** (no separate tool) |
 
 ---
 
@@ -438,6 +440,6 @@ Minimum 40 goals before Phase 2 ships:
 
 ## Next action (implementation)
 
-Start **Phase 0.1**: patch `src/workflow/engine.ts` to return `stepResults` + optional synthesizer hook; add unit test; upgrade `full-seo-audit` workflow with `"synthesizer": "full-seo-optimization-lite"` as first merger proof.
+Phase 0 synthesizers are live. Prefer deepening existing jobs (asset lists, link prioritization, eval harness) over new catalog tools. Field CrUX remains blocked on a paid/vendor decision.
 
 See also: [`../ARCHITECTURE.md`](../ARCHITECTURE.md), [`../../docs/PLATFORM-COUPLING.md`](../../docs/PLATFORM-COUPLING.md).

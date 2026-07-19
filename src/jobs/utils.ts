@@ -127,6 +127,112 @@ export function operationIdsFromSteps(steps: { operationId: string }[]): string[
   return [...new Set(steps.map((s) => s.operationId))];
 }
 
+/** Pull page-speed evidence.assetOptimizer for agents / jobReports. */
+export function extractAssetOptimizer(
+  speedReport: Record<string, unknown> | null
+): Record<string, unknown> | null {
+  if (!speedReport?.evidence || typeof speedReport.evidence !== "object") return null;
+  const evidence = speedReport.evidence as Record<string, unknown>;
+  const ao = evidence.assetOptimizer;
+  if (!ao || typeof ao !== "object") return null;
+  return ao as Record<string, unknown>;
+}
+
+/**
+ * Prioritized actions from pageSpeedAnalyzer evidence.assetOptimizer.
+ * High impact for LCP compress + render-blocking defer.
+ */
+export function assetActionsFromSpeedReport(
+  speedReport: Record<string, unknown> | null,
+  limit = 8
+): PrioritizedAction[] {
+  const ao = extractAssetOptimizer(speedReport);
+  if (!ao) return [];
+  const actions: PrioritizedAction[] = [];
+
+  const compress = Array.isArray(ao.compressImages) ? ao.compressImages : [];
+  for (const item of compress) {
+    if (actions.length >= limit) break;
+    if (!item || typeof item !== "object") continue;
+    const row = item as Record<string, unknown>;
+    const src = String(row.src || "").trim();
+    if (!src) continue;
+    const reason = String(row.reason || "Compress / resize image");
+    actions.push({
+      rank: actions.length + 1,
+      workstream: "assets",
+      action: `Compress or resize image: ${src} (${reason})`,
+      expectedImpact: /lcp/i.test(reason) ? "high" : "medium",
+      effort: "medium",
+    });
+  }
+
+  const defer = Array.isArray(ao.deferScripts) ? ao.deferScripts : [];
+  for (const item of defer) {
+    if (actions.length >= limit) break;
+    if (!item || typeof item !== "object") continue;
+    const row = item as Record<string, unknown>;
+    const src = String(row.src || "").trim();
+    if (!src) continue;
+    actions.push({
+      rank: actions.length + 1,
+      workstream: "assets",
+      action: `Defer or async script: ${src}`,
+      expectedImpact: "high",
+      effort: "low",
+    });
+  }
+
+  const dims = Array.isArray(ao.fixDimensions) ? ao.fixDimensions : [];
+  for (const srcRaw of dims) {
+    if (actions.length >= limit) break;
+    const src = String(srcRaw || "").trim();
+    if (!src) continue;
+    actions.push({
+      rank: actions.length + 1,
+      workstream: "assets",
+      action: `Add width/height attributes for CLS: ${src}`,
+      expectedImpact: "medium",
+      effort: "low",
+    });
+  }
+
+  const preloads = Array.isArray(ao.preloadHints) ? ao.preloadHints : [];
+  for (const item of preloads) {
+    if (actions.length >= limit) break;
+    if (!item || typeof item !== "object") continue;
+    const row = item as Record<string, unknown>;
+    const href = String(row.href || "").trim();
+    if (!href) continue;
+    const as = String(row.as || "image");
+    actions.push({
+      rank: actions.length + 1,
+      workstream: "assets",
+      action: `Consider preload as=${as}: ${href}`,
+      expectedImpact: as === "image" ? "high" : "medium",
+      effort: "low",
+    });
+  }
+
+  return actions.map((a, i) => ({ ...a, rank: i + 1 }));
+}
+
+export function mergePrioritizedActions(
+  ...groups: PrioritizedAction[][]
+): PrioritizedAction[] {
+  const seen = new Set<string>();
+  const out: PrioritizedAction[] = [];
+  for (const group of groups) {
+    for (const a of group) {
+      const key = a.action.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(a);
+    }
+  }
+  return out.map((a, i) => ({ ...a, rank: i + 1 }));
+}
+
 export function prioritizedLinkSuggestionsFromShaped(
   shaped: unknown,
   cap = 15

@@ -40,6 +40,36 @@ const speedShaped = {
         proxies: { lcpScore: 45, tbtScore: 60, fcpScore: 55, clsScore: 70 },
         ttfbMs: 840,
       },
+      evidence: {
+        lcpCandidate: { src: "https://example.com/hero.jpg", bytes: 450000 },
+        renderBlockingScripts: [
+          { src: "https://example.com/app.js", defer: false, async: false },
+        ],
+        imagesMissingDimensions: ["https://example.com/card.png"],
+        assetOptimizer: {
+          compressImages: [
+            {
+              src: "https://example.com/hero.jpg",
+              bytes: 450000,
+              reason: "Likely LCP candidate — compress and resize hero",
+            },
+          ],
+          deferScripts: [
+            {
+              src: "https://example.com/app.js",
+              reason: "Render-blocking script without async/defer",
+            },
+          ],
+          fixDimensions: ["https://example.com/card.png"],
+          preloadHints: [
+            {
+              href: "https://example.com/hero.jpg",
+              as: "image",
+              reason: "Preload likely LCP image candidate",
+            },
+          ],
+        },
+      },
       findings: [
         {
           title: "Likely LCP contributor: large image asset",
@@ -74,6 +104,11 @@ describe("job synthesizers", () => {
     assert.ok(report.steps.seo);
     assert.ok(report.steps.speed);
     assert.ok(report.scores.LCP);
+    assert.ok(
+      report.prioritizedActions.some((a) => /hero\.jpg|app\.js/i.test(a.action)),
+      "full-seo-audit should include asset optimizer actions when speed is weak"
+    );
+    assert.ok(report.workstreams.assets?.assetOptimizer);
   });
 
   it("builds core-web-vitals scores by metric", () => {
@@ -91,7 +126,16 @@ describe("job synthesizers", () => {
     assert.equal(report.scores.LCP.status, "poor");
     assert.equal(report.scores.TTFB.value, "840ms");
     assert.ok(report.limitations?.some((l) => /proxy/i.test(l)));
-    assert.ok(report.prioritizedActions[0].action.includes("WebP") || report.prioritizedActions.length > 0);
+    assert.ok(report.prioritizedActions[0].action.includes("hero.jpg") || report.prioritizedActions.length > 0);
+    assert.ok(
+      report.prioritizedActions.some((a) => a.workstream === "assets"),
+      "CWV should prioritize assetOptimizer-derived actions"
+    );
+    assert.equal(
+      report.workstreams.assets?.assetOptimizer?.compressImages?.[0]?.src,
+      "https://example.com/hero.jpg"
+    );
+    assert.ok(report.summary.some((s) => /asset|hero|Compress/i.test(s)));
   });
 
   it("merges full-seo-optimization workstreams", async () => {

@@ -1,9 +1,12 @@
 import type { JobReport, SynthesizeJobParams } from "./types";
 import {
+  assetActionsFromSpeedReport,
+  extractAssetOptimizer,
   extractReport,
   extractUrl,
   findingsFromReport,
   mergeFindings,
+  mergePrioritizedActions,
   operationIdsFromSteps,
   rankActions,
   scoreFromProxy,
@@ -30,6 +33,7 @@ export function synthesizeCoreWebVitals(params: SynthesizeJobParams): JobReport 
   const seoReport = extractReport(seoShaped);
   const socialReport = extractReport(socialShaped);
   const speedPayload = unwrapToolPayload(speedShaped);
+  const assetOptimizer = extractAssetOptimizer(speedReport);
 
   const speedFindings = findingsFromReport(speedReport, "performance").map((f) => ({
     ...f,
@@ -100,20 +104,27 @@ export function synthesizeCoreWebVitals(params: SynthesizeJobParams): JobReport 
     },
   };
 
-  const prioritizedActions = rankActions(
+  const findingActions = rankActions(
     findings.filter((f) => f.workstream === "performance" || f.metric),
     12
   );
+  const assetActions = assetActionsFromSpeedReport(speedReport, 8);
+  const prioritizedActions = mergePrioritizedActions(assetActions, findingActions).slice(0, 12);
 
-  const worst = (["LCP", "TTFB", "INP", "CLS"] as const).find((m) => scores[m]?.status === "poor")
-    || (["LCP", "TTFB", "INP", "CLS"] as const).find((m) => scores[m]?.status === "needs_improvement");
+  const worst =
+    (["LCP", "TTFB", "INP", "CLS"] as const).find((m) => scores[m]?.status === "poor") ||
+    (["LCP", "TTFB", "INP", "CLS"] as const).find(
+      (m) => scores[m]?.status === "needs_improvement"
+    );
 
   const summary = [
     url ? `Core Web Vitals diagnosis for ${url}.` : "Core Web Vitals diagnosis complete.",
     worst ? `Weakest metric area: ${worst}.` : "All proxy metrics look acceptable in this pass.",
-    prioritizedActions[0]
-      ? `Highest-impact fix: ${prioritizedActions[0].action}`
-      : "Review findings for render and asset optimizations.",
+    assetActions[0]
+      ? `Top asset fix: ${assetActions[0].action}`
+      : prioritizedActions[0]
+        ? `Highest-impact fix: ${prioritizedActions[0].action}`
+        : "Review findings for render and asset optimizations.",
   ];
 
   return {
@@ -129,6 +140,9 @@ export function synthesizeCoreWebVitals(params: SynthesizeJobParams): JobReport 
       performance: { report: speedReport },
       technicalSeo: { report: seoReport },
       socialPreview: { report: socialReport },
+      assets: assetOptimizer
+        ? { assetOptimizer, actionCount: assetActions.length }
+        : { assetOptimizer: null },
     },
     toolsUsed: operationIdsFromSteps(steps),
     steps: stepResults,
@@ -136,6 +150,7 @@ export function synthesizeCoreWebVitals(params: SynthesizeJobParams): JobReport 
       "LCP/CLS/INP scores are HTML-based proxies unless field CrUX data is integrated.",
       "INP is approximated via Total Blocking Time (TBT) proxy.",
       "TTFB uses fetch timing to first HTML response, not Chrome trace data.",
+      "assetOptimizer lists are heuristic (image HEAD sizes + HTML attributes), not Lighthouse audits.",
     ],
   };
 }
