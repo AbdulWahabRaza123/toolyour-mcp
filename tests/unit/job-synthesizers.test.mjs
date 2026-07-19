@@ -438,4 +438,120 @@ describe("job synthesizers", () => {
     assert.ok(report.prioritizedActions.length >= 2);
     assert.equal(report.scores.topicSignals.status, "poor");
   });
+
+  it("builds seo-deploy-regression from bulk step", async () => {
+    const { synthesizeSeoDeployRegression } = await import(
+      "../../dist/jobs/seo-deploy-regression.js"
+    );
+    const bulkShaped = {
+      status: 200,
+      operationId: "bulkUrlSeoAuditor",
+      data: {
+        schemaVersion: "toolyour.toolResult@1",
+        toolId: "bulk-url-seo-auditor",
+        url: "https://example.com/",
+        data: {
+          url: "https://example.com/",
+          results: [
+            { url: "https://example.com/about", score: 42, grade: "F", status: 200, issues: ["Missing title"] },
+            { url: "https://example.com/", score: 88, grade: "B", status: 200, issues: [] },
+          ],
+          worstUrls: [
+            { url: "https://example.com/about", score: 42, grade: "F", status: 200, issues: ["Missing title"] },
+          ],
+        },
+        report: {
+          summary: { totalScore: 65, grade: "D", topPriorities: ["Missing titles"] },
+          metrics: { avgScore: 65, minScore: 42, urlCount: 2 },
+          findings: [
+            {
+              title: "1 page(s) missing a title tag",
+              severity: "high",
+              whyItMatters: "Titles matter",
+              howToFix: ["Add a title"],
+            },
+          ],
+        },
+      },
+    };
+    const report = synthesizeSeoDeployRegression({
+      synthesizerId: "seo-deploy-regression",
+      workflowId: "seo-deploy-regression-job",
+      input: { urls: ["https://example.com/", "https://example.com/about"] },
+      steps: [{ id: "bulk", operationId: "bulkUrlSeoAuditor" }],
+      stepResults: { bulk: bulkShaped },
+    });
+    assert.equal(report.schemaVersion, "toolyour.jobReport@1");
+    assert.equal(report.scores.minScore.value, 42);
+    assert.ok(report.workstreams?.bulk?.worstUrls?.length >= 1);
+    assert.ok(
+      report.prioritizedActions.some((a) => /about|Diff|Re-run bulk/i.test(a.action))
+    );
+    assert.ok(report.workstreams?.seoDiff?.skipped);
+  });
+
+  it("merges seo-deploy-regression bulk + diff steps", async () => {
+    const { synthesizeSeoDeployRegression } = await import(
+      "../../dist/jobs/seo-deploy-regression.js"
+    );
+    const report = synthesizeSeoDeployRegression({
+      synthesizerId: "seo-deploy-regression",
+      workflowId: "seo-deploy-regression-diff-job",
+      input: {
+        urls: ["https://example.com/"],
+        urlA: "https://staging.example.com/",
+        urlB: "https://example.com/",
+      },
+      steps: [
+        { id: "bulk", operationId: "bulkUrlSeoAuditor" },
+        { id: "diff", operationId: "seoChangeDiff" },
+      ],
+      stepResults: {
+        bulk: {
+          status: 200,
+          operationId: "bulkUrlSeoAuditor",
+          data: {
+            schemaVersion: "toolyour.toolResult@1",
+            toolId: "bulk-url-seo-auditor",
+            url: "https://example.com/",
+            data: {
+              url: "https://example.com/",
+              worstUrls: [
+                { url: "https://example.com/", score: 70, grade: "C", issues: ["Missing canonical"] },
+              ],
+            },
+            report: {
+              summary: { totalScore: 70, grade: "C", topPriorities: [] },
+              metrics: { avgScore: 70, minScore: 70, urlCount: 1 },
+              findings: [],
+            },
+          },
+        },
+        diff: {
+          status: 200,
+          operationId: "seoChangeDiff",
+          data: {
+            schemaVersion: "toolyour.toolResult@1",
+            toolId: "seo-change-diff",
+            url: "https://staging.example.com/",
+            data: { changes: [{ field: "title", before: "A", after: "B" }] },
+            report: {
+              summary: { totalScore: 55, grade: "F", topPriorities: ["Title changed"] },
+              findings: [
+                {
+                  title: "Title tag changed",
+                  severity: "high",
+                  whyItMatters: "SERP CTR may shift",
+                  howToFix: ["Confirm intentional title change"],
+                },
+              ],
+            },
+          },
+        },
+      },
+    });
+    assert.ok(report.findings.some((f) => /Title tag changed/i.test(f.title)));
+    assert.ok(report.scores.templateDiff);
+    assert.equal(report.workstreams?.seoDiff?.skipped, undefined);
+  });
 });

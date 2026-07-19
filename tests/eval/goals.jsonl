@@ -13,4 +13,6 @@
 {"goal":"local page seo for my html","expectedJobId":"local-page-seo","requiredInput":{"html":"<html></html>"},"category":"local"}
 {"goal":"audit this html before deploy","expectedJobId":"seo-audit-local","requiredInput":{"html":"<html></html>"},"category":"local"}
 {"goal":"convert docx to pdf","expectedJobId":"docx-to-pdf","category":"document"}
+{"goal":"seo regression after deploy","expectedJobId":"seo-deploy-regression","requiredInput":{"urls":["https://example.com/"]},"category":"seo"}
+{"goal":"staging vs production seo check","expectedJobId":"seo-deploy-regression-diff","requiredInput":{"urls":["https://example.com/"],"urlA":"https://staging.example.com/","urlB":"https://example.com/"},"category":"seo"}
 {"goal":"write me a poem about cats","expectedStatus":"suggest","category":"negative"}

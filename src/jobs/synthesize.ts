@@ -7,6 +7,7 @@ import { synthesizeKeywordOpportunityReview } from "./keyword-opportunity-review
 import { synthesizeInternalLinkArchitecture } from "./internal-link-architecture";
 import { synthesizeSocialPreviewAudit } from "./social-preview-audit";
 import { synthesizeTechnicalSeoAudit } from "./technical-seo-audit";
+import { synthesizeSeoDeployRegression } from "./seo-deploy-regression";
 
 const SYNTHESIZERS: Record<string, (params: SynthesizeJobParams) => JobReport> = {
   "full-seo-audit": synthesizeFullSeoAudit,
@@ -17,6 +18,7 @@ const SYNTHESIZERS: Record<string, (params: SynthesizeJobParams) => JobReport> =
   "social-preview-audit": synthesizeSocialPreviewAudit,
   "content-quality-audit": synthesizeContentQualityAudit,
   "keyword-opportunity-review": synthesizeKeywordOpportunityReview,
+  "seo-deploy-regression": synthesizeSeoDeployRegression,
 };
 
 export function synthesizeJobReport(params: SynthesizeJobParams): JobReport | null {

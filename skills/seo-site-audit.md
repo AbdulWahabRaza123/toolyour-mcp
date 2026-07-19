@@ -24,6 +24,8 @@ Use this playbook when the user wants a **site or page SEO audit**.
    - *"optimize this page for SEO {url}"* → `full-seo-optimization-job` (6-step `jobReport`)
    - *"technical seo audit {url}"* → `technical-seo-audit-job` (lite: SEO + links + speed)
    - *"bulk seo audit"* / many URLs → `bulk-url-seo-audit` task → `bulkUrlSeoAuditor` with `input.urls` (array; free ≤5, paid ≤20)
+   - *"seo regression after deploy"* / post-deploy URL list → `seo-deploy-regression` → `seo-deploy-regression-job` (load skill `seo-deploy-regression`)
+   - *"staging vs production"* template check → `seo-deploy-regression-diff` with `urls` + `urlA` + `urlB`
 5. Summarize **top issues**, **metrics**, and **fix priorities** for the user from `jobReport` when present (workflow jobs), else from step outputs.
    - For `full-seo-audit`, when speed proxies are weak, `prioritizedActions` / `workstreams.assets` may include page-speed **assetOptimizer** compress/defer URLs — include those in the fix list.
 6. Do not paste raw HTML — use summarized MCP responses only.

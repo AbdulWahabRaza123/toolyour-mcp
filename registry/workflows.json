@@ -95,6 +95,23 @@
         { "id": "keywords", "operationId": "rankCheckerKeywords" },
         { "id": "content", "operationId": "contentOptimization" }
       ]
+    },
+    {
+      "id": "seo-deploy-regression-job",
+      "title": "SEO Deploy Regression",
+      "description": "Post-deploy bulk URL lite scorecard; returns worst URLs and fix priorities.",
+      "synthesizer": "seo-deploy-regression",
+      "steps": [{ "id": "bulk", "operationId": "bulkUrlSeoAuditor" }]
+    },
+    {
+      "id": "seo-deploy-regression-diff-job",
+      "title": "SEO Deploy Regression + Template Diff",
+      "description": "Bulk URL lite scorecard plus one SEO Change Diff (urlA vs urlB).",
+      "synthesizer": "seo-deploy-regression",
+      "steps": [
+        { "id": "bulk", "operationId": "bulkUrlSeoAuditor" },
+        { "id": "diff", "operationId": "seoChangeDiff" }
+      ]
     }
   ]
 }

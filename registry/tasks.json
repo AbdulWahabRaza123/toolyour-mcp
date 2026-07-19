@@ -136,6 +136,38 @@
       "requiredInput": ["urls"]
     },
     {
+      "id": "seo-deploy-regression",
+      "title": "SEO deploy regression",
+      "description": "After deploy: bulk lite scorecard across key URLs with worst-page priorities.",
+      "keywords": [
+        "after deploy",
+        "seo regression",
+        "deploy regression",
+        "post deploy seo",
+        "post-deploy seo",
+        "seo after deploy",
+        "regression check seo"
+      ],
+      "type": "workflow",
+      "target": "seo-deploy-regression-job",
+      "requiredInput": ["urls"]
+    },
+    {
+      "id": "seo-deploy-regression-diff",
+      "title": "SEO deploy regression with template diff",
+      "description": "Bulk URL scorecard plus one staging-vs-production SEO Change Diff.",
+      "keywords": [
+        "staging vs production",
+        "staging versus production",
+        "seo change after deploy",
+        "template seo diff deploy",
+        "prod vs staging seo"
+      ],
+      "type": "workflow",
+      "target": "seo-deploy-regression-diff-job",
+      "requiredInput": ["urls", "urlA", "urlB"]
+    },
+    {
       "id": "improve-core-web-vitals",
       "title": "Improve Core Web Vitals",
       "description": "Diagnose LCP, TTFB, INP/TBT, and CLS with prioritized fixes.",
