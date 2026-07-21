@@ -89,15 +89,23 @@ export function synthesizeInternalLinkArchitecture(params: SynthesizeJobParams):
 
   const hubPages = hubPagesFromShaped(graphShaped);
   const linkActions = prioritizedLinkSuggestionsFromShaped(graphShaped, 15);
-  const brokenActions = brokenLinks.slice(0, 10).map((link, i) => ({
-    rank: i + 1,
+  const brokenActions = brokenLinks.slice(0, 10).map((link) => ({
+    rank: 0,
     workstream: "linkGraph",
     action: `Fix broken link on ${link.from} pointing to ${link.to}`,
     expectedImpact: "high" as const,
     effort: "low" as const,
   }));
+  const orphanActions = orphanPages.slice(0, 5).map((page) => ({
+    rank: 0,
+    workstream: "linkGraph",
+    action: `Add inbound internal links to orphan page ${page}`,
+    expectedImpact: "medium" as const,
+    effort: "medium" as const,
+  }));
 
-  const prioritizedActions = [...brokenActions, ...linkActions]
+  // Broken links always rank first; then orphans; then suggested links.
+  const prioritizedActions = [...brokenActions, ...orphanActions, ...linkActions]
     .slice(0, 15)
     .map((a, i) => ({ ...a, rank: i + 1 }));
 

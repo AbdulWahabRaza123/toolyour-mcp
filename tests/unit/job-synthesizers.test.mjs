@@ -284,6 +284,16 @@ describe("job synthesizers", () => {
     assert.ok(report.prioritizedActions.length >= 1);
     assert.ok(report.findings.some((f) => /orphan/i.test(f.title)));
     assert.ok(report.findings.some((f) => /broken/i.test(f.title)));
+    assert.equal(report.scores.orphanPages?.value, 1);
+    assert.equal(report.scores.brokenLinks?.value, 1);
+    assert.ok(report.scores.hubPages?.value >= 1);
+    assert.match(report.prioritizedActions[0].action, /broken link/i);
+    assert.ok(
+      report.prioritizedActions.some((a) => /orphan/i.test(a.action)),
+      "orphan pages should appear in prioritizedActions after broken links"
+    );
+    assert.match(report.summary.join(" "), /orphan/i);
+    assert.match(report.summary.join(" "), /broken/i);
   });
 
   it("merges technical-seo-audit workstreams", async () => {

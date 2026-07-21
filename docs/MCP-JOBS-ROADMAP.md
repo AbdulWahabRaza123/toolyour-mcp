@@ -440,6 +440,6 @@ Minimum 40 goals before Phase 2 ships:
 
 ## Next action (implementation)
 
-Phase 0 synthesizers are live. Prefer deepening existing jobs (asset lists, link prioritization, eval harness) over new catalog tools. Field CrUX remains blocked on a paid/vendor decision.
+Phase 0 synthesizers are live with `pageSpeedAnalyzer.evidence.assetOptimizer` feeding CWV / full-SEO `workstreams.assets` and prioritized asset actions. Internal-link jobs rank broken → orphan → suggested links and expose `scores.orphanPages` / `brokenLinks` / `hubPages`. Prefer GSC/ops and eval harness over new catalog tools. Field CrUX remains blocked on a paid/vendor decision.
 
 See also: [`../ARCHITECTURE.md`](../ARCHITECTURE.md), [`../../docs/PLATFORM-COUPLING.md`](../../docs/PLATFORM-COUPLING.md).
