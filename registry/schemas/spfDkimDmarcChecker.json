@@ -1,0 +1,12 @@
+{
+  "operationId": "spfDkimDmarcChecker",
+  "gatewayPath": "/api/v1/security-apis/spf-dkim-dmarc-checker",
+  "method": "GET",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

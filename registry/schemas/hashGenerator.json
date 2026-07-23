@@ -1,0 +1,109 @@
+{
+  "operationId": "hashGenerator",
+  "gatewayPath": "/api/v1/security-apis/hash-generator",
+  "method": "POST",
+  "request": {
+    "oneOf": [
+      {
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "example": "hello"
+          },
+          "input": {
+            "type": "string",
+            "description": "Alias for text"
+          },
+          "algorithm": {
+            "type": "string",
+            "enum": [
+              "md5",
+              "sha1",
+              "sha256",
+              "sha384",
+              "sha512",
+              "sha3-256",
+              "sha3-512"
+            ],
+            "default": "sha256",
+            "example": "sha256"
+          }
+        }
+      },
+      {
+        "type": "object",
+        "required": [
+          "inputs"
+        ],
+        "properties": {
+          "inputs": {
+            "type": "object",
+            "required": [
+              "text"
+            ],
+            "properties": {
+              "text": {
+                "type": "string",
+                "example": "hello"
+              },
+              "input": {
+                "type": "string",
+                "description": "Alias for text"
+              },
+              "algorithm": {
+                "type": "string",
+                "enum": [
+                  "md5",
+                  "sha1",
+                  "sha256",
+                  "sha384",
+                  "sha512",
+                  "sha3-256",
+                  "sha3-512"
+                ],
+                "default": "sha256",
+                "example": "sha256"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "description": "Send fields at the top level, or nested under `inputs`."
+  },
+  "response": {
+    "type": "object",
+    "required": [
+      "text"
+    ],
+    "properties": {
+      "text": {
+        "type": "string",
+        "example": "hello"
+      },
+      "input": {
+        "type": "string",
+        "description": "Alias for text"
+      },
+      "algorithm": {
+        "type": "string",
+        "enum": [
+          "md5",
+          "sha1",
+          "sha256",
+          "sha384",
+          "sha512",
+          "sha3-256",
+          "sha3-512"
+        ],
+        "default": "sha256",
+        "example": "sha256"
+      }
+    }
+  },
+  "responseHint": "Returns JSON response"
+}

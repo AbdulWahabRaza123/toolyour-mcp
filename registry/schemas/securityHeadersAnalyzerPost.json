@@ -1,0 +1,58 @@
+{
+  "operationId": "securityHeadersAnalyzerPost",
+  "gatewayPath": "/api/v1/security-apis/security-headers-analyzer",
+  "method": "POST",
+  "request": {
+    "oneOf": [
+      {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://example.com"
+          }
+        }
+      },
+      {
+        "type": "object",
+        "required": [
+          "inputs"
+        ],
+        "properties": {
+          "inputs": {
+            "type": "object",
+            "required": [
+              "url"
+            ],
+            "properties": {
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "example": "https://example.com"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "description": "Send fields at the top level, or nested under `inputs`."
+  },
+  "response": {
+    "type": "object",
+    "required": [
+      "url"
+    ],
+    "properties": {
+      "url": {
+        "type": "string",
+        "format": "uri",
+        "example": "https://example.com"
+      }
+    }
+  },
+  "responseHint": "Returns JSON response"
+}

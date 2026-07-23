@@ -1,10 +1,10 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-07-19T15:31:41.755Z",
+  "generatedAt": "2026-07-23T13:50:20.292Z",
   "stats": {
-    "totalOpenApiRoutes": 251,
-    "hasApiIncluded": 251,
-    "excluded": 0
+    "totalOpenApiRoutes": 264,
+    "hasApiIncluded": 263,
+    "excluded": 1
   },
   "categories": [
     "AI Models",
@@ -16,6 +16,7 @@
     "Office",
     "SEO APIs",
     "SEO Tools",
+    "Security APIs",
     "Text Intelligence",
     "Text Utilities",
     "Unit Conversions",
@@ -1541,6 +1542,102 @@
       "name": "Bulk URL SEO auditor (lite scorecard, plan-capped)",
       "category": "SEO APIs",
       "description": "Bulk URL SEO auditor (lite scorecard, plan-capped)",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "securityHeadersAnalyzer",
+      "name": "Analyze HTTP security headers",
+      "category": "Security APIs",
+      "description": "Analyze HTTP security headers",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "sslTlsCertificateChecker",
+      "name": "Inspect TLS certificate",
+      "category": "Security APIs",
+      "description": "Inspect TLS certificate",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "cookieSecurityAnalyzer",
+      "name": "Analyze Set-Cookie flags",
+      "category": "Security APIs",
+      "description": "Analyze Set-Cookie flags",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "spfDkimDmarcChecker",
+      "name": "Check SPF, DKIM, DMARC DNS",
+      "category": "Security APIs",
+      "description": "Check SPF, DKIM, DMARC DNS",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "jwtDecoder",
+      "name": "Decode JWT (no signature verify)",
+      "category": "Security APIs",
+      "description": "Decode JWT (no signature verify)",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "passwordStrengthChecker",
+      "name": "Estimate password strength",
+      "category": "Security APIs",
+      "description": "Estimate password strength",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "securePasswordGenerator",
+      "name": "Generate a random password",
+      "category": "Security APIs",
+      "description": "Generate a random password",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "hashGenerator",
+      "name": "Hash text with common digests",
+      "category": "Security APIs",
+      "description": "Hash text with common digests",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "securityHeadersAnalyzerPost",
+      "name": "Analyze HTTP security headers (POST body.url)",
+      "category": "Security APIs",
+      "description": "Analyze HTTP security headers (POST body.url)",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "sslTlsCertificateCheckerPost",
+      "name": "Inspect TLS certificate (POST body.url)",
+      "category": "Security APIs",
+      "description": "Inspect TLS certificate (POST body.url)",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "cookieSecurityAnalyzerPost",
+      "name": "Analyze cookies (POST body.url)",
+      "category": "Security APIs",
+      "description": "Analyze cookies (POST body.url)",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "spfDkimDmarcCheckerPost",
+      "name": "Email auth DNS (POST body.url)",
+      "category": "Security APIs",
+      "description": "Email auth DNS (POST body.url)",
       "inputShape": "json",
       "backend": "node"
     },
@@ -5005,6 +5102,186 @@
       "responseHint": "Returns JSON response",
       "validatePaths": [
         "seo-apis/bulk-url-seo-auditor"
+      ]
+    },
+    "securityHeadersAnalyzer": {
+      "operationId": "securityHeadersAnalyzer",
+      "method": "GET",
+      "gatewayPath": "/api/v1/security-apis/security-headers-analyzer",
+      "category": "Security APIs",
+      "name": "Analyze HTTP security headers",
+      "description": "Analyze HTTP security headers",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/security-headers-analyzer"
+      ]
+    },
+    "sslTlsCertificateChecker": {
+      "operationId": "sslTlsCertificateChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/security-apis/ssl-tls-certificate-checker",
+      "category": "Security APIs",
+      "name": "Inspect TLS certificate",
+      "description": "Inspect TLS certificate",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/ssl-tls-certificate-checker"
+      ]
+    },
+    "cookieSecurityAnalyzer": {
+      "operationId": "cookieSecurityAnalyzer",
+      "method": "GET",
+      "gatewayPath": "/api/v1/security-apis/cookie-security-analyzer",
+      "category": "Security APIs",
+      "name": "Analyze Set-Cookie flags",
+      "description": "Analyze Set-Cookie flags",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/cookie-security-analyzer"
+      ]
+    },
+    "spfDkimDmarcChecker": {
+      "operationId": "spfDkimDmarcChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/security-apis/spf-dkim-dmarc-checker",
+      "category": "Security APIs",
+      "name": "Check SPF, DKIM, DMARC DNS",
+      "description": "Check SPF, DKIM, DMARC DNS",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/spf-dkim-dmarc-checker"
+      ]
+    },
+    "jwtDecoder": {
+      "operationId": "jwtDecoder",
+      "method": "POST",
+      "gatewayPath": "/api/v1/security-apis/jwt-decoder",
+      "category": "Security APIs",
+      "name": "Decode JWT (no signature verify)",
+      "description": "Decode JWT (no signature verify)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/jwt-decoder"
+      ]
+    },
+    "passwordStrengthChecker": {
+      "operationId": "passwordStrengthChecker",
+      "method": "POST",
+      "gatewayPath": "/api/v1/security-apis/password-strength-checker",
+      "category": "Security APIs",
+      "name": "Estimate password strength",
+      "description": "Estimate password strength",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/password-strength-checker"
+      ]
+    },
+    "securePasswordGenerator": {
+      "operationId": "securePasswordGenerator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/security-apis/secure-password-generator",
+      "category": "Security APIs",
+      "name": "Generate a random password",
+      "description": "Generate a random password",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/secure-password-generator"
+      ]
+    },
+    "hashGenerator": {
+      "operationId": "hashGenerator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/security-apis/hash-generator",
+      "category": "Security APIs",
+      "name": "Hash text with common digests",
+      "description": "Hash text with common digests",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/hash-generator"
+      ]
+    },
+    "securityHeadersAnalyzerPost": {
+      "operationId": "securityHeadersAnalyzerPost",
+      "method": "POST",
+      "gatewayPath": "/api/v1/security-apis/security-headers-analyzer",
+      "category": "Security APIs",
+      "name": "Analyze HTTP security headers (POST body.url)",
+      "description": "Analyze HTTP security headers (POST body.url)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/security-headers-analyzer"
+      ]
+    },
+    "sslTlsCertificateCheckerPost": {
+      "operationId": "sslTlsCertificateCheckerPost",
+      "method": "POST",
+      "gatewayPath": "/api/v1/security-apis/ssl-tls-certificate-checker",
+      "category": "Security APIs",
+      "name": "Inspect TLS certificate (POST body.url)",
+      "description": "Inspect TLS certificate (POST body.url)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/ssl-tls-certificate-checker"
+      ]
+    },
+    "cookieSecurityAnalyzerPost": {
+      "operationId": "cookieSecurityAnalyzerPost",
+      "method": "POST",
+      "gatewayPath": "/api/v1/security-apis/cookie-security-analyzer",
+      "category": "Security APIs",
+      "name": "Analyze cookies (POST body.url)",
+      "description": "Analyze cookies (POST body.url)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/cookie-security-analyzer"
+      ]
+    },
+    "spfDkimDmarcCheckerPost": {
+      "operationId": "spfDkimDmarcCheckerPost",
+      "method": "POST",
+      "gatewayPath": "/api/v1/security-apis/spf-dkim-dmarc-checker",
+      "category": "Security APIs",
+      "name": "Email auth DNS (POST body.url)",
+      "description": "Email auth DNS (POST body.url)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/spf-dkim-dmarc-checker"
       ]
     },
     "gst_calculator_post": {

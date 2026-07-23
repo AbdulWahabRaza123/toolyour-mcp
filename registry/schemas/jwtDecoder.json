@@ -1,0 +1,70 @@
+{
+  "operationId": "jwtDecoder",
+  "gatewayPath": "/api/v1/security-apis/jwt-decoder",
+  "method": "POST",
+  "request": {
+    "oneOf": [
+      {
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "JWT string (header.payload[.signature]). Signature is not verified.",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMifQ.sig"
+          },
+          "jwt": {
+            "type": "string",
+            "description": "Alias for token"
+          }
+        }
+      },
+      {
+        "type": "object",
+        "required": [
+          "inputs"
+        ],
+        "properties": {
+          "inputs": {
+            "type": "object",
+            "required": [
+              "token"
+            ],
+            "properties": {
+              "token": {
+                "type": "string",
+                "description": "JWT string (header.payload[.signature]). Signature is not verified.",
+                "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMifQ.sig"
+              },
+              "jwt": {
+                "type": "string",
+                "description": "Alias for token"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "description": "Send fields at the top level, or nested under `inputs`."
+  },
+  "response": {
+    "type": "object",
+    "required": [
+      "token"
+    ],
+    "properties": {
+      "token": {
+        "type": "string",
+        "description": "JWT string (header.payload[.signature]). Signature is not verified.",
+        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMifQ.sig"
+      },
+      "jwt": {
+        "type": "string",
+        "description": "Alias for token"
+      }
+    }
+  },
+  "responseHint": "Returns JSON response"
+}
