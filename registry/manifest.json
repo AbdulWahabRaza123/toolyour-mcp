@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-07-23T13:50:20.292Z",
+  "generatedAt": "2026-07-24T13:34:02.709Z",
   "stats": {
-    "totalOpenApiRoutes": 264,
-    "hasApiIncluded": 263,
+    "totalOpenApiRoutes": 277,
+    "hasApiIncluded": 276,
     "excluded": 1
   },
   "categories": [
@@ -1578,6 +1578,46 @@
       "backend": "node"
     },
     {
+      "operationId": "corsPolicyChecker",
+      "name": "Inspect CORS response headers",
+      "category": "Security APIs",
+      "description": "Inspect CORS response headers",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "httpSecurityRedirectChecker",
+      "name": "HTTP→HTTPS and redirect hop hygiene",
+      "category": "Security APIs",
+      "description": "HTTP→HTTPS and redirect hop hygiene",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "dnsLookup",
+      "name": "DNS A/AAAA/MX/TXT/NS/CNAME lookup",
+      "category": "Security APIs",
+      "description": "DNS A/AAAA/MX/TXT/NS/CNAME lookup",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "securityTxtChecker",
+      "name": "Fetch security.txt (RFC 9116)",
+      "category": "Security APIs",
+      "description": "Fetch security.txt (RFC 9116)",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "subresourceIntegrityChecker",
+      "name": "Report SRI on script/link tags",
+      "category": "Security APIs",
+      "description": "Report SRI on script/link tags",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
       "operationId": "jwtDecoder",
       "name": "Decode JWT (no signature verify)",
       "category": "Security APIs",
@@ -1610,6 +1650,30 @@
       "backend": "node"
     },
     {
+      "operationId": "secretLeakScanner",
+      "name": "Scan text for leaked secrets (heuristics)",
+      "category": "Security APIs",
+      "description": "Scan text for leaked secrets (heuristics)",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "hmacGenerator",
+      "name": "Compute HMAC digest",
+      "category": "Security APIs",
+      "description": "Compute HMAC digest",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "bcryptHashGenerator",
+      "name": "Generate bcrypt password hash",
+      "category": "Security APIs",
+      "description": "Generate bcrypt password hash",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
       "operationId": "securityHeadersAnalyzerPost",
       "name": "Analyze HTTP security headers (POST body.url)",
       "category": "Security APIs",
@@ -1638,6 +1702,46 @@
       "name": "Email auth DNS (POST body.url)",
       "category": "Security APIs",
       "description": "Email auth DNS (POST body.url)",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "corsPolicyCheckerPost",
+      "name": "CORS check (POST body.url)",
+      "category": "Security APIs",
+      "description": "CORS check (POST body.url)",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "httpSecurityRedirectCheckerPost",
+      "name": "Redirect security check (POST body.url)",
+      "category": "Security APIs",
+      "description": "Redirect security check (POST body.url)",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "dnsLookupPost",
+      "name": "DNS lookup (POST body.url)",
+      "category": "Security APIs",
+      "description": "DNS lookup (POST body.url)",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "securityTxtCheckerPost",
+      "name": "security.txt check (POST body.url)",
+      "category": "Security APIs",
+      "description": "security.txt check (POST body.url)",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "subresourceIntegrityCheckerPost",
+      "name": "SRI check (POST body.url)",
+      "category": "Security APIs",
+      "description": "SRI check (POST body.url)",
       "inputShape": "json",
       "backend": "node"
     },
@@ -5164,6 +5268,81 @@
         "security-apis/spf-dkim-dmarc-checker"
       ]
     },
+    "corsPolicyChecker": {
+      "operationId": "corsPolicyChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/security-apis/cors-policy-checker",
+      "category": "Security APIs",
+      "name": "Inspect CORS response headers",
+      "description": "Inspect CORS response headers",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/cors-policy-checker"
+      ]
+    },
+    "httpSecurityRedirectChecker": {
+      "operationId": "httpSecurityRedirectChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/security-apis/http-security-redirect-checker",
+      "category": "Security APIs",
+      "name": "HTTP→HTTPS and redirect hop hygiene",
+      "description": "HTTP→HTTPS and redirect hop hygiene",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/http-security-redirect-checker"
+      ]
+    },
+    "dnsLookup": {
+      "operationId": "dnsLookup",
+      "method": "GET",
+      "gatewayPath": "/api/v1/security-apis/dns-lookup",
+      "category": "Security APIs",
+      "name": "DNS A/AAAA/MX/TXT/NS/CNAME lookup",
+      "description": "DNS A/AAAA/MX/TXT/NS/CNAME lookup",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/dns-lookup"
+      ]
+    },
+    "securityTxtChecker": {
+      "operationId": "securityTxtChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/security-apis/security-txt-checker",
+      "category": "Security APIs",
+      "name": "Fetch security.txt (RFC 9116)",
+      "description": "Fetch security.txt (RFC 9116)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/security-txt-checker"
+      ]
+    },
+    "subresourceIntegrityChecker": {
+      "operationId": "subresourceIntegrityChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/security-apis/subresource-integrity-checker",
+      "category": "Security APIs",
+      "name": "Report SRI on script/link tags",
+      "description": "Report SRI on script/link tags",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/subresource-integrity-checker"
+      ]
+    },
     "jwtDecoder": {
       "operationId": "jwtDecoder",
       "method": "POST",
@@ -5224,6 +5403,51 @@
         "security-apis/hash-generator"
       ]
     },
+    "secretLeakScanner": {
+      "operationId": "secretLeakScanner",
+      "method": "POST",
+      "gatewayPath": "/api/v1/security-apis/secret-leak-scanner",
+      "category": "Security APIs",
+      "name": "Scan text for leaked secrets (heuristics)",
+      "description": "Scan text for leaked secrets (heuristics)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/secret-leak-scanner"
+      ]
+    },
+    "hmacGenerator": {
+      "operationId": "hmacGenerator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/security-apis/hmac-generator",
+      "category": "Security APIs",
+      "name": "Compute HMAC digest",
+      "description": "Compute HMAC digest",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/hmac-generator"
+      ]
+    },
+    "bcryptHashGenerator": {
+      "operationId": "bcryptHashGenerator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/security-apis/bcrypt-hash-generator",
+      "category": "Security APIs",
+      "name": "Generate bcrypt password hash",
+      "description": "Generate bcrypt password hash",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/bcrypt-hash-generator"
+      ]
+    },
     "securityHeadersAnalyzerPost": {
       "operationId": "securityHeadersAnalyzerPost",
       "method": "POST",
@@ -5282,6 +5506,81 @@
       "responseHint": "Returns JSON response",
       "validatePaths": [
         "security-apis/spf-dkim-dmarc-checker"
+      ]
+    },
+    "corsPolicyCheckerPost": {
+      "operationId": "corsPolicyCheckerPost",
+      "method": "POST",
+      "gatewayPath": "/api/v1/security-apis/cors-policy-checker",
+      "category": "Security APIs",
+      "name": "CORS check (POST body.url)",
+      "description": "CORS check (POST body.url)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/cors-policy-checker"
+      ]
+    },
+    "httpSecurityRedirectCheckerPost": {
+      "operationId": "httpSecurityRedirectCheckerPost",
+      "method": "POST",
+      "gatewayPath": "/api/v1/security-apis/http-security-redirect-checker",
+      "category": "Security APIs",
+      "name": "Redirect security check (POST body.url)",
+      "description": "Redirect security check (POST body.url)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/http-security-redirect-checker"
+      ]
+    },
+    "dnsLookupPost": {
+      "operationId": "dnsLookupPost",
+      "method": "POST",
+      "gatewayPath": "/api/v1/security-apis/dns-lookup",
+      "category": "Security APIs",
+      "name": "DNS lookup (POST body.url)",
+      "description": "DNS lookup (POST body.url)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/dns-lookup"
+      ]
+    },
+    "securityTxtCheckerPost": {
+      "operationId": "securityTxtCheckerPost",
+      "method": "POST",
+      "gatewayPath": "/api/v1/security-apis/security-txt-checker",
+      "category": "Security APIs",
+      "name": "security.txt check (POST body.url)",
+      "description": "security.txt check (POST body.url)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/security-txt-checker"
+      ]
+    },
+    "subresourceIntegrityCheckerPost": {
+      "operationId": "subresourceIntegrityCheckerPost",
+      "method": "POST",
+      "gatewayPath": "/api/v1/security-apis/subresource-integrity-checker",
+      "category": "Security APIs",
+      "name": "SRI check (POST body.url)",
+      "description": "SRI check (POST body.url)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/subresource-integrity-checker"
       ]
     },
     "gst_calculator_post": {

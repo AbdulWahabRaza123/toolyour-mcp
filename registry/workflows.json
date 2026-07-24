@@ -112,6 +112,55 @@
         { "id": "bulk", "operationId": "bulkUrlSeoAuditor" },
         { "id": "diff", "operationId": "seoChangeDiff" }
       ]
+    },
+    {
+      "id": "full-security-audit",
+      "title": "Full Security Audit",
+      "description": "Security headers, TLS certificate, and cookie flags for a URL; returns merged job report.",
+      "synthesizer": "full-security-audit",
+      "steps": [
+        { "id": "headers", "operationId": "securityHeadersAnalyzer" },
+        { "id": "tls", "operationId": "sslTlsCertificateChecker" },
+        { "id": "cookies", "operationId": "cookieSecurityAnalyzer" }
+      ]
+    },
+    {
+      "id": "security-headers-job",
+      "title": "Security Headers Check",
+      "description": "Single-URL security headers analysis with prioritized hardening actions.",
+      "synthesizer": "security-headers",
+      "steps": [{ "id": "headers", "operationId": "securityHeadersAnalyzer" }]
+    },
+    {
+      "id": "developer-ship-checklist-job",
+      "title": "Developer Ship Checklist",
+      "description": "Pre-deploy gate: security headers, TLS, mixed content, HTTP status, and page speed.",
+      "synthesizer": "developer-ship-checklist",
+      "steps": [
+        { "id": "headers", "operationId": "securityHeadersAnalyzer" },
+        { "id": "tls", "operationId": "sslTlsCertificateChecker" },
+        { "id": "mixed", "operationId": "mixedContentChecker" },
+        { "id": "status", "operationId": "httpStatusChecker" },
+        { "id": "speed", "operationId": "pageSpeedAnalyzer" }
+      ]
+    },
+    {
+      "id": "secrets-hygiene-job",
+      "title": "Secrets Hygiene Scan",
+      "description": "Scan pasted env/config text for leaked secrets (JWT-shaped tokens: invoke jwtDecoder separately).",
+      "synthesizer": "secrets-hygiene",
+      "steps": [{ "id": "leak", "operationId": "secretLeakScanner" }]
+    },
+    {
+      "id": "email-auth-security-job",
+      "title": "Email Auth + DNS Security",
+      "description": "SPF/DKIM/DMARC, DNS lookup, and security.txt for a domain.",
+      "synthesizer": "email-auth-security",
+      "steps": [
+        { "id": "spf", "operationId": "spfDkimDmarcChecker" },
+        { "id": "dns", "operationId": "dnsLookup" },
+        { "id": "securityTxt", "operationId": "securityTxtChecker" }
+      ]
     }
   ]
 }

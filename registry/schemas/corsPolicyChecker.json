@@ -1,0 +1,12 @@
+{
+  "operationId": "corsPolicyChecker",
+  "gatewayPath": "/api/v1/security-apis/cors-policy-checker",
+  "method": "GET",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

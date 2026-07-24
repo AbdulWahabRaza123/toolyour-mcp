@@ -8,6 +8,13 @@ import { synthesizeInternalLinkArchitecture } from "./internal-link-architecture
 import { synthesizeSocialPreviewAudit } from "./social-preview-audit";
 import { synthesizeTechnicalSeoAudit } from "./technical-seo-audit";
 import { synthesizeSeoDeployRegression } from "./seo-deploy-regression";
+import {
+  synthesizeFullSecurityAudit,
+  synthesizeSecurityHeaders,
+} from "./full-security-audit";
+import { synthesizeDeveloperShipChecklist } from "./developer-ship-checklist";
+import { synthesizeSecretsHygiene } from "./secrets-hygiene";
+import { synthesizeEmailAuthSecurity } from "./email-auth-security";
 
 const SYNTHESIZERS: Record<string, (params: SynthesizeJobParams) => JobReport> = {
   "full-seo-audit": synthesizeFullSeoAudit,
@@ -19,6 +26,11 @@ const SYNTHESIZERS: Record<string, (params: SynthesizeJobParams) => JobReport> =
   "content-quality-audit": synthesizeContentQualityAudit,
   "keyword-opportunity-review": synthesizeKeywordOpportunityReview,
   "seo-deploy-regression": synthesizeSeoDeployRegression,
+  "full-security-audit": synthesizeFullSecurityAudit,
+  "security-headers": synthesizeSecurityHeaders,
+  "developer-ship-checklist": synthesizeDeveloperShipChecklist,
+  "secrets-hygiene": synthesizeSecretsHygiene,
+  "email-auth-security": synthesizeEmailAuthSecurity,
 };
 
 export function synthesizeJobReport(params: SynthesizeJobParams): JobReport | null {

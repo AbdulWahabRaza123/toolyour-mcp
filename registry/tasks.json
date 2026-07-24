@@ -320,6 +320,87 @@
       "type": "local",
       "target": "html-seo-audit",
       "requiredInput": ["html"]
+    },
+    {
+      "id": "full-security-audit",
+      "title": "Full security audit",
+      "description": "Headers, TLS certificate, and cookie security for a URL.",
+      "keywords": [
+        "security audit",
+        "full security audit",
+        "harden site",
+        "website security",
+        "site security check",
+        "audit security headers",
+        "tls cookie audit"
+      ],
+      "type": "workflow",
+      "target": "full-security-audit",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "security-headers",
+      "title": "Security headers check",
+      "description": "Analyze HTTP security headers for a URL.",
+      "keywords": [
+        "check security headers",
+        "security headers",
+        "csp check",
+        "hsts check",
+        "x-frame-options"
+      ],
+      "type": "workflow",
+      "target": "security-headers-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "developer-ship-checklist",
+      "title": "Developer ship checklist",
+      "description": "Pre-deploy security + mixed content + status + speed gate.",
+      "keywords": [
+        "before deploy",
+        "ship checklist",
+        "prod readiness",
+        "harden and ship",
+        "pre deploy check",
+        "production readiness",
+        "ready to ship"
+      ],
+      "type": "workflow",
+      "target": "developer-ship-checklist-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "secrets-hygiene",
+      "title": "Secrets hygiene scan",
+      "description": "Scan pasted env/config text for leaked API keys and tokens.",
+      "keywords": [
+        "secret leak",
+        "leaked api key",
+        "scan for secrets",
+        "env secrets",
+        "credentials in text",
+        "secrets hygiene"
+      ],
+      "type": "workflow",
+      "target": "secrets-hygiene-job",
+      "requiredInput": ["text"]
+    },
+    {
+      "id": "email-auth-security",
+      "title": "Email auth and DNS security",
+      "description": "SPF/DKIM/DMARC, DNS records, and security.txt for a domain.",
+      "keywords": [
+        "spf dkim dmarc",
+        "email authentication",
+        "security.txt",
+        "dns email security",
+        "vulnerability disclosure file",
+        "mx dns check"
+      ],
+      "type": "workflow",
+      "target": "email-auth-security-job",
+      "requiredInput": ["url"]
     }
   ]
 }
