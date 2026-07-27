@@ -1,0 +1,133 @@
+{
+  "operationId": "webhookSignatureVerifier",
+  "gatewayPath": "/api/v1/security-apis/webhook-signature-verifier",
+  "method": "POST",
+  "request": {
+    "oneOf": [
+      {
+        "type": "object",
+        "required": [
+          "payload",
+          "secret",
+          "signature"
+        ],
+        "properties": {
+          "payload": {
+            "type": "string",
+            "description": "Raw request body"
+          },
+          "body": {
+            "type": "string",
+            "description": "Alias for payload"
+          },
+          "secret": {
+            "type": "string"
+          },
+          "signature": {
+            "type": "string",
+            "description": "Header value (sha256=… or Stripe t=,v1=)"
+          },
+          "header": {
+            "type": "string",
+            "description": "Alias for signature"
+          },
+          "scheme": {
+            "type": "string",
+            "enum": [
+              "hmac-sha256",
+              "github",
+              "stripe"
+            ],
+            "default": "hmac-sha256"
+          }
+        }
+      },
+      {
+        "type": "object",
+        "required": [
+          "inputs"
+        ],
+        "properties": {
+          "inputs": {
+            "type": "object",
+            "required": [
+              "payload",
+              "secret",
+              "signature"
+            ],
+            "properties": {
+              "payload": {
+                "type": "string",
+                "description": "Raw request body"
+              },
+              "body": {
+                "type": "string",
+                "description": "Alias for payload"
+              },
+              "secret": {
+                "type": "string"
+              },
+              "signature": {
+                "type": "string",
+                "description": "Header value (sha256=… or Stripe t=,v1=)"
+              },
+              "header": {
+                "type": "string",
+                "description": "Alias for signature"
+              },
+              "scheme": {
+                "type": "string",
+                "enum": [
+                  "hmac-sha256",
+                  "github",
+                  "stripe"
+                ],
+                "default": "hmac-sha256"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "description": "Send fields at the top level, or nested under `inputs`."
+  },
+  "response": {
+    "type": "object",
+    "required": [
+      "payload",
+      "secret",
+      "signature"
+    ],
+    "properties": {
+      "payload": {
+        "type": "string",
+        "description": "Raw request body"
+      },
+      "body": {
+        "type": "string",
+        "description": "Alias for payload"
+      },
+      "secret": {
+        "type": "string"
+      },
+      "signature": {
+        "type": "string",
+        "description": "Header value (sha256=… or Stripe t=,v1=)"
+      },
+      "header": {
+        "type": "string",
+        "description": "Alias for signature"
+      },
+      "scheme": {
+        "type": "string",
+        "enum": [
+          "hmac-sha256",
+          "github",
+          "stripe"
+        ],
+        "default": "hmac-sha256"
+      }
+    }
+  },
+  "responseHint": "Returns JSON response"
+}

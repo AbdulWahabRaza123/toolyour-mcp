@@ -6,14 +6,23 @@
     "oneOf": [
       {
         "type": "object",
-        "required": [
-          "url"
-        ],
         "properties": {
           "url": {
             "type": "string",
             "format": "uri",
             "example": "https://example.com"
+          },
+          "pem": {
+            "type": "string",
+            "description": "Offline certificate PEM"
+          },
+          "certificate": {
+            "type": "string",
+            "description": "Alias for pem"
+          },
+          "csr": {
+            "type": "string",
+            "description": "Certificate signing request PEM"
           }
         }
       },
@@ -25,14 +34,23 @@
         "properties": {
           "inputs": {
             "type": "object",
-            "required": [
-              "url"
-            ],
             "properties": {
               "url": {
                 "type": "string",
                 "format": "uri",
                 "example": "https://example.com"
+              },
+              "pem": {
+                "type": "string",
+                "description": "Offline certificate PEM"
+              },
+              "certificate": {
+                "type": "string",
+                "description": "Alias for pem"
+              },
+              "csr": {
+                "type": "string",
+                "description": "Certificate signing request PEM"
               }
             }
           }
@@ -43,14 +61,23 @@
   },
   "response": {
     "type": "object",
-    "required": [
-      "url"
-    ],
     "properties": {
       "url": {
         "type": "string",
         "format": "uri",
         "example": "https://example.com"
+      },
+      "pem": {
+        "type": "string",
+        "description": "Offline certificate PEM"
+      },
+      "certificate": {
+        "type": "string",
+        "description": "Alias for pem"
+      },
+      "csr": {
+        "type": "string",
+        "description": "Certificate signing request PEM"
       }
     }
   },

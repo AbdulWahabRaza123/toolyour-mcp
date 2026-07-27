@@ -36,6 +36,14 @@
               "sha512"
             ],
             "default": "sha256"
+          },
+          "expected": {
+            "type": "string",
+            "description": "Optional expected digest for timing-safe compare"
+          },
+          "signature": {
+            "type": "string",
+            "description": "Alias for expected"
           }
         }
       },
@@ -77,6 +85,14 @@
                   "sha512"
                 ],
                 "default": "sha256"
+              },
+              "expected": {
+                "type": "string",
+                "description": "Optional expected digest for timing-safe compare"
+              },
+              "signature": {
+                "type": "string",
+                "description": "Alias for expected"
               }
             }
           }
@@ -117,6 +133,14 @@
           "sha512"
         ],
         "default": "sha256"
+      },
+      "expected": {
+        "type": "string",
+        "description": "Optional expected digest for timing-safe compare"
+      },
+      "signature": {
+        "type": "string",
+        "description": "Alias for expected"
       }
     }
   },

@@ -3,7 +3,7 @@ id: developer-ship-checklist
 title: Developer Ship Checklist
 category: developer
 description: Pre-deploy gate combining security headers/TLS with mixed content, HTTP status, speed, and related SEO ship tools.
-operationIds: securityHeadersAnalyzer, sslTlsCertificateChecker, cookieSecurityAnalyzer, mixedContentChecker, httpStatusChecker, redirectChainAnalyzer, robotsTxtChecker, pageSpeedAnalyzer, seoChangeDiff, corsPolicyChecker, httpSecurityRedirectChecker, secretLeakScanner, dnsLookup
+operationIds: securityHeadersAnalyzer, sslTlsCertificateChecker, cookieSecurityAnalyzer, mixedContentChecker, httpStatusChecker, redirectChainAnalyzer, robotsTxtChecker, pageSpeedAnalyzer, seoChangeDiff, corsPolicyChecker, httpSecurityRedirectChecker, secretLeakScanner, dnsLookup, cspPolicyEvaluator, jwtSignatureVerifier, webhookSignatureVerifier
 ---
 
 # Developer Ship Checklist Skill

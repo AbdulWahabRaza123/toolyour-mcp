@@ -18,6 +18,15 @@
             "type": "string",
             "description": "Alias for password"
           },
+          "algorithm": {
+            "type": "string",
+            "enum": [
+              "bcrypt",
+              "argon2id",
+              "argon2"
+            ],
+            "default": "bcrypt"
+          },
           "rounds": {
             "type": "integer",
             "minimum": 4,
@@ -27,6 +36,14 @@
           "cost": {
             "type": "integer",
             "description": "Alias for rounds"
+          },
+          "iterations": {
+            "type": "integer",
+            "description": "Argon2 time cost"
+          },
+          "memorySize": {
+            "type": "integer",
+            "description": "Argon2 memory (KiB)"
           }
         }
       },
@@ -50,6 +67,15 @@
                 "type": "string",
                 "description": "Alias for password"
               },
+              "algorithm": {
+                "type": "string",
+                "enum": [
+                  "bcrypt",
+                  "argon2id",
+                  "argon2"
+                ],
+                "default": "bcrypt"
+              },
               "rounds": {
                 "type": "integer",
                 "minimum": 4,
@@ -59,6 +85,14 @@
               "cost": {
                 "type": "integer",
                 "description": "Alias for rounds"
+              },
+              "iterations": {
+                "type": "integer",
+                "description": "Argon2 time cost"
+              },
+              "memorySize": {
+                "type": "integer",
+                "description": "Argon2 memory (KiB)"
               }
             }
           }
@@ -81,6 +115,15 @@
         "type": "string",
         "description": "Alias for password"
       },
+      "algorithm": {
+        "type": "string",
+        "enum": [
+          "bcrypt",
+          "argon2id",
+          "argon2"
+        ],
+        "default": "bcrypt"
+      },
       "rounds": {
         "type": "integer",
         "minimum": 4,
@@ -90,6 +133,14 @@
       "cost": {
         "type": "integer",
         "description": "Alias for rounds"
+      },
+      "iterations": {
+        "type": "integer",
+        "description": "Argon2 time cost"
+      },
+      "memorySize": {
+        "type": "integer",
+        "description": "Argon2 memory (KiB)"
       }
     }
   },

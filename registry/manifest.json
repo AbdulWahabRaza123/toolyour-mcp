@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-07-24T13:34:02.709Z",
+  "generatedAt": "2026-07-27T15:59:02.948Z",
   "stats": {
-    "totalOpenApiRoutes": 277,
-    "hasApiIncluded": 276,
+    "totalOpenApiRoutes": 280,
+    "hasApiIncluded": 279,
     "excluded": 1
   },
   "categories": [
@@ -1667,9 +1667,33 @@
     },
     {
       "operationId": "bcryptHashGenerator",
-      "name": "Generate bcrypt password hash",
+      "name": "Generate bcrypt or Argon2id password hash",
       "category": "Security APIs",
-      "description": "Generate bcrypt password hash",
+      "description": "Generate bcrypt or Argon2id password hash",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "cspPolicyEvaluator",
+      "name": "Evaluate a CSP policy string",
+      "category": "Security APIs",
+      "description": "Evaluate a CSP policy string",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "jwtSignatureVerifier",
+      "name": "Verify JWT signature with secret or public key",
+      "category": "Security APIs",
+      "description": "Verify JWT signature with secret or public key",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "webhookSignatureVerifier",
+      "name": "Verify webhook HMAC signatures",
+      "category": "Security APIs",
+      "description": "Verify webhook HMAC signatures",
       "inputShape": "json",
       "backend": "node"
     },
@@ -5438,14 +5462,59 @@
       "method": "POST",
       "gatewayPath": "/api/v1/security-apis/bcrypt-hash-generator",
       "category": "Security APIs",
-      "name": "Generate bcrypt password hash",
-      "description": "Generate bcrypt password hash",
+      "name": "Generate bcrypt or Argon2id password hash",
+      "description": "Generate bcrypt or Argon2id password hash",
       "backend": "node",
       "multipart": false,
       "jsonBody": true,
       "responseHint": "Returns JSON response",
       "validatePaths": [
         "security-apis/bcrypt-hash-generator"
+      ]
+    },
+    "cspPolicyEvaluator": {
+      "operationId": "cspPolicyEvaluator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/security-apis/csp-policy-evaluator",
+      "category": "Security APIs",
+      "name": "Evaluate a CSP policy string",
+      "description": "Evaluate a CSP policy string",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/csp-policy-evaluator"
+      ]
+    },
+    "jwtSignatureVerifier": {
+      "operationId": "jwtSignatureVerifier",
+      "method": "POST",
+      "gatewayPath": "/api/v1/security-apis/jwt-signature-verifier",
+      "category": "Security APIs",
+      "name": "Verify JWT signature with secret or public key",
+      "description": "Verify JWT signature with secret or public key",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/jwt-signature-verifier"
+      ]
+    },
+    "webhookSignatureVerifier": {
+      "operationId": "webhookSignatureVerifier",
+      "method": "POST",
+      "gatewayPath": "/api/v1/security-apis/webhook-signature-verifier",
+      "category": "Security APIs",
+      "name": "Verify webhook HMAC signatures",
+      "description": "Verify webhook HMAC signatures",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "security-apis/webhook-signature-verifier"
       ]
     },
     "securityHeadersAnalyzerPost": {

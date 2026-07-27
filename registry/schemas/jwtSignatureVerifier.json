@@ -1,0 +1,124 @@
+{
+  "operationId": "jwtSignatureVerifier",
+  "gatewayPath": "/api/v1/security-apis/jwt-signature-verifier",
+  "method": "POST",
+  "request": {
+    "oneOf": [
+      {
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "jwt": {
+            "type": "string",
+            "description": "Alias for token"
+          },
+          "secret": {
+            "type": "string",
+            "description": "HMAC secret for HS*"
+          },
+          "key": {
+            "type": "string",
+            "description": "Alias for secret"
+          },
+          "publicKey": {
+            "type": "string",
+            "description": "PEM public key for RS*/ES*"
+          },
+          "pem": {
+            "type": "string",
+            "description": "Alias for publicKey"
+          },
+          "jwk": {
+            "type": "object",
+            "description": "JWK public key"
+          }
+        }
+      },
+      {
+        "type": "object",
+        "required": [
+          "inputs"
+        ],
+        "properties": {
+          "inputs": {
+            "type": "object",
+            "required": [
+              "token"
+            ],
+            "properties": {
+              "token": {
+                "type": "string"
+              },
+              "jwt": {
+                "type": "string",
+                "description": "Alias for token"
+              },
+              "secret": {
+                "type": "string",
+                "description": "HMAC secret for HS*"
+              },
+              "key": {
+                "type": "string",
+                "description": "Alias for secret"
+              },
+              "publicKey": {
+                "type": "string",
+                "description": "PEM public key for RS*/ES*"
+              },
+              "pem": {
+                "type": "string",
+                "description": "Alias for publicKey"
+              },
+              "jwk": {
+                "type": "object",
+                "description": "JWK public key"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "description": "Send fields at the top level, or nested under `inputs`."
+  },
+  "response": {
+    "type": "object",
+    "required": [
+      "token"
+    ],
+    "properties": {
+      "token": {
+        "type": "string"
+      },
+      "jwt": {
+        "type": "string",
+        "description": "Alias for token"
+      },
+      "secret": {
+        "type": "string",
+        "description": "HMAC secret for HS*"
+      },
+      "key": {
+        "type": "string",
+        "description": "Alias for secret"
+      },
+      "publicKey": {
+        "type": "string",
+        "description": "PEM public key for RS*/ES*"
+      },
+      "pem": {
+        "type": "string",
+        "description": "Alias for publicKey"
+      },
+      "jwk": {
+        "type": "object",
+        "description": "JWK public key"
+      }
+    }
+  },
+  "responseHint": "Returns JSON response"
+}
