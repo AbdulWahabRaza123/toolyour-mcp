@@ -1,13 +1,13 @@
-import fs from "fs";
-import { getEnv } from "../config";
+import { defsCache } from "../registry/defs-cache";
 import type { McpTaskDef } from "../contracts";
 
 export function loadTasks(): McpTaskDef[] {
-  const env = getEnv();
-  const tasksPath = env.tasksPath;
-  if (!fs.existsSync(tasksPath)) return [];
-  const raw = JSON.parse(fs.readFileSync(tasksPath, "utf8"));
-  return Array.isArray(raw.tasks) ? raw.tasks : [];
+  return defsCache.getTasks();
 }
 
-export { matchTask, rankTaskSuggestions, normalizeTaskInput } from "./match-task";
+export {
+  matchTask,
+  rankTaskSuggestions,
+  normalizeTaskInput,
+  isConfidentMatch,
+} from "./match-task";

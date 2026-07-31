@@ -398,7 +398,7 @@ Minimum 40 goals before Phase 2 ships:
 - [ ] `hasApi` unchanged unless new routes
 - [ ] `toolyour-docs/customer` `mcp-*.mdx` — job examples
 - [ ] `blog-automation-worker/content/fact-packs/mcp.json` — job count / capabilities
-- [ ] `toolbox/utils/brand.ts` — only if positioning changes (e.g. "early phase" → "job workflows")
+- [x] `toolbox/utils/brand.ts` — solve_task maturity upgraded (fuzzy + confidence gating)
 - [ ] Redeploy `toolyour-mcp` after registry/synthesizer changes
 - [ ] `npm run validate` in blog-automation-worker
 

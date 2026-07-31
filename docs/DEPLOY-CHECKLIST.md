@@ -60,4 +60,4 @@ Confirm:
 
 - New **routes** → OpenAPI + `npm run build:registry` in `docs`
 - New **public URLs** → sitemap, allowlists, live check before linking
-- **solve_task** stays **early phase** in copy until routing maturity is intentionally upgraded in `brand.ts` + `llms.txt`
+- **solve_task** maturity copy must match `brand.solveTask` + fact-pack `mcp.json` (fuzzy routing + confidence gating; suggest on ambiguous goals)

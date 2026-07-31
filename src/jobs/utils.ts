@@ -251,8 +251,15 @@ export function prioritizedLinkSuggestionsFromShaped(
   const fromData = Array.isArray(payload.suggestedLinks)
     ? (payload.suggestedLinks as Array<Record<string, unknown>>)
     : [];
-  const links = fromReport.length > 0 ? fromReport : fromData;
-  return links.slice(0, cap).map((link, i) => ({
+  const links = (fromReport.length > 0 ? fromReport : fromData)
+    .slice()
+    .sort((a, b) => {
+      const ra = typeof a.relevanceScore === "number" ? a.relevanceScore : 0;
+      const rb = typeof b.relevanceScore === "number" ? b.relevanceScore : 0;
+      return rb - ra;
+    })
+    .slice(0, Math.min(cap, 10));
+  return links.map((link, i) => ({
     rank: i + 1,
     workstream: "internalLinking",
     action: `Add internal link from ${String(link.from)} → ${String(link.to)} with anchor "${String(link.suggestedAnchorText || "Learn more")}"`,

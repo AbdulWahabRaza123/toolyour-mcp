@@ -1,8 +1,13 @@
 import { randomUUID } from "crypto";
 import { constants, getEnv } from "../config";
 import { circuitBreaker } from "./circuit-breaker";
+import { Semaphore } from "./semaphore";
 import type { McpToolRoute } from "../contracts";
 import type { Logger } from "../observability/logger";
+import { incr } from "../observability/counters";
+
+/** Shared across invokes in this process — free backpressure, no paid queue. */
+export const gatewaySemaphore = new Semaphore(constants.gatewayMaxConcurrent);
 
 export interface GatewayInvokeOptions {
   apiKey: string;
@@ -31,6 +36,14 @@ function headersToRecord(h: Headers): Record<string, string> {
   return out;
 }
 
+function isTransientStatus(status: number): boolean {
+  return status === 502 || status === 503 || status === 504;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export async function invokeGatewayRoute(
   route: McpToolRoute,
   opts: GatewayInvokeOptions
@@ -46,6 +59,20 @@ export async function invokeGatewayRoute(
     });
   }
 
+  const release = await gatewaySemaphore.acquire();
+  try {
+    return await invokeGatewayRouteUnlocked(route, opts, env, backend);
+  } finally {
+    release();
+  }
+}
+
+async function invokeGatewayRouteUnlocked(
+  route: McpToolRoute,
+  opts: GatewayInvokeOptions,
+  env: ReturnType<typeof getEnv>,
+  backend: McpToolRoute["backend"]
+): Promise<GatewayInvokeResult> {
   const requestId = opts.requestId || randomUUID();
   const url = new URL(`${env.gatewayUrl}${route.gatewayPath}`);
   if (opts.query) {
@@ -75,46 +102,83 @@ export async function invokeGatewayRoute(
     body = JSON.stringify(opts.body);
   }
 
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), constants.gatewayTimeoutMs);
+  const maxAttempts = 1 + Math.max(0, constants.gatewayRetryCount);
+  let lastError: unknown;
 
-  try {
-    const res = await fetch(url.toString(), {
-      method: route.method,
-      headers,
-      body,
-      signal: controller.signal,
-    });
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(
+      () => controller.abort(),
+      constants.gatewayTimeoutMs
+    );
 
-    const text = await res.text();
-    let data: unknown = text;
-    const ct = res.headers.get("content-type") || "";
-    if (ct.includes("application/json") && text) {
-      try {
-        data = JSON.parse(text);
-      } catch {
-        data = text;
+    try {
+      const res = await fetch(url.toString(), {
+        method: route.method,
+        headers,
+        body,
+        signal: controller.signal,
+      });
+
+      const text = await res.text();
+      let data: unknown = text;
+      const ct = res.headers.get("content-type") || "";
+      if (ct.includes("application/json") && text) {
+        try {
+          data = JSON.parse(text);
+        } catch {
+          data = text;
+        }
       }
-    }
 
-    if (res.status >= 500) {
-      circuitBreaker.recordFailure(backend);
-    } else if (res.ok) {
-      circuitBreaker.recordSuccess(backend);
-    }
+      if (isTransientStatus(res.status) && attempt < maxAttempts) {
+        incr("gatewayRetries");
+        opts.logger.warn("gateway transient status, retrying", {
+          status: res.status,
+          attempt,
+          operationId: opts.operationId,
+        });
+        await sleep(constants.gatewayRetryBackoffMs);
+        continue;
+      }
 
-    return {
-      status: res.status,
-      headers: headersToRecord(res.headers),
-      data,
-      text,
-    };
-  } catch (e) {
-    circuitBreaker.recordFailure(backend);
-    throw e;
-  } finally {
-    clearTimeout(timer);
+      if (res.status >= 500) {
+        const opened = circuitBreaker.recordFailure(backend);
+        if (opened) incr("circuitOpens");
+      } else if (res.ok) {
+        circuitBreaker.recordSuccess(backend);
+      }
+
+      incr("invokes");
+      return {
+        status: res.status,
+        headers: headersToRecord(res.headers),
+        data,
+        text,
+      };
+    } catch (e) {
+      lastError = e;
+      if (attempt < maxAttempts) {
+        incr("gatewayRetries");
+        opts.logger.warn("gateway network error, retrying", {
+          attempt,
+          error: e instanceof Error ? e.message : String(e),
+          operationId: opts.operationId,
+        });
+        await sleep(constants.gatewayRetryBackoffMs);
+        continue;
+      }
+      const opened = circuitBreaker.recordFailure(backend);
+      if (opened) incr("circuitOpens");
+      throw e;
+    } finally {
+      clearTimeout(timer);
+    }
   }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("Gateway invoke failed after retries");
 }
 
 export async function checkGatewayHealth(): Promise<boolean> {

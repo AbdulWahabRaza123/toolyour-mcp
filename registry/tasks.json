@@ -34,7 +34,10 @@
         "this html",
         "landing page seo",
         "meta tags check",
-        "before i deploy"
+        "before i deploy",
+        "before deploy",
+        "audit this html",
+        "html before deploy"
       ],
       "type": "local",
       "target": "html-seo-audit",
@@ -161,7 +164,10 @@
         "staging versus production",
         "seo change after deploy",
         "template seo diff deploy",
-        "prod vs staging seo"
+        "prod vs staging seo",
+        "compare seo",
+        "seo compare",
+        "staging and production seo"
       ],
       "type": "workflow",
       "target": "seo-deploy-regression-diff-job",
@@ -184,7 +190,9 @@
         "fix performance",
         "improve performance",
         "speed up page",
-        "pagespeed insights"
+        "pagespeed insights",
+        "pagespeed",
+        "page speed issues"
       ],
       "type": "workflow",
       "target": "core-web-vitals-job",

@@ -35,21 +35,46 @@ export class CircuitBreaker {
     s.openUntil = 0;
   }
 
-  recordFailure(backend: Backend) {
+  /** Returns true when this failure newly opens the breaker. */
+  recordFailure(backend: Backend): boolean {
     const now = Date.now();
     const s = this.state(backend);
+    const wasOpen = now < s.openUntil;
     s.failures = s.failures.filter(
       (t) => now - t < constants.circuitBreakerWindowMs
     );
     s.failures.push(now);
     if (s.failures.length >= constants.circuitBreakerFailureThreshold) {
       s.openUntil = now + constants.circuitBreakerOpenMs;
+      return !wasOpen;
     }
+    return false;
   }
 
   retryAfterMs(backend: Backend): number {
     const s = this.state(backend);
     return Math.max(0, s.openUntil - Date.now());
+  }
+
+  /** Snapshot for health endpoints. */
+  snapshot(): Record<string, { open: boolean; retryAfterMs: number; recentFailures: number }> {
+    const backends: Array<"node" | "python"> = ["node", "python"];
+    const out: Record<
+      string,
+      { open: boolean; retryAfterMs: number; recentFailures: number }
+    > = {};
+    for (const b of backends) {
+      const s = this.state(b);
+      const now = Date.now();
+      out[b] = {
+        open: now < s.openUntil,
+        retryAfterMs: Math.max(0, s.openUntil - now),
+        recentFailures: s.failures.filter(
+          (t) => now - t < constants.circuitBreakerWindowMs
+        ).length,
+      };
+    }
+    return out;
   }
 }
 

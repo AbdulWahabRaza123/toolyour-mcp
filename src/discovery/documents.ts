@@ -18,7 +18,7 @@ const META_TOOLS = [
   {
     name: "solve_task",
     description:
-      "Primary entry: plain-language goal; server routes to a workflow or tool. Early-phase routing — may return status suggest.",
+      "Primary entry: plain-language goal; server routes to a workflow or tool with fuzzy matching and confidence gating. Ambiguous goals return status suggest with ranked options.",
   },
   {
     name: "discover_tools",
@@ -37,6 +37,11 @@ const META_TOOLS = [
     name: "invoke_tool",
     description:
       "Execute an API-backed tool by operationId. Bills the same monthly quota as REST.",
+  },
+  {
+    name: "fetch_payload",
+    description:
+      "Fetch full truncated payload by dataRefId (free in-process TTL store).",
   },
   {
     name: "list_skills",
@@ -73,6 +78,19 @@ export function buildServerCard() {
       endpoint: MCP_PUBLIC_ENDPOINT,
       messagesPath: "/mcp/messages",
     },
+    transports: [
+      {
+        type: "sse",
+        endpoint: MCP_PUBLIC_ENDPOINT,
+        messagesPath: "/mcp/messages",
+        note: "Legacy SSE — widely supported (Cursor, etc.)",
+      },
+      {
+        type: "streamable-http",
+        endpoint: `${MCP_PUBLIC_ENDPOINT}/http`,
+        note: "MCP Streamable HTTP — free SDK transport; use when the client supports it",
+      },
+    ],
     capabilities: {
       tools: { listChanged: true },
       resources: { subscribe: false, listChanged: false },
@@ -92,7 +110,8 @@ export function buildServerCard() {
     notes: [
       "Catalog tools (converters, SEO, documents, etc.) are dynamic — use discover_tools; only hasApi tools are exposed.",
       "Discovery meta-tools are free; tool/workflow execution shares the REST monthly quota.",
-      "solve_task routing is early-phase; prefer discover_tools → get_tool_schema → invoke_tool for production-critical flows.",
+      "solve_task is the primary entry with fuzzy matching and confidence gating; ambiguous goals return ranked suggestions. Use discover_tools → get_tool_schema → invoke_tool for an explicit operationId.",
+      "Large responses may include dataRefId — use fetch_payload (free in-process TTL store, no paid blob).",
     ],
   };
 }
@@ -109,6 +128,8 @@ export function buildManifest() {
     endpoints: {
       // Current production transport (SSEServerTransport)
       sse: MCP_PUBLIC_ENDPOINT,
+      // Streamable HTTP (SDK-native, free)
+      streamableHttp: `${MCP_PUBLIC_ENDPOINT}/http`,
     },
     capabilities: {
       tools: true,

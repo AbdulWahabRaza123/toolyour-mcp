@@ -5,7 +5,17 @@
   "request": {
     "type": "object",
     "additionalProperties": true,
-    "description": "Tool-specific input fields."
+    "description": "Tool-specific input fields.",
+    "required": [
+      "file"
+    ],
+    "properties": {
+      "file": {
+        "type": "string",
+        "format": "binary",
+        "description": "Required input: file"
+      }
+    }
   },
   "response": null,
   "responseHint": "Returns JSON file content"

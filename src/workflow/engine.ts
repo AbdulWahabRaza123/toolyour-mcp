@@ -1,21 +1,18 @@
-import fs from "fs";
-import { getEnv } from "../config";
+import { defsCache } from "../registry/defs-cache";
 import type { McpWorkflowDef } from "../contracts";
 import { invokeGatewayRoute } from "../gateway/client";
 import { buildGatewayInvokePayload, extractUrlFromPayload } from "../gateway/request";
-import { validateApiKey } from "../auth/session";
+import { invalidateApiKeyCache, validateApiKey } from "../auth/session";
 import { RegistryLoader } from "../registry/loader";
 import { shapeResponseForLlm } from "../summarize/registry";
 import type { Logger } from "../observability/logger";
 import { randomUUID } from "crypto";
 import { synthesizeJobReport } from "../jobs/synthesize";
 import type { WorkflowStepMeta } from "../jobs/types";
+import { incr } from "../observability/counters";
 
 export function loadWorkflows(): McpWorkflowDef[] {
-  const env = getEnv();
-  if (!fs.existsSync(env.workflowsPath)) return [];
-  const raw = JSON.parse(fs.readFileSync(env.workflowsPath, "utf8"));
-  return Array.isArray(raw.workflows) ? raw.workflows : [];
+  return defsCache.getWorkflows();
 }
 
 export interface WorkflowRunContext {
@@ -31,6 +28,7 @@ export interface WorkflowRunResult {
   completedSteps: string[];
   failedStep?: string;
   error?: unknown;
+  stepErrors?: Record<string, unknown>;
   steps: Record<string, unknown>;
   /** Last step shaped output (legacy) */
   result: unknown;
@@ -43,8 +41,7 @@ export async function runWorkflow(
   input: Record<string, unknown>,
   ctx: WorkflowRunContext
 ): Promise<WorkflowRunResult> {
-  const workflows = loadWorkflows();
-  const wf = workflows.find((w) => w.id === workflowId);
+  const wf = defsCache.getWorkflow(workflowId);
   if (!wf) {
     throw Object.assign(new Error("Workflow not found"), {
       code: "workflow_not_found",
@@ -53,22 +50,36 @@ export async function runWorkflow(
 
   const completedSteps: string[] = [];
   const stepResults: Record<string, unknown> = {};
+  const stepErrors: Record<string, unknown> = {};
   const stepMeta: WorkflowStepMeta[] = [];
   let lastOutput: unknown = input;
+  let hardFail: {
+    failedStep: string;
+    error: unknown;
+  } | null = null;
 
   for (const step of wf.steps) {
     const route = ctx.registry.getRoute(step.operationId);
     stepMeta.push({ id: step.id, operationId: step.operationId });
     if (!route) {
+      const err = { code: "tool_not_api_backed", operationId: step.operationId };
+      if (step.continueOnError) {
+        stepErrors[step.id] = err;
+        continue;
+      }
+      incr("workflowPartial");
+      const jobReport = partialJobReport(wf, input, stepMeta, stepResults);
       return {
         status: "partial",
         workflowId,
         completedSteps,
         failedStep: step.id,
-        error: { code: "tool_not_api_backed", operationId: step.operationId },
+        error: err,
+        stepErrors,
         steps: stepResults,
         result: lastOutput,
         partialResult: stepResults,
+        jobReport: jobReport || undefined,
       };
     }
 
@@ -94,6 +105,19 @@ export async function runWorkflow(
         if (url) stepInput = { ...stepInput, url };
       }
 
+      // Multi-URL steps (seoChangeDiff): prefer urlA/urlB from workflow input
+      if (
+        typeof input.urlA === "string" &&
+        typeof input.urlB === "string" &&
+        !stepInput.urlA
+      ) {
+        stepInput = {
+          ...stepInput,
+          urlA: input.urlA,
+          urlB: input.urlB,
+        };
+      }
+
       const payload = buildGatewayInvokePayload(route, stepInput);
 
       const res = await invokeGatewayRoute(route, {
@@ -108,6 +132,10 @@ export async function runWorkflow(
         logger: ctx.logger,
       });
 
+      if (res.status === 401) {
+        invalidateApiKeyCache(ctx.apiKey, route.backend);
+      }
+
       const shaped = shapeResponseForLlm(
         step.operationId,
         res.status,
@@ -119,29 +147,46 @@ export async function runWorkflow(
       lastOutput = shaped;
 
       if (res.status < 200 || res.status >= 300) {
-        return {
-          status: "partial",
-          workflowId,
-          completedSteps,
-          failedStep: step.id,
-          error: shaped,
-          steps: stepResults,
-          result: lastOutput,
-          partialResult: stepResults,
-        };
+        if (step.continueOnError) {
+          stepErrors[step.id] = shaped;
+          continue;
+        }
+        hardFail = { failedStep: step.id, error: shaped };
+        break;
       }
     } catch (e) {
-      return {
-        status: "partial",
-        workflowId,
-        completedSteps,
-        failedStep: step.id,
-        error: e instanceof Error ? e.message : String(e),
-        steps: stepResults,
-        result: lastOutput,
-        partialResult: stepResults,
-      };
+      const msg = e instanceof Error ? e.message : String(e);
+      if (
+        e &&
+        typeof e === "object" &&
+        (e as { code?: string }).code === "unauthorized"
+      ) {
+        invalidateApiKeyCache(ctx.apiKey);
+      }
+      if (step.continueOnError) {
+        stepErrors[step.id] = msg;
+        continue;
+      }
+      hardFail = { failedStep: step.id, error: msg };
+      break;
     }
+  }
+
+  if (hardFail) {
+    incr("workflowPartial");
+    const jobReport = partialJobReport(wf, input, stepMeta, stepResults);
+    return {
+      status: "partial",
+      workflowId,
+      completedSteps,
+      failedStep: hardFail.failedStep,
+      error: hardFail.error,
+      stepErrors: Object.keys(stepErrors).length ? stepErrors : undefined,
+      steps: stepResults,
+      result: lastOutput,
+      partialResult: stepResults,
+      jobReport: jobReport || undefined,
+    };
   }
 
   const jobReport = wf.synthesizer
@@ -155,12 +200,36 @@ export async function runWorkflow(
       })
     : null;
 
+  incr(Object.keys(stepErrors).length ? "workflowPartial" : "workflowCompleted");
+
   return {
-    status: "completed",
+    status: Object.keys(stepErrors).length ? "partial" : "completed",
     workflowId,
     completedSteps,
+    stepErrors: Object.keys(stepErrors).length ? stepErrors : undefined,
     steps: stepResults,
     result: jobReport || lastOutput,
     jobReport: jobReport || undefined,
   };
+}
+
+function partialJobReport(
+  wf: McpWorkflowDef,
+  input: Record<string, unknown>,
+  stepMeta: WorkflowStepMeta[],
+  stepResults: Record<string, unknown>
+) {
+  if (!wf.synthesizer || Object.keys(stepResults).length === 0) return null;
+  try {
+    return synthesizeJobReport({
+      synthesizerId: wf.synthesizer,
+      workflowId: wf.id,
+      jobId: wf.id,
+      input,
+      steps: stepMeta,
+      stepResults,
+    });
+  } catch {
+    return null;
+  }
 }

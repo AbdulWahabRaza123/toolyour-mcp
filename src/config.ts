@@ -17,6 +17,20 @@ const defaults: McpConstants = {
   summarizedMaxBytes: 4096,
   gatewayTimeoutMs: 120000,
   discoverCacheTtlSeconds: 60,
+  gatewayRetryCount: 1,
+  gatewayRetryBackoffMs: 400,
+  mcpSessionTtlMs: 30 * 60 * 1000,
+  mcpSessionSweepMs: 60 * 1000,
+  taskMatchMinScore: 2,
+  taskMatchAmbiguityMargin: 2,
+  dataRefTtlMs: 15 * 60 * 1000,
+  dataRefSweepMs: 60 * 1000,
+  dataRefMaxEntries: 200,
+  dataRefMaxTotalBytes: 32 * 1024 * 1024,
+  gatewayMaxConcurrent: Math.max(
+    1,
+    Number(process.env.GATEWAY_MAX_CONCURRENT || 24)
+  ),
 };
 
 function loadJsonConstants(): Partial<McpConstants> {

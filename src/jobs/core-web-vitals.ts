@@ -57,6 +57,12 @@ export function synthesizeCoreWebVitals(params: SynthesizeJobParams): JobReport 
       : typeof speedPayload?.loadTime === "number"
         ? Math.round(speedPayload.loadTime)
         : null;
+  const ttfbSource =
+    typeof metrics.ttfbSource === "string" ? metrics.ttfbSource : null;
+  const inpProxyLabel =
+    typeof metrics.inpProxyLabel === "string"
+      ? metrics.inpProxyLabel
+      : "TBT proxy for INP risk";
 
   const totalScore =
     typeof speedReport?.summary === "object"
@@ -68,6 +74,29 @@ export function synthesizeCoreWebVitals(params: SynthesizeJobParams): JobReport 
   const inpStatus = scoreFromProxy(proxies.tbtScore);
   const ttfbStatus =
     ttfbMs == null ? "unknown" : ttfbMs < 600 ? "good" : ttfbMs < 1200 ? "needs_improvement" : "poor";
+
+  if (
+    (ttfbStatus === "poor" || ttfbStatus === "needs_improvement") &&
+    !findings.some((f) => f.metric === "TTFB")
+  ) {
+    findings.push({
+      workstream: "performance",
+      severity: ttfbStatus === "poor" ? "high" : "medium",
+      title:
+        ttfbStatus === "poor"
+          ? "Slow Time to First Byte"
+          : "Moderate Time to First Byte",
+      whyItMatters:
+        "Slow TTFB delays LCP/FCP and every subsequent paint metric.",
+      howToFix: [
+        "Cache HTML at the edge where possible.",
+        "Reduce origin SSR/DB work on the critical path.",
+        "Use a CDN and optimize TLS handshake latency.",
+      ],
+      metric: "TTFB",
+      evidence: { ttfbMs, ttfbSource },
+    });
+  }
 
   const scores: JobReport["scores"] = {
     overall: {
@@ -81,20 +110,23 @@ export function synthesizeCoreWebVitals(params: SynthesizeJobParams): JobReport 
       status: lcpStatus,
       primaryCause: speedFindings.find((f) => f.metric === "LCP")?.title,
     },
+    INP: {
+      label: inpProxyLabel,
+      value: typeof proxies.tbtScore === "number" ? `${proxies.tbtScore}/100` : "—",
+      status: inpStatus,
+      primaryCause: "Total Blocking Time proxies main-thread blocking that affects INP",
+    },
     TTFB: {
-      label: "Time to First Byte (fetch proxy)",
+      label:
+        ttfbSource === "server-timing"
+          ? "Time to First Byte (Server-Timing)"
+          : "Time to First Byte (fetch proxy)",
       value: ttfbMs != null ? `${ttfbMs}ms` : "—",
       status: ttfbStatus,
       primaryCause:
         ttfbStatus !== "good"
           ? "Server response or network latency before HTML arrives"
           : undefined,
-    },
-    INP: {
-      label: "Interaction delay risk (TBT proxy)",
-      value: typeof proxies.tbtScore === "number" ? `${proxies.tbtScore}/100` : "—",
-      status: inpStatus,
-      primaryCause: "Total Blocking Time proxies main-thread blocking that affects INP",
     },
     CLS: {
       label: "Cumulative Layout Shift (proxy)",
@@ -148,8 +180,8 @@ export function synthesizeCoreWebVitals(params: SynthesizeJobParams): JobReport 
     steps: stepResults,
     limitations: [
       "LCP/CLS/INP scores are HTML-based proxies unless field CrUX data is integrated.",
-      "INP is approximated via Total Blocking Time (TBT) proxy.",
-      "TTFB uses fetch timing to first HTML response, not Chrome trace data.",
+      "INP is approximated via Total Blocking Time (TBT) proxy (see scores.INP.label).",
+      "TTFB prefers Server-Timing when present; otherwise uses fetch timing to first HTML response (not Chrome trace).",
       "assetOptimizer lists are heuristic (image HEAD sizes + HTML attributes), not Lighthouse audits.",
     ],
   };

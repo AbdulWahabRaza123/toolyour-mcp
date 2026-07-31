@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-// @ts-nocheck — MCP SDK + Zod triggers TS2589 deep instantiation on tool registrations
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { randomUUID } from "crypto";
@@ -9,6 +7,7 @@ import { RegistryLoader, searchTools } from "../registry/loader";
 import { loadSkillContent, loadSkills } from "../skills/loader";
 import { runWorkflow } from "../workflow/engine";
 import { invokeOperation, solveTask } from "../orchestrator/solve-task";
+import { payloadStore } from "../payloads/store";
 import type { Logger } from "../observability/logger";
 
 export interface McpServerContext {
@@ -18,15 +17,46 @@ export interface McpServerContext {
   logger: Logger;
 }
 
+type TextContent = { type: "text"; text: string };
+type ToolResult = { content: TextContent[]; isError?: boolean };
+
+/**
+ * Typed wrapper around McpServer.tool to avoid Zod+SDK TS2589 deep instantiation
+ * without silencing the whole module via @ts-nocheck.
+ */
+function registerTool(
+  server: McpServer,
+  name: string,
+  description: string,
+  schema: Record<string, z.ZodTypeAny>,
+  handler: (args: Record<string, unknown>) => Promise<ToolResult>
+): void {
+  const register = server.tool.bind(server) as (
+    n: string,
+    d: string,
+    s: Record<string, z.ZodTypeAny>,
+    h: (args: Record<string, unknown>) => Promise<ToolResult>
+  ) => void;
+  register(name, description, schema, handler);
+}
+
+function textResult(payload: unknown, isError = false): ToolResult {
+  return {
+    content: [{ type: "text", text: JSON.stringify(payload, null, 2) }],
+    isError,
+  };
+}
+
 export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   const server = new McpServer({
     name: constants.serverName,
     version: constants.serverVersion,
   });
 
-  server.tool(
+  registerTool(
+    server,
     "solve_task",
-    "Primary entry point: describe what the user wants in natural language. Server auto-picks workflow or tool, extracts URLs from the goal, and runs it. For local/unpublished work, pass input.html, input.text, or input.code from the workspace — MCP runs free local analysis and text-based tools without a deployed URL. Set input.enhance=false to skip billed API text tools. If status is suggest, review toolSuggestions in the response or call discover_tools with a specific query. Suggestions are free; bills quota only when a backend tool/workflow executes.",
+    "Primary entry point: describe what the user wants in natural language. Server auto-picks workflow or tool with fuzzy matching and confidence gating, extracts URLs from the goal, and runs it. Ambiguous goals return status suggest with ranked taskSuggestions and toolSuggestions. For local/unpublished work, pass input.html, input.text, or input.code — MCP runs free local analysis and text-based tools without a deployed URL. Set input.enhance=false to skip billed API text tools. Suggestions are free; bills quota only when a backend tool/workflow executes.",
     {
       goal: z
         .string()
@@ -40,18 +70,19 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
           "Optional: url, html, text, code, sourceHint (file path), enhance (false to skip billed text tools)"
         ),
     },
-    async ({ goal, input }) => {
-      const result = await solveTask(goal, input || {}, ctx);
-      return {
-        content: [
-          { type: "text" as const, text: JSON.stringify(result, null, 2) },
-        ],
-        isError: result.status === "error" || result.status === "partial",
-      };
+    async (args) => {
+      const goal = String(args.goal || "");
+      const input = (args.input || {}) as Record<string, unknown>;
+      const result = await solveTask(goal, input, ctx);
+      return textResult(
+        result,
+        result.status === "error" || result.status === "partial"
+      );
     }
   );
 
-  server.tool(
+  registerTool(
+    server,
     "discover_tools",
     "Search 230+ API-backed tools by keyword or intent. Returns compact cards (not full schemas). Use specific queries (e.g. 'docx pdf', 'headline rewrite', 'webp convert'). Call list_categories first to narrow by family, then discover_tools(query, category). Free — not billed. Typical flow: discover_tools → get_tool_schema → invoke_tool.",
     {
@@ -68,71 +99,56 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
         ),
       limit: z.number().int().min(1).max(25).optional(),
     },
-    async ({ query, category, limit }) => {
+    async (args) => {
+      const query = String(args.query || "");
+      const category =
+        typeof args.category === "string" ? args.category : undefined;
+      const limit = typeof args.limit === "number" ? args.limit : undefined;
       const manifest = ctx.registry.getManifest();
       const tools = searchTools(manifest, query, category, limit);
-      return {
-        content: [
-          {
-            type: "text" as const,
-            text: JSON.stringify({ tools, count: tools.length }, null, 2),
-          },
-        ],
-      };
+      return textResult({ tools, count: tools.length });
     }
   );
 
-  server.tool(
+  registerTool(
+    server,
     "list_categories",
     "List tool category families (Convertors, Documents, SEO Tools, etc.). Use before discover_tools to narrow search — e.g. discover_tools('pdf', category: 'Documents'). Free — not billed.",
     {},
     async () => {
       const categories = ctx.registry.getManifest().categories;
-      return {
-        content: [
-          { type: "text" as const, text: JSON.stringify({ categories }, null, 2) },
-        ],
-      };
+      return textResult({ categories });
     }
   );
 
-  server.tool(
+  registerTool(
+    server,
     "get_tool_schema",
     "Get JSON schema for one API-backed tool by operationId.",
     {
       operationId: z.string(),
     },
-    async ({ operationId }) => {
+    async (args) => {
+      const operationId = String(args.operationId || "");
       if (!ctx.registry.hasOperation(operationId)) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: JSON.stringify({
-                error: {
-                  code: MCP_ERROR_CODES.TOOL_NOT_API_BACKED,
-                  message: "Tool not available for API / MCP",
-                },
-              }),
+        return textResult(
+          {
+            error: {
+              code: MCP_ERROR_CODES.TOOL_NOT_API_BACKED,
+              message: "Tool not available for API / MCP",
             },
-          ],
-          isError: true,
-        };
+          },
+          true
+        );
       }
       const schema = ctx.registry.getSchema(operationId);
       const route = ctx.registry.getRoute(operationId);
-      return {
-        content: [
-          {
-            type: "text" as const,
-            text: JSON.stringify({ operationId, route, schema }, null, 2),
-          },
-        ],
-      };
+      return textResult({ operationId, route, schema });
     }
   );
 
-  server.tool(
+  registerTool(
+    server,
     "invoke_tool",
     "Invoke an API-backed ToolYour tool. Large outputs return downloadUrl.",
     {
@@ -140,34 +156,33 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
       input: z.any().optional(),
       requestId: z.string().optional(),
     },
-    async ({ operationId, input, requestId }) => {
+    async (args) => {
+      const operationId = String(args.operationId || "");
       const route = ctx.registry.getRoute(operationId);
       if (!route) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: JSON.stringify({
-                error: {
-                  code: MCP_ERROR_CODES.TOOL_NOT_API_BACKED,
-                  message: "Tool not available for API / MCP",
-                },
-              }),
+        return textResult(
+          {
+            error: {
+              code: MCP_ERROR_CODES.TOOL_NOT_API_BACKED,
+              message: "Tool not available for API / MCP",
             },
-          ],
-          isError: true,
-        };
+          },
+          true
+        );
       }
 
       const started = Date.now();
-      const reqId = requestId || randomUUID();
+      const reqId =
+        typeof args.requestId === "string" && args.requestId
+          ? args.requestId
+          : randomUUID();
 
       try {
         const invoked = await invokeOperation(
           ctx,
           route,
           operationId,
-          (input || {}) as Record<string, unknown>,
+          (args.input || {}) as Record<string, unknown>,
           reqId
         );
 
@@ -179,98 +194,113 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
           transport: "mcp",
         });
 
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: JSON.stringify(invoked.shaped, null, 2),
-            },
-          ],
-          isError: invoked.isError,
-        };
+        return textResult(invoked.shaped, invoked.isError);
       } catch (e) {
         const err = e as Error & { code?: string; retryable?: boolean };
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: JSON.stringify({
-                error: {
-                  code: err.code || MCP_ERROR_CODES.GATEWAY_ERROR,
-                  message: err.message,
-                  retryable: err.retryable,
-                },
-              }),
+        return textResult(
+          {
+            error: {
+              code: err.code || MCP_ERROR_CODES.GATEWAY_ERROR,
+              message: err.message,
+              retryable: err.retryable,
             },
-          ],
-          isError: true,
-        };
+          },
+          true
+        );
       }
     }
   );
 
-  server.tool(
+  registerTool(
+    server,
     "list_skills",
     "List curated ToolYour agent skills (playbooks).",
     { category: z.string().optional() },
-    async ({ category }) => {
+    async (args) => {
       let skills = loadSkills();
+      const category =
+        typeof args.category === "string" ? args.category : undefined;
       if (category) {
         skills = skills.filter(
           (s) => s.category.toLowerCase() === category.toLowerCase()
         );
       }
+      return textResult({ skills });
+    }
+  );
+
+  registerTool(
+    server,
+    "load_skill",
+    "Load full skill playbook markdown for a multi-step agent goal.",
+    { skillId: z.string() },
+    async (args) => {
+      const skillId = String(args.skillId || "");
+      const content = loadSkillContent(skillId);
+      if (!content) {
+        return textResult(
+          { error: { code: MCP_ERROR_CODES.SKILL_NOT_FOUND, skillId } },
+          true
+        );
+      }
       return {
-        content: [
-          { type: "text" as const, text: JSON.stringify({ skills }, null, 2) },
-        ],
+        content: [{ type: "text", text: content }],
       };
     }
   );
 
-  server.tool(
-    "load_skill",
-    "Load full skill playbook markdown for a multi-step agent goal.",
-    { skillId: z.string() },
-    async ({ skillId }) => {
-      const content = loadSkillContent(skillId);
-      if (!content) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: JSON.stringify({
-                error: { code: MCP_ERROR_CODES.SKILL_NOT_FOUND, skillId },
-              }),
+  registerTool(
+    server,
+    "fetch_payload",
+    "Fetch a full truncated tool/workflow payload by dataRefId from a summarized response. Free — in-process TTL store (no paid blob). Returns 404 if expired; re-run the tool then.",
+    {
+      dataRefId: z
+        .string()
+        .describe("UUID from summarized response dataRefId field"),
+    },
+    async (args) => {
+      const dataRefId = String(args.dataRefId || "").trim();
+      const entry = payloadStore.get(dataRefId);
+      if (!entry) {
+        return textResult(
+          {
+            error: {
+              code: MCP_ERROR_CODES.INVALID_INPUT,
+              message: "Payload not found or expired",
+              hint: "dataRef entries expire after a short TTL; re-invoke the tool/workflow.",
             },
-          ],
-          isError: true,
-        };
+          },
+          true
+        );
       }
-      return { content: [{ type: "text" as const, text: content }] };
+      return textResult({
+        id: entry.id,
+        operationId: entry.operationId,
+        expiresAt: new Date(entry.expiresAt).toISOString(),
+        originalBytes: entry.bytes,
+        data: entry.data,
+      });
     }
   );
 
-  server.tool(
+  registerTool(
+    server,
     "run_workflow",
     "Run a server-side multi-step workflow (bills per underlying tool call).",
     {
       workflowId: z.string(),
       input: z.any().optional(),
     },
-    async ({ workflowId, input }) => {
-      const result = await runWorkflow(workflowId, input || {}, {
+    async (args) => {
+      const workflowId = String(args.workflowId || "");
+      const input = (args.input || {}) as Record<string, unknown>;
+      const result = await runWorkflow(workflowId, input, {
         apiKey: ctx.apiKey,
         mcpSessionId: ctx.mcpSessionId,
         registry: ctx.registry,
         logger: ctx.logger,
       });
-      return {
-        content: [
-          { type: "text" as const, text: JSON.stringify(result, null, 2) },
-        ],
-        isError: result.status === "partial",
-      };
+      return textResult(result, result.status === "partial");
     }
   );
 

@@ -1,24 +1,11 @@
-import fs from "fs";
-import { getEnv } from "../config";
+import { defsCache } from "../registry/defs-cache";
+import type { ContentAdapterDef } from "../contracts";
 import { normalizeGoalText } from "./match-task";
 
-export interface ContentAdapterDef {
-  id: string;
-  keywords: string[];
-  taskIds?: string[];
-  workflowIds?: string[];
-  urlOperationIds?: string[];
-  localHandlers?: string[];
-  textPipeline?: string[];
-  inputKinds?: Array<"html" | "text" | "code">;
-}
+export type { ContentAdapterDef };
 
 export function loadContentAdapters(): ContentAdapterDef[] {
-  const env = getEnv();
-  const adaptersPath = env.contentAdaptersPath;
-  if (!fs.existsSync(adaptersPath)) return [];
-  const raw = JSON.parse(fs.readFileSync(adaptersPath, "utf8"));
-  return Array.isArray(raw.adapters) ? raw.adapters : [];
+  return defsCache.getContentAdapters();
 }
 
 export function scoreAdapter(goal: string, adapter: ContentAdapterDef): number {

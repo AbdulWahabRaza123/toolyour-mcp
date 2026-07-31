@@ -15,11 +15,15 @@ describe("MCP discovery documents", () => {
     assert.equal(card.authentication.required, true);
     assert.ok(card.tools.some((t) => t.name === "solve_task"));
     assert.ok(card.tools.some((t) => t.name === "discover_tools"));
+    assert.ok(card.tools.some((t) => t.name === "fetch_payload"));
+    assert.ok(Array.isArray(card.transports));
+    assert.ok(card.transports.some((t) => t.type === "streamable-http"));
   });
 
   it("manifest lists sse and api_key auth", () => {
     const m = buildManifest();
     assert.equal(m.endpoints.sse, MCP_PUBLIC_ENDPOINT);
+    assert.equal(m.endpoints.streamableHttp, `${MCP_PUBLIC_ENDPOINT}/http`);
     assert.deepEqual(m.authentication.methods, ["api_key"]);
     assert.equal(m.authentication.api_key.header, "X-Api-Key");
   });

@@ -5,7 +5,7 @@ export interface LogFields {
   mcpSessionId?: string;
   operationId?: string;
   durationMs?: number;
-  transport?: "mcp";
+  transport?: "mcp" | "mcp-sse" | "mcp-http";
   [key: string]: unknown;
 }
 

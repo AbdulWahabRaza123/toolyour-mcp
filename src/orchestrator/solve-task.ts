@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import { MCP_ERROR_CODES } from "../contracts";
 import type { Logger } from "../observability/logger";
 import { runWorkflow } from "../workflow/engine";
@@ -8,6 +7,7 @@ import {
   matchTask,
   normalizeTaskInput,
   rankTaskSuggestions,
+  isConfidentMatch,
 } from "./task-registry";
 import { searchTools } from "../registry/loader";
 import { invokeOperation } from "./invoke-operation";
@@ -17,6 +17,8 @@ import {
   hasDirectContent,
 } from "./content-input";
 import { localDevGuidance } from "./local-dev";
+import { incr } from "../observability/counters";
+
 export interface SolveTaskContext {
   apiKey: string;
   mcpSessionId: string;
@@ -26,6 +28,35 @@ export interface SolveTaskContext {
 
 export type { InvokeOperationContext } from "./invoke-operation";
 export { invokeOperation } from "./invoke-operation";
+
+function suggestResponse(
+  trimmedGoal: string,
+  tasks: ReturnType<typeof loadTasks>,
+  registry: RegistryLoader,
+  message?: string
+) {
+  incr("suggestReturns");
+  const manifest = registry.getManifest();
+  const tools = searchTools(manifest, trimmedGoal, undefined, 5);
+  const suggestions = rankTaskSuggestions(trimmedGoal, tasks, 5);
+
+  return {
+    status: "suggest" as const,
+    goal: trimmedGoal,
+    message:
+      message ||
+      "No high-confidence task match. Review toolSuggestions below (pre-searched from your goal), taskSuggestions, or call discover_tools with a more specific query. Use list_categories to filter by tool family.",
+    taskSuggestions: suggestions.map((s) => ({
+      id: s.task.id,
+      title: s.task.title,
+      description: s.task.description,
+      type: s.task.type,
+      target: s.task.target,
+      score: s.score,
+    })),
+    toolSuggestions: tools,
+  };
+}
 
 export async function solveTask(
   goal: string,
@@ -45,10 +76,11 @@ export async function solveTask(
 
   const tasks = loadTasks();
   const match = matchTask(trimmedGoal, tasks);
+  const confident = isConfidentMatch(trimmedGoal, tasks, match);
   const bundle = extractContentBundle(input);
   const hasContent = hasDirectContent(bundle);
 
-  if (match) {
+  if (match && confident) {
     const bridge = await tryContentBridge(
       trimmedGoal,
       input,
@@ -86,26 +118,15 @@ export async function solveTask(
     }
   }
 
-  if (!match) {
-    const manifest = ctx.registry.getManifest();
-    const tools = searchTools(manifest, trimmedGoal, undefined, 5);
-    const suggestions = rankTaskSuggestions(trimmedGoal, tasks, 3);
-
-    return {
-      status: "suggest" as const,
-      goal: trimmedGoal,
-      message:
-        "No high-confidence task match. Review toolSuggestions below (pre-searched from your goal), taskSuggestions, or call discover_tools with a more specific query. Use list_categories to filter by tool family.",
-      taskSuggestions: suggestions.map((s) => ({
-        id: s.task.id,
-        title: s.task.title,
-        description: s.task.description,
-        type: s.task.type,
-        target: s.task.target,
-        score: s.score,
-      })),
-      toolSuggestions: tools,
-    };
+  if (!match || !confident) {
+    return suggestResponse(
+      trimmedGoal,
+      tasks,
+      ctx.registry,
+      match && !confident
+        ? "Ambiguous or weak task match. Review ranked taskSuggestions and toolSuggestions, then call solve_task with a clearer goal or invoke_tool with an operationId."
+        : undefined
+    );
   }
 
   const { task } = match;
@@ -197,7 +218,7 @@ export async function solveTask(
   }
 
   const invoked = await invokeOperation(
-    ctx,
+    { ...ctx, registry: ctx.registry },
     route,
     task.target,
     normalized.data

@@ -13,6 +13,23 @@ export interface McpConstants {
   summarizedMaxBytes: number;
   gatewayTimeoutMs: number;
   discoverCacheTtlSeconds: number;
+  /** One automatic retry on transient gateway failures */
+  gatewayRetryCount: number;
+  gatewayRetryBackoffMs: number;
+  /** SSE session idle TTL before sweep */
+  mcpSessionTtlMs: number;
+  mcpSessionSweepMs: number;
+  /** Min absolute score to auto-execute a matched task */
+  taskMatchMinScore: number;
+  /** If top-2 scores are within this margin, return suggest instead of execute */
+  taskMatchAmbiguityMargin: number;
+  /** Truncated response payload store (in-process, free) */
+  dataRefTtlMs: number;
+  dataRefSweepMs: number;
+  dataRefMaxEntries: number;
+  dataRefMaxTotalBytes: number;
+  /** Max in-flight gateway fetches per MCP process (free backpressure). */
+  gatewayMaxConcurrent: number;
 }
 
 export interface McpErrorBody {
@@ -73,6 +90,19 @@ export interface McpWorkflowStep {
   operationId: string;
   inputFrom?: string;
   inputMap?: Record<string, string>;
+  /** When true, step failure is recorded but workflow continues */
+  continueOnError?: boolean;
+}
+
+export interface ContentAdapterDef {
+  id: string;
+  keywords: string[];
+  taskIds?: string[];
+  workflowIds?: string[];
+  urlOperationIds?: string[];
+  localHandlers?: string[];
+  textPipeline?: string[];
+  inputKinds?: Array<"html" | "text" | "code">;
 }
 
 export interface McpWorkflowDef {

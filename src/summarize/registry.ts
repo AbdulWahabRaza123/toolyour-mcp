@@ -1,4 +1,6 @@
 import { constants } from "../config";
+import { incr } from "../observability/counters";
+import { buildDataRefPath, payloadStore } from "../payloads/store";
 
 function isToolFileResponse(data: unknown): boolean {
   if (!data || typeof data !== "object") return false;
@@ -11,14 +13,111 @@ function isToolFileResponse(data: unknown): boolean {
   );
 }
 
-function truncateJson(data: unknown, maxBytes: number): unknown {
+function isJobReport(data: unknown): boolean {
+  if (!data || typeof data !== "object") return false;
+  const o = data as Record<string, unknown>;
+  return (
+    o.schemaVersion === "toolyour.jobReport@1" ||
+    (typeof o.jobId === "string" &&
+      Array.isArray(o.findings) &&
+      Array.isArray(o.prioritizedActions))
+  );
+}
+
+const JOB_PRESERVE_KEYS = new Set([
+  "schemaVersion",
+  "jobId",
+  "workflowId",
+  "url",
+  "summary",
+  "scores",
+  "findings",
+  "prioritizedActions",
+  "toolsUsed",
+  "limitations",
+]);
+
+/**
+ * Structure-aware truncation: keep JobReport action fields intact;
+ * shrink nested evidence / steps / workstreams last.
+ */
+function structureAwareTruncate(
+  data: unknown,
+  maxBytes: number
+): { data: unknown; dropped: string[] } {
   const text = JSON.stringify(data);
-  if (text.length <= maxBytes) return data;
+  if (text.length <= maxBytes) return { data, dropped: [] };
+
+  const dropped: string[] = [];
+
+  if (isJobReport(data)) {
+    const report = { ...(data as Record<string, unknown>) };
+    if (Array.isArray(report.findings) && report.findings.length > 25) {
+      dropped.push(`findings:${report.findings.length - 25}`);
+      report.findings = report.findings.slice(0, 25);
+    }
+    if (
+      Array.isArray(report.prioritizedActions) &&
+      report.prioritizedActions.length > 12
+    ) {
+      dropped.push(
+        `prioritizedActions:${report.prioritizedActions.length - 12}`
+      );
+      report.prioritizedActions = report.prioritizedActions.slice(0, 12);
+    }
+    if (report.steps) {
+      dropped.push("steps");
+      delete report.steps;
+    }
+    if (report.workstreams) {
+      const ws = report.workstreams as Record<string, unknown>;
+      const slim: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(ws)) {
+        if (v && typeof v === "object") {
+          const obj = v as Record<string, unknown>;
+          slim[k] = {
+            keys: Object.keys(obj),
+            note: "Full workstream omitted for context size",
+          };
+        } else {
+          slim[k] = v;
+        }
+      }
+      dropped.push("workstreams.detail");
+      report.workstreams = slim;
+    }
+
+    const after = JSON.stringify(report);
+    if (after.length <= maxBytes) return { data: report, dropped };
+
+    const minimal: Record<string, unknown> = {};
+    for (const key of JOB_PRESERVE_KEYS) {
+      if (key in report) minimal[key] = report[key];
+    }
+    dropped.push("non-core-fields");
+    return { data: minimal, dropped };
+  }
+
+  if (data && typeof data === "object" && !Array.isArray(data)) {
+    const obj = { ...(data as Record<string, unknown>) };
+    for (const [k, v] of Object.entries(obj)) {
+      if (Array.isArray(v) && v.length > 20) {
+        dropped.push(`${k}:${v.length - 20}`);
+        obj[k] = v.slice(0, 20);
+      }
+    }
+    const after = JSON.stringify(obj);
+    if (after.length <= maxBytes) return { data: obj, dropped };
+  }
+
   return {
-    summary: "Response truncated for LLM context",
-    preview: text.slice(0, maxBytes),
-    truncated: true,
-    originalBytes: text.length,
+    data: {
+      summary: "Response truncated for LLM context",
+      preview: text.slice(0, maxBytes),
+      truncated: true,
+      originalBytes: text.length,
+    },
+    dropped: ["raw-preview"],
   };
 }
 
@@ -53,11 +152,23 @@ export function shapeResponseForLlm(
     return { status: 200, operationId, data };
   }
 
+  incr("truncations");
+  const stored = payloadStore.store(operationId, data);
+  const { data: trimmed, dropped } = structureAwareTruncate(
+    data,
+    constants.summarizedMaxBytes
+  );
+
   return {
     status: 200,
     operationId,
-    data: truncateJson(data, constants.summarizedMaxBytes),
-    dataRef: null,
+    data: trimmed,
+    dataRef: buildDataRefPath(stored.id),
+    dataRefId: stored.id,
+    dataRefExpiresAt: new Date(stored.expiresAt).toISOString(),
     summarized: true,
+    droppedFields: dropped,
+    originalBytes: bytes,
+    hint: "Full payload available via fetch_payload(dataRefId) or GET dataRef with X-Api-Key (in-process TTL store, free).",
   };
 }

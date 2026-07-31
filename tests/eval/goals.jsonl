@@ -1,7 +1,10 @@
 {"goal":"fix core web vitals for https://example.com","expectedJobId":"improve-core-web-vitals","requiredJobFields":["scores","prioritizedActions"],"category":"cwv"}
 {"goal":"why is LCP slow on https://example.com","expectedJobId":"improve-core-web-vitals","requiredJobFields":["scores.LCP","findings"],"category":"cwv"}
 {"goal":"improve CLS on my landing page https://example.com","expectedJobId":"improve-core-web-vitals","requiredJobFields":["scores.CLS"],"category":"cwv"}
+{"goal":"fix core web vitlas for https://example.com","expectedJobId":"improve-core-web-vitals","category":"cwv-typo"}
+{"goal":"pagespeed issues on https://example.com","expectedJobId":"improve-core-web-vitals","category":"cwv-synonym"}
 {"goal":"optimize this page for SEO https://example.com","expectedJobId":"full-seo-optimization","requiredJobFields":["workstreams","prioritizedActions"],"category":"seo"}
+{"goal":"seo optimisation for https://example.com","expectedJobId":"full-seo-optimization","category":"seo-uk"}
 {"goal":"full seo audit https://example.com","expectedJobId":"seo-audit","requiredJobFields":["steps"],"category":"seo"}
 {"goal":"improve internal linking https://example.com","expectedJobId":"internal-link-architecture","requiredJobFields":["prioritizedActions"],"category":"links"}
 {"goal":"find orphan pages on https://example.com","expectedJobId":"internal-link-architecture","requiredJobFields":["findings"],"category":"links"}
@@ -15,4 +18,10 @@
 {"goal":"convert docx to pdf","expectedJobId":"docx-to-pdf","category":"document"}
 {"goal":"seo regression after deploy","expectedJobId":"seo-deploy-regression","requiredInput":{"urls":["https://example.com/"]},"category":"seo"}
 {"goal":"staging vs production seo check","expectedJobId":"seo-deploy-regression-diff","requiredInput":{"urls":["https://example.com/"],"urlA":"https://staging.example.com/","urlB":"https://example.com/"},"category":"seo"}
+{"goal":"compare seo https://staging.example.com vs https://www.example.com","expectedJobId":"seo-deploy-regression-diff","category":"seo-multi-url"}
+{"goal":"check security headers for https://example.com","expectedJobId":"security-headers","category":"security"}
+{"goal":"open graph social preview for https://example.com","expectedJobId":"social-preview-audit","category":"social"}
+{"goal":"diagnose cls layout shift on https://example.com","expectedJobId":"improve-core-web-vitals","category":"cwv"}
+{"goal":"spf dkim dmarc email auth for https://example.com","expectedJobId":"email-auth-security","category":"security"}
 {"goal":"write me a poem about cats","expectedStatus":"suggest","category":"negative"}
+{"goal":"tell me a joke","expectedStatus":"suggest","category":"negative"}

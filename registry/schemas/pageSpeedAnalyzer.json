@@ -5,8 +5,15 @@
   "request": {
     "type": "object",
     "additionalProperties": true,
-    "description": "Tool-specific input fields."
+    "required": ["url"],
+    "properties": {
+      "url": {
+        "type": "string",
+        "description": "Absolute URL to analyze"
+      }
+    },
+    "description": "Page speed analyzer input"
   },
   "response": null,
-  "responseHint": "Returns JSON response"
+  "responseHint": "Returns JSON response with metrics.ttfbMs, proxies, and assetOptimizer hints"
 }
