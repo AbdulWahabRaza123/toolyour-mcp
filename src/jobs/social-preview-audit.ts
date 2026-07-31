@@ -74,12 +74,29 @@ export function synthesizeSocialPreviewAudit(params: SynthesizeJobParams): JobRe
       ? (socialPayload.openGraphTags as Record<string, string>)["og:title"]
       : undefined;
 
+  const missingOg =
+    typeof metrics.missingOpenGraphCount === "number"
+      ? metrics.missingOpenGraphCount
+      : undefined;
+  const missingTw =
+    typeof metrics.missingTwitterCount === "number"
+      ? metrics.missingTwitterCount
+      : undefined;
+  const tagsComplete =
+    findings.length === 0 && missingOg === 0 && missingTw === 0;
+
   const summary = [
     url ? `Social preview audit for ${url}.` : "Social preview audit complete.",
-    ogTitle ? `Current og:title preview: "${String(ogTitle).slice(0, 80)}".` : "og:title is missing.",
+    ogTitle
+      ? `Current og:title preview: "${String(ogTitle).slice(0, 80)}".`
+      : "og:title is missing.",
     prioritizedActions[0]
       ? `Top fix: ${prioritizedActions[0].action}`
-      : "Open Graph and Twitter Card tags look complete.",
+      : missingOg || missingTw
+        ? `Missing tags: ${missingOg ?? "?"} Open Graph, ${missingTw ?? "?"} Twitter Card.`
+        : tagsComplete
+          ? "Open Graph and Twitter Card tags look complete."
+          : "Review findings for social preview gaps.",
   ];
 
   return {

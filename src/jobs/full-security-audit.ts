@@ -184,6 +184,17 @@ export function synthesizeSecurityHeaders(params: SynthesizeJobParams): JobRepor
   const findings = findingsFromSecurityPayload(headers, "securityHeaders");
   const headerScore = scoreFromPayload(headers);
   const prioritizedActions = rankActions(findings, 10);
+  const high = findings.filter((f) => f.severity === "high").length;
+  const medium = findings.filter((f) => f.severity === "medium").length;
+
+  const gapLine =
+    high > 0
+      ? `${high} high-severity header gap${high === 1 ? "" : "s"} need attention.`
+      : medium > 0
+        ? `${medium} medium-severity header warning${medium === 1 ? "" : "s"} to tighten.`
+        : findings.length === 0
+          ? "No header gaps detected in this pass."
+          : `${findings.length} header issue${findings.length === 1 ? "" : "s"} to review.`;
 
   return {
     schemaVersion: "toolyour.jobReport@1",
@@ -192,10 +203,14 @@ export function synthesizeSecurityHeaders(params: SynthesizeJobParams): JobRepor
     url,
     summary: [
       url ? `Security headers check for ${url}.` : "Security headers check complete.",
-      `${findings.filter((f) => f.severity === "high").length} high-severity header gaps.`,
+      typeof headerScore === "number"
+        ? `Headers score ${headerScore}/100${headers?.grade ? ` (grade ${String(headers.grade)})` : ""}.`
+        : gapLine,
       prioritizedActions[0]
         ? `Top fix: ${prioritizedActions[0].action}`
-        : "Headers look acceptable for this pass.",
+        : high + medium === 0
+          ? "Headers look acceptable for this pass."
+          : gapLine,
     ],
     scores: {
       overall: {

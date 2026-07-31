@@ -13,40 +13,71 @@ export function extractUrl(input: Record<string, unknown>, stepResults: Record<s
 
 export function extractUrlFromShaped(shaped: unknown): string | undefined {
   if (!shaped || typeof shaped !== "object") return undefined;
-  const root = shaped as Record<string, unknown>;
-  const data = root.data;
-  if (data && typeof data === "object") {
-    const d = data as Record<string, unknown>;
-    if (typeof d.url === "string") return d.url;
-    const inner = d.data;
-    if (inner && typeof inner === "object" && typeof (inner as Record<string, unknown>).url === "string") {
-      return (inner as Record<string, unknown>).url as string;
-    }
+  const body = resolveToolResultBody(shaped);
+  if (!body) return undefined;
+  if (typeof body.url === "string") return body.url;
+  const inner = body.data;
+  if (inner && typeof inner === "object" && typeof (inner as Record<string, unknown>).url === "string") {
+    return (inner as Record<string, unknown>).url as string;
   }
   return undefined;
 }
 
-/** Normalized tool result body from shaped MCP invoke response. */
-export function unwrapToolPayload(shaped: unknown): Record<string, unknown> | null {
+/**
+ * Peel MCP shaped invoke `{ status: 200, data }` down to the tool result core.
+ * Handles both:
+ * - Direct toolResult: `{ schemaVersion, data, report }`
+ * - Gateway envelope: `{ status: true, code, result: toolResult|flatPayload }`
+ */
+export function resolveToolResultBody(shaped: unknown): Record<string, unknown> | null {
   if (!shaped || typeof shaped !== "object") return null;
   const root = shaped as Record<string, unknown>;
   if (root.status !== 200) return null;
   const data = root.data;
-  if (!data || typeof data !== "object") return null;
-  const d = data as Record<string, unknown>;
-  if (d.data && typeof d.data === "object") return d.data as Record<string, unknown>;
-  return d;
+  if (!data || typeof data !== "object" || Array.isArray(data)) return null;
+  let body = data as Record<string, unknown>;
+
+  const looksLikeGatewayEnvelope =
+    "result" in body &&
+    body.result !== null &&
+    typeof body.result === "object" &&
+    !Array.isArray(body.result) &&
+    (typeof body.status === "boolean" ||
+      typeof body.code === "number" ||
+      "error" in body ||
+      "message" in body);
+
+  if (looksLikeGatewayEnvelope) {
+    body = body.result as Record<string, unknown>;
+  }
+  return body;
+}
+
+/** Normalized tool result body from shaped MCP invoke response. */
+export function unwrapToolPayload(shaped: unknown): Record<string, unknown> | null {
+  const body = resolveToolResultBody(shaped);
+  if (!body) return null;
+  // toolyour.toolResult@1 — domain fields live under .data
+  if (
+    body.data &&
+    typeof body.data === "object" &&
+    !Array.isArray(body.data) &&
+    (body.report ||
+      body.schemaVersion === "toolyour.toolResult@1" ||
+      typeof body.toolId === "string")
+  ) {
+    return body.data as Record<string, unknown>;
+  }
+  return body;
 }
 
 export function extractReport(shaped: unknown): Record<string, unknown> | null {
-  if (!shaped || typeof shaped !== "object") return null;
-  const root = shaped as Record<string, unknown>;
-  if (root.status !== 200) return null;
-  const data = root.data;
-  if (!data || typeof data !== "object") return null;
-  const d = data as Record<string, unknown>;
-  const report = d.report;
-  if (report && typeof report === "object") return report as Record<string, unknown>;
+  const body = resolveToolResultBody(shaped);
+  if (!body) return null;
+  const report = body.report;
+  if (report && typeof report === "object" && !Array.isArray(report)) {
+    return report as Record<string, unknown>;
+  }
   return null;
 }
 

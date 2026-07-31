@@ -352,8 +352,122 @@ describe("job synthesizers", () => {
       stepResults: { social: socialShaped },
     });
     assert.ok(report.scores.openGraph);
+    assert.equal(report.scores.overall.value, 40);
+    assert.equal(report.scores.overall.status, "poor");
     assert.ok(report.workstreams?.socialPreview);
     assert.ok(report.prioritizedActions.length >= 1);
+    assert.ok(report.findings.length >= 1);
+    assert.equal(report.summary.some((s) => /look complete/i.test(s)), false);
+  });
+
+  it("builds social-preview from gateway envelope (prod shape)", async () => {
+    const { synthesizeSocialPreviewAudit } = await import("../../dist/jobs/social-preview-audit.js");
+    const socialShaped = {
+      status: 200,
+      operationId: "socialMediaIntegration",
+      data: {
+        status: true,
+        code: 200,
+        message: "Social media analysis completed",
+        result: {
+          schemaVersion: "toolyour.toolResult@1",
+          toolId: "social-media-integration",
+          url: "https://example.com",
+          data: {
+            url: "https://example.com",
+            openGraphTags: {},
+            twitterCardTags: {},
+            suggestions: ["Add Open Graph title"],
+          },
+          report: {
+            summary: { totalScore: 18, grade: "F", topPriorities: ["Add missing Open Graph tags"] },
+            metrics: { missingOpenGraphCount: 5, missingTwitterCount: 4 },
+            findings: [
+              {
+                title: "Missing Open Graph tags",
+                severity: "high",
+                whyItMatters: "CTR",
+                howToFix: ["Add og:title meta tag"],
+              },
+            ],
+          },
+        },
+        error: "",
+      },
+    };
+    const report = synthesizeSocialPreviewAudit({
+      synthesizerId: "social-preview-audit",
+      workflowId: "social-preview-audit-job",
+      input: { url: "https://example.com" },
+      steps: [{ id: "social", operationId: "socialMediaIntegration" }],
+      stepResults: { social: socialShaped },
+    });
+    assert.equal(report.scores.overall.value, 18);
+    assert.equal(report.findings.length, 1);
+    assert.match(report.summary.join(" "), /og:title is missing/i);
+    assert.match(report.summary.join(" "), /Top fix:/i);
+    assert.equal(report.summary.some((s) => /look complete/i.test(s)), false);
+  });
+
+  it("builds security-headers report from gateway envelope", async () => {
+    const { synthesizeSecurityHeaders } = await import("../../dist/jobs/full-security-audit.js");
+    const headersShaped = {
+      status: 200,
+      operationId: "securityHeadersAnalyzer",
+      data: {
+        status: true,
+        code: 200,
+        message: "Success",
+        result: {
+          url: "https://example.com/",
+          status: 200,
+          score: 32,
+          grade: "F",
+          checks: [
+            {
+              id: "csp",
+              name: "Content-Security-Policy",
+              present: false,
+              value: null,
+              severity: "fail",
+              advice: "Add a CSP to reduce XSS and injection risk.",
+            },
+            {
+              id: "hsts",
+              name: "Strict-Transport-Security",
+              present: false,
+              value: null,
+              severity: "fail",
+              advice: "Enable HSTS on HTTPS responses.",
+            },
+            {
+              id: "xfo",
+              name: "X-Frame-Options",
+              present: false,
+              value: null,
+              severity: "warn",
+              advice: "Set DENY or SAMEORIGIN.",
+            },
+          ],
+          summary: { pass: 0, warn: 1, fail: 2 },
+        },
+        error: "",
+      },
+    };
+    const report = synthesizeSecurityHeaders({
+      synthesizerId: "security-headers",
+      workflowId: "security-headers-job",
+      input: { url: "https://example.com" },
+      steps: [{ id: "headers", operationId: "securityHeadersAnalyzer" }],
+      stepResults: { headers: headersShaped },
+    });
+    assert.equal(report.scores.overall.value, 32);
+    assert.equal(report.scores.overall.status, "poor");
+    assert.ok(report.findings.length >= 3);
+    assert.ok(report.prioritizedActions.length >= 1);
+    assert.match(report.summary.join(" "), /32\/100/);
+    assert.match(report.summary.join(" "), /Top fix:/i);
+    assert.equal(report.summary.some((s) => /look acceptable/i.test(s)), false);
   });
 
   it("merges content-quality-audit workstreams", async () => {
