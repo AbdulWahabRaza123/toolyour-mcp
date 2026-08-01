@@ -45,3 +45,30 @@ describe("async runs", () => {
     );
   });
 });
+
+describe("optional webhook fault tolerance", () => {
+  it("notifyJobFinishedOptional never throws without config", async () => {
+    const { notifyJobFinishedOptional } = await import(
+      "../../dist/runs/webhook.js"
+    );
+    const { createLogger } = await import("../../dist/observability/logger.js");
+    runStore.start();
+    const run = runStore.create({
+      userId: "u1",
+      apiKeyId: "k1",
+      kind: "solve_task",
+    });
+    runStore.finish(run.id, "completed", { ok: true });
+    const finished = runStore.get(run.id);
+    assert.ok(finished);
+    const result = await notifyJobFinishedOptional(
+      "ty_fake_key_for_test",
+      finished,
+      createLogger("error")
+    );
+    assert.equal(result.delivered, false);
+    assert.equal(result.attempted, false);
+    // Run still readable after notify
+    assert.equal(runStore.get(run.id)?.status, "completed");
+  });
+});

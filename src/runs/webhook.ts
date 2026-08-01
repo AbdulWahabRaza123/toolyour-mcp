@@ -8,6 +8,15 @@ export interface JobWebhookConfig {
   secret: string;
 }
 
+export interface WebhookNotifyResult {
+  attempted: boolean;
+  delivered: boolean;
+  skippedReason?: string;
+}
+
+/**
+ * Load optional per-user webhook config. Never throws — returns null when unset or SaaS unreachable.
+ */
 export async function fetchJobWebhookConfig(
   apiKey: string,
   logger: Logger
@@ -21,16 +30,28 @@ export async function fetchJobWebhookConfig(
         "X-SaaS-Secret": env.internalSecret,
       },
       body: JSON.stringify({ apiKey }),
+      signal: AbortSignal.timeout(5_000),
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      logger.warn("mcp job webhook config non-ok (ignored)", { status: res.status });
+      return null;
+    }
     const body = (await res.json()) as {
-      url?: string;
-      secret?: string;
+      url?: string | null;
+      secret?: string | null;
     };
-    if (!body.url || !body.secret) return null;
-    return { url: body.url, secret: body.secret };
+    const url = typeof body.url === "string" ? body.url.trim() : "";
+    const secret = typeof body.secret === "string" ? body.secret.trim() : "";
+    if (!url || !secret) return null;
+    if (!/^https:\/\//i.test(url)) {
+      logger.warn("mcp job webhook url rejected (must be https)", {
+        urlPreview: url.slice(0, 32),
+      });
+      return null;
+    }
+    return { url, secret };
   } catch (e) {
-    logger.warn("mcp job webhook config fetch failed", {
+    logger.warn("mcp job webhook config fetch failed (ignored)", {
       error: e instanceof Error ? e.message : String(e),
     });
     return null;
@@ -41,11 +62,15 @@ function signBody(secret: string, body: string): string {
   return createHmac("sha256", secret).update(body).digest("hex");
 }
 
+/**
+ * Best-effort outbound notify. Retries a few times then gives up.
+ * Callers must not await this for correctness — job results live in runStore / get_run.
+ */
 export async function deliverJobFinishedWebhook(
   config: JobWebhookConfig,
   run: StoredRun,
   logger: Logger
-): Promise<void> {
+): Promise<boolean> {
   const payload = {
     event: "mcp.job.finished",
     runId: run.id,
@@ -79,15 +104,15 @@ export async function deliverJobFinishedWebhook(
           attempt,
           status: res.status,
         });
-        return;
+        return true;
       }
-      logger.warn("mcp job webhook non-2xx", {
+      logger.warn("mcp job webhook non-2xx (will retry or skip)", {
         runId: run.id,
         attempt,
         status: res.status,
       });
     } catch (e) {
-      logger.warn("mcp job webhook delivery error", {
+      logger.warn("mcp job webhook delivery error (will retry or skip)", {
         runId: run.id,
         attempt,
         error: e instanceof Error ? e.message : String(e),
@@ -96,5 +121,41 @@ export async function deliverJobFinishedWebhook(
     if (attempt < maxAttempts) {
       await new Promise((r) => setTimeout(r, 400 * attempt));
     }
+  }
+  logger.warn("mcp job webhook abandoned after retries — get_run still works", {
+    runId: run.id,
+  });
+  return false;
+}
+
+/**
+ * Optional notify after a run finishes. Never throws; never blocks job correctness.
+ */
+export async function notifyJobFinishedOptional(
+  apiKey: string,
+  run: StoredRun,
+  logger: Logger
+): Promise<WebhookNotifyResult> {
+  try {
+    const config = await fetchJobWebhookConfig(apiKey, logger);
+    if (!config) {
+      return {
+        attempted: false,
+        delivered: false,
+        skippedReason: "no_webhook_configured_or_saas_unavailable",
+      };
+    }
+    const delivered = await deliverJobFinishedWebhook(config, run, logger);
+    return { attempted: true, delivered };
+  } catch (e) {
+    logger.warn("mcp job webhook notify crashed (ignored)", {
+      runId: run.id,
+      error: e instanceof Error ? e.message : String(e),
+    });
+    return {
+      attempted: true,
+      delivered: false,
+      skippedReason: "notify_exception",
+    };
   }
 }
