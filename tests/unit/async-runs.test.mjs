@@ -12,8 +12,8 @@ describe("async runs", () => {
     assert.equal(wantsAsync(undefined), false);
   });
 
-  it("stores and finishes a run", () => {
-    runStore.start();
+  it("stores and finishes a run", async () => {
+    await runStore.start();
     const run = runStore.create({
       userId: "u1",
       apiKeyId: "k1",
@@ -27,7 +27,7 @@ describe("async runs", () => {
     });
     assert.ok(finished);
     assert.equal(finished.status, "completed");
-    const got = runStore.get(run.id);
+    const got = await runStore.get(run.id);
     assert.equal(got?.status, "completed");
     assert.deepEqual(got?.result, {
       status: "completed",
@@ -52,14 +52,14 @@ describe("optional webhook fault tolerance", () => {
       "../../dist/runs/webhook.js"
     );
     const { createLogger } = await import("../../dist/observability/logger.js");
-    runStore.start();
+    await runStore.start();
     const run = runStore.create({
       userId: "u1",
       apiKeyId: "k1",
       kind: "solve_task",
     });
     runStore.finish(run.id, "completed", { ok: true });
-    const finished = runStore.get(run.id);
+    const finished = await runStore.get(run.id);
     assert.ok(finished);
     const result = await notifyJobFinishedOptional(
       "ty_fake_key_for_test",
@@ -68,7 +68,6 @@ describe("optional webhook fault tolerance", () => {
     );
     assert.equal(result.delivered, false);
     assert.equal(result.attempted, false);
-    // Run still readable after notify
-    assert.equal(runStore.get(run.id)?.status, "completed");
+    assert.equal((await runStore.get(run.id))?.status, "completed");
   });
 });

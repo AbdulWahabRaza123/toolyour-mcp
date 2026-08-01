@@ -1,5 +1,13 @@
 import { randomUUID } from "crypto";
 import { constants } from "../config";
+import type { Logger } from "../observability/logger";
+import {
+  isRedisRunsEnabled,
+  redisGetRun,
+  redisPutRun,
+  startRedisRuns,
+  stopRedisRuns,
+} from "./redis-backend";
 
 export type RunStatus = "accepted" | "running" | "completed" | "partial" | "error";
 
@@ -17,28 +25,35 @@ export interface StoredRun {
   bytes: number;
 }
 
-const RUN_TTL_MS = 60 * 60 * 1000;
+export const RUN_TTL_MS = 60 * 60 * 1000;
 const RUN_MAX_ENTRIES = 200;
 const RUN_MAX_TOTAL_BYTES = 32 * 1024 * 1024;
 
 /**
- * Process-local TTL store for async MCP runs.
- * Multi-replica: each instance has its own store (same sticky limitation as dataRef).
+ * Durable async run store: in-process TTL always on; Redis optional for multi-replica get_run.
+ * Missing/broken Redis never breaks accept/finish — memory remains authoritative for the writer.
  */
 class RunStore {
   private entries = new Map<string, StoredRun>();
   private totalBytes = 0;
   private sweepTimer: ReturnType<typeof setInterval> | null = null;
+  private logger: Logger | null = null;
 
-  start() {
-    if (this.sweepTimer) return;
-    this.sweepTimer = setInterval(() => this.sweep(), constants.dataRefSweepMs);
-    this.sweepTimer.unref?.();
+  async start(logger?: Logger) {
+    this.logger = logger || null;
+    if (!this.sweepTimer) {
+      this.sweepTimer = setInterval(() => this.sweep(), constants.dataRefSweepMs);
+      this.sweepTimer.unref?.();
+    }
+    if (logger) {
+      await startRedisRuns(logger);
+    }
   }
 
-  stop() {
+  async stop() {
     if (this.sweepTimer) clearInterval(this.sweepTimer);
     this.sweepTimer = null;
+    await stopRedisRuns();
   }
 
   create(partial: {
@@ -54,7 +69,7 @@ class RunStore {
     ) {
       const oldest = this.entries.keys().next().value as string | undefined;
       if (!oldest) break;
-      this.delete(oldest);
+      this.deleteLocal(oldest);
     }
 
     const now = Date.now();
@@ -70,6 +85,7 @@ class RunStore {
       bytes: 0,
     };
     this.entries.set(entry.id, entry);
+    void redisPutRun(entry);
     return entry;
   }
 
@@ -78,6 +94,7 @@ class RunStore {
     if (!entry) return;
     entry.status = "running";
     entry.updatedAt = Date.now();
+    void redisPutRun(entry);
   }
 
   finish(
@@ -85,7 +102,7 @@ class RunStore {
     status: "completed" | "partial" | "error",
     result: unknown,
     error?: unknown
-  ) {
+  ): StoredRun | null {
     const entry = this.entries.get(id);
     if (!entry) return null;
     this.totalBytes = Math.max(0, this.totalBytes - entry.bytes);
@@ -97,21 +114,52 @@ class RunStore {
     entry.updatedAt = Date.now();
     entry.expiresAt = Date.now() + RUN_TTL_MS;
     this.totalBytes += entry.bytes;
+    void redisPutRun(entry);
     return entry;
   }
 
-  get(id: string): StoredRun | null {
+  /**
+   * Local-first, then Redis (cross-replica). Never throws.
+   */
+  async get(id: string): Promise<StoredRun | null> {
+    this.sweep();
+    const local = this.entries.get(id);
+    if (local) {
+      if (Date.now() >= local.expiresAt) {
+        this.deleteLocal(id);
+      } else {
+        return local;
+      }
+    }
+    try {
+      const remote = await redisGetRun(id);
+      if (remote) {
+        // Warm local cache for subsequent polls on this instance
+        this.entries.set(remote.id, remote);
+        this.totalBytes += remote.bytes || 0;
+        return remote;
+      }
+    } catch (e) {
+      this.logger?.warn("mcp run redis get failed (ignored)", {
+        error: e instanceof Error ? e.message : String(e),
+      });
+    }
+    return null;
+  }
+
+  /** Sync peek for unit tests / same-instance only */
+  getLocal(id: string): StoredRun | null {
     this.sweep();
     const entry = this.entries.get(id);
     if (!entry) return null;
     if (Date.now() >= entry.expiresAt) {
-      this.delete(id);
+      this.deleteLocal(id);
       return null;
     }
     return entry;
   }
 
-  delete(id: string) {
+  deleteLocal(id: string) {
     const entry = this.entries.get(id);
     if (!entry) return;
     this.entries.delete(id);
@@ -121,7 +169,7 @@ class RunStore {
   sweep() {
     const now = Date.now();
     for (const [id, entry] of this.entries) {
-      if (now >= entry.expiresAt) this.delete(id);
+      if (now >= entry.expiresAt) this.deleteLocal(id);
     }
   }
 
@@ -130,6 +178,7 @@ class RunStore {
       entries: this.entries.size,
       totalBytes: this.totalBytes,
       ttlMs: RUN_TTL_MS,
+      redis: isRedisRunsEnabled(),
     };
   }
 }

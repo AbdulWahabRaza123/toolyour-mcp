@@ -16,7 +16,24 @@
         "local",
         "my code",
         "before deploy",
-        "dev server"
+        "dev server",
+        "verify seo after fix",
+        "recheck seo audit"
+      ],
+      "type": "workflow",
+      "target": "full-seo-audit",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "fix-verify-seo-audit",
+      "title": "Fix-verify SEO audit",
+      "description": "Re-run SEO + speed audit after fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify seo audit",
+        "verify seo after fix",
+        "recheck seo audit",
+        "confirm seo fixed",
+        "seo audit regression"
       ],
       "type": "workflow",
       "target": "full-seo-audit",
@@ -506,7 +523,24 @@
         "security.txt",
         "dns email security",
         "vulnerability disclosure file",
-        "mx dns check"
+        "mx dns check",
+        "verify email auth",
+        "recheck spf dkim"
+      ],
+      "type": "workflow",
+      "target": "email-auth-security-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "fix-verify-email-auth",
+      "title": "Fix-verify email auth",
+      "description": "Re-run SPF/DKIM/DMARC + DNS after email/DNS fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify email auth",
+        "verify spf dkim after fix",
+        "recheck dmarc",
+        "confirm email authentication",
+        "email auth regression"
       ],
       "type": "workflow",
       "target": "email-auth-security-job",

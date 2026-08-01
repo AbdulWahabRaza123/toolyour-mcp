@@ -28,6 +28,8 @@
 {"goal":"fix verify security headers for https://example.com","expectedJobId":"fix-verify-security-headers","category":"verify"}
 {"goal":"fix verify social preview for https://example.com","expectedJobId":"fix-verify-social-preview","category":"verify"}
 {"goal":"fix verify core web vitals for https://example.com","expectedJobId":"fix-verify-core-web-vitals","category":"verify"}
+{"goal":"fix verify seo audit for https://example.com","expectedJobId":"fix-verify-seo-audit","category":"verify"}
+{"goal":"fix verify email auth for https://example.com","expectedJobId":"fix-verify-email-auth","category":"verify"}
 {"goal":"ship this html before publish","expectedJobId":"content-ship-local","requiredInput":{"html":"<html></html>"},"category":"local"}
 {"goal":"write me a poem about cats","expectedStatus":"suggest","category":"negative"}
 {"goal":"tell me a joke","expectedStatus":"suggest","category":"negative"}

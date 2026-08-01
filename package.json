@@ -20,6 +20,7 @@
     "ci": "npm run build && npm run lint:skills && npm run check:schema-required && npm run test:mcp",
     "smoke:jobs:offline": "npm run build && node scripts/smoke-jobs-offline.mjs",
     "smoke:jobs:live": "node scripts/test-mcp-use-cases.mjs",
+    "smoke:live:agent": "node scripts/smoke-live-agent-loop.mjs",
     "smoke:staging": "node scripts/smoke-staging.mjs"
   },
   "dependencies": {
@@ -27,6 +28,7 @@
     "cheerio": "^1.0.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "ioredis": "^5.11.1",
     "zod": "^3.24.2"
   },
   "devDependencies": {

@@ -20,7 +20,7 @@ const registry = new RegistryLoader(logger);
 registry.start();
 defsCache.start(logger);
 payloadStore.start();
-runStore.start();
+void runStore.start(logger);
 
 const app = express();
 // SSE POST /mcp/messages reads the raw stream — skip JSON there.
@@ -269,18 +269,18 @@ app.get("/mcp/payloads/:id", (req, res) => {
   });
 });
 
-/** Poll async MCP run (same API key). Free in-process TTL store (~60m). */
-app.get("/mcp/runs/:id", (req, res) => {
+/** Poll async MCP run (same API key). Memory + optional Redis TTL (~60m). */
+app.get("/mcp/runs/:id", async (req, res) => {
   const apiKey = extractApiKey(req);
   if (!apiKey) {
     res.status(401).json({ error: "Missing X-Api-Key" });
     return;
   }
-  const entry = runStore.get(req.params.id);
+  const entry = await runStore.get(req.params.id);
   if (!entry) {
     res.status(404).json({
       error: "Run not found or expired",
-      hint: "Async runs are short-lived in-process on the accepting MCP instance.",
+      hint: "Async runs TTL ~60m. With REDIS_URL, get_run works across MCP replicas; without Redis, poll the same instance that accepted the job.",
     });
     return;
   }

@@ -22,6 +22,8 @@ export const SKILL_WORKFLOW_MAP: Record<string, string> = {
   "fix-verify-security-headers": "security-headers-job",
   "fix-verify-social-preview": "social-preview-audit-job",
   "fix-verify-core-web-vitals": "core-web-vitals-job",
+  "fix-verify-seo-audit": "full-seo-audit",
+  "fix-verify-email-auth": "email-auth-security-job",
 };
 
 export function skillWorkflowId(skillId: string): string | undefined {

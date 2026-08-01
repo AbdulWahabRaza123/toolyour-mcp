@@ -402,20 +402,20 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "get_run",
-    "Poll an async solve_task / run_playbook / run_workflow run by runId. Free — in-process TTL (~60m). Also available as GET /mcp/runs/:runId.",
+    "Poll an async solve_task / run_playbook / run_workflow run by runId. Free. Uses in-process TTL; with REDIS_URL also readable across MCP replicas. Webhook notify is optional.",
     {
       runId: z.string().describe("UUID returned when async:true"),
     },
     async (args) => {
       const runId = String(args.runId || "").trim();
-      const entry = runStore.get(runId);
+      const entry = await runStore.get(runId);
       if (!entry) {
         return textResult(
           {
             error: {
               code: MCP_ERROR_CODES.INVALID_INPUT,
               message: "Run not found or expired",
-              hint: "Async runs are short-lived in-process; sticky to the MCP instance that accepted the job.",
+              hint: "Poll the accepting instance, or set REDIS_URL on MCP for cross-replica get_run. Webhook is optional.",
             },
           },
           true
