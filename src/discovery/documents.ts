@@ -33,7 +33,7 @@ const META_TOOLS = [
   {
     name: "verify_task",
     description:
-      "Re-run a goal and return score/finding deltas vs a baseline jobReport.",
+      "Re-run a goal and return score/finding deltas vs baseline. Supports async:true; poll get_run.",
   },
   {
     name: "discover_tools",
@@ -61,7 +61,7 @@ const META_TOOLS = [
   {
     name: "get_run",
     description:
-      "Poll an async solve_task/run_playbook/run_workflow by runId (free in-process TTL).",
+      "Poll async solve_task/run_playbook/run_workflow/verify_task by runId. Read resultStatus — run status completed only means finished.",
   },
   {
     name: "list_skills",
@@ -132,7 +132,7 @@ export function buildServerCard() {
       "Discovery meta-tools are free; tool/workflow execution shares the REST monthly quota.",
       "solve_task is the primary entry with fuzzy matching and confidence gating; ambiguous goals return ranked suggestions. Use plan_task (free) before execute; run_playbook for skills; verify_task for deltas. Default solve_task responses are compact.",
       "Large responses may include dataRefId — use fetch_payload (free in-process TTL store, no paid blob).",
-      "Optional async:true returns runId; always poll get_run (REDIS_URL enables cross-replica). Dashboard mcp.job.finished webhook is optional best-effort and never required for correctness.",
+      "Optional async:true on solve_task / run_playbook / run_workflow / verify_task returns runId; always poll get_run and read resultStatus (suggest|need_input|verified|error|…). REDIS_URL enables cross-replica. Dashboard mcp.job.finished webhook is optional best-effort and never required for correctness.",
     ],
   };
 }
@@ -173,7 +173,7 @@ export function buildManifest() {
       security_contact: "mailto:support@toolyour.com",
     },
     rate_limits: {
-      note: "Shared monthly quota with REST (Free: 500 requests/month). Meta discovery tools are free.",
+      note: "Shared monthly credit quota with REST (Free: 500 credits/month; tools cost 1–10 credits). Meta discovery tools are free.",
     },
     registration: { dynamic: false },
     documentation: MCP_DOCS_URL,
