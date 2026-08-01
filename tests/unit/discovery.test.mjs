@@ -16,6 +16,7 @@ describe("MCP discovery documents", () => {
     assert.ok(card.tools.some((t) => t.name === "solve_task"));
     assert.ok(card.tools.some((t) => t.name === "discover_tools"));
     assert.ok(card.tools.some((t) => t.name === "fetch_payload"));
+    assert.ok(card.tools.some((t) => t.name === "get_run"));
     assert.ok(card.tools.some((t) => t.name === "plan_task"));
     assert.ok(card.tools.some((t) => t.name === "run_playbook"));
     assert.ok(card.tools.some((t) => t.name === "verify_task"));

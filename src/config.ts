@@ -53,12 +53,17 @@ export const constants: McpConstants = {
 };
 
 export function getEnv() {
+  const validateUrl =
+    process.env.SAAS_VALIDATE_URL ||
+    "http://127.0.0.1:3002/internal/validate-key";
+  const saasInternalBase = validateUrl.replace(/\/validate-key\/?$/, "");
   return {
     port: Number(process.env.PORT || 3090),
     gatewayUrl: (process.env.GATEWAY_URL || "http://127.0.0.1:8888").replace(/\/$/, ""),
-    validateUrl:
-      process.env.SAAS_VALIDATE_URL ||
-      "http://127.0.0.1:3002/internal/validate-key",
+    validateUrl,
+    mcpJobWebhookConfigUrl:
+      process.env.SAAS_MCP_JOB_WEBHOOK_URL ||
+      `${saasInternalBase}/mcp-job-webhook`,
     internalSecret: process.env.SAAS_INTERNAL_SECRET || "",
     registryPath:
       process.env.REGISTRY_PATH ||

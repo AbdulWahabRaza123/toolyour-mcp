@@ -59,6 +59,11 @@ const META_TOOLS = [
       "Fetch full truncated payload by dataRefId (free in-process TTL store).",
   },
   {
+    name: "get_run",
+    description:
+      "Poll an async solve_task/run_playbook/run_workflow by runId (free in-process TTL).",
+  },
+  {
     name: "list_skills",
     description: "List agent skill playbooks available on this server.",
   },
@@ -127,6 +132,7 @@ export function buildServerCard() {
       "Discovery meta-tools are free; tool/workflow execution shares the REST monthly quota.",
       "solve_task is the primary entry with fuzzy matching and confidence gating; ambiguous goals return ranked suggestions. Use plan_task (free) before execute; run_playbook for skills; verify_task for deltas. Default solve_task responses are compact.",
       "Large responses may include dataRefId — use fetch_payload (free in-process TTL store, no paid blob).",
+      "Optional async:true on solve_task / run_playbook / run_workflow returns runId; poll get_run or configure a job-finished webhook in the dashboard.",
     ],
   };
 }

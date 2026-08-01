@@ -18,6 +18,8 @@ import {
   parseResponseMode,
 } from "../orchestrator/compact-response";
 import { payloadStore } from "../payloads/store";
+import { acceptAsyncJob, wantsAsync } from "../runs/async-job";
+import { runStore } from "../runs/store";
 import type { Logger } from "../observability/logger";
 
 export interface McpServerContext {
@@ -96,11 +98,28 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
         .enum(["compact", "full", "dataRef"])
         .optional()
         .describe("compact (default) | full | dataRef"),
+      async: z
+        .boolean()
+        .optional()
+        .describe(
+          "If true, return runId immediately and continue server-side; poll get_run or receive mcp.job.finished webhook"
+        ),
     },
     async (args) => {
       const goal = String(args.goal || "");
       const input = (args.input || {}) as Record<string, unknown>;
       const mode = parseResponseMode(args.responseMode);
+      if (wantsAsync(args.async)) {
+        return textResult(
+          await acceptAsyncJob({
+            kind: "solve_task",
+            apiKey: ctx.apiKey,
+            logger: ctx.logger,
+            responseMode: mode,
+            work: () => solveTask(goal, input, ctx, mode),
+          })
+        );
+      }
       const result = await solveTask(goal, input, ctx, mode);
       return textResult(
         result,
@@ -118,11 +137,23 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
       skillId: z.string().describe("Skill id from list_skills"),
       input: z.any().optional(),
       responseMode: z.enum(["compact", "full", "dataRef"]).optional(),
+      async: z.boolean().optional(),
     },
     async (args) => {
       const skillId = String(args.skillId || "");
       const input = (args.input || {}) as Record<string, unknown>;
       const mode = parseResponseMode(args.responseMode);
+      if (wantsAsync(args.async)) {
+        return textResult(
+          await acceptAsyncJob({
+            kind: "run_playbook",
+            apiKey: ctx.apiKey,
+            logger: ctx.logger,
+            responseMode: mode,
+            work: () => runPlaybook(skillId, input, ctx, mode),
+          })
+        );
+      }
       const result = await runPlaybook(skillId, input, ctx, mode);
       return textResult(
         result,
@@ -370,26 +401,77 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
 
   registerTool(
     server,
+    "get_run",
+    "Poll an async solve_task / run_playbook / run_workflow run by runId. Free — in-process TTL (~60m). Also available as GET /mcp/runs/:runId.",
+    {
+      runId: z.string().describe("UUID returned when async:true"),
+    },
+    async (args) => {
+      const runId = String(args.runId || "").trim();
+      const entry = runStore.get(runId);
+      if (!entry) {
+        return textResult(
+          {
+            error: {
+              code: MCP_ERROR_CODES.INVALID_INPUT,
+              message: "Run not found or expired",
+              hint: "Async runs are short-lived in-process; sticky to the MCP instance that accepted the job.",
+            },
+          },
+          true
+        );
+      }
+      return textResult({
+        runId: entry.id,
+        kind: entry.kind,
+        status: entry.status,
+        createdAt: new Date(entry.createdAt).toISOString(),
+        updatedAt: new Date(entry.updatedAt).toISOString(),
+        expiresAt: new Date(entry.expiresAt).toISOString(),
+        result: entry.result ?? null,
+        error: entry.error ?? null,
+      });
+    }
+  );
+
+  registerTool(
+    server,
     "run_workflow",
     "Run a server-side multi-step workflow (bills per underlying tool call). Prefer solve_task or run_playbook when you have a goal/skillId.",
     {
       workflowId: z.string(),
       input: z.any().optional(),
       responseMode: z.enum(["compact", "full", "dataRef"]).optional(),
+      async: z.boolean().optional(),
     },
     async (args) => {
       const workflowId = String(args.workflowId || "");
       const input = (args.input || {}) as Record<string, unknown>;
       const mode = parseResponseMode(args.responseMode);
-      const result = await runWorkflow(workflowId, input, {
-        apiKey: ctx.apiKey,
-        mcpSessionId: ctx.mcpSessionId,
-        registry: ctx.registry,
-        logger: ctx.logger,
-      });
+      const work = async () => {
+        const result = await runWorkflow(workflowId, input, {
+          apiKey: ctx.apiKey,
+          mcpSessionId: ctx.mcpSessionId,
+          registry: ctx.registry,
+          logger: ctx.logger,
+        });
+        return applyResponseMode(result, mode);
+      };
+      if (wantsAsync(args.async)) {
+        return textResult(
+          await acceptAsyncJob({
+            kind: "run_workflow",
+            apiKey: ctx.apiKey,
+            logger: ctx.logger,
+            responseMode: mode,
+            work,
+          })
+        );
+      }
+      const result = await work();
       return textResult(
-        applyResponseMode(result, mode),
-        result.status === "partial"
+        result,
+        (result as { status?: string }).status === "partial"
       );
     }
   );

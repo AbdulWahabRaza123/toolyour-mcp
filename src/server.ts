@@ -8,6 +8,7 @@ import { createLogger } from "./observability/logger";
 import { RegistryLoader } from "./registry/loader";
 import { defsCache } from "./registry/defs-cache";
 import { payloadStore } from "./payloads/store";
+import { runStore } from "./runs/store";
 import { registerHealthRoutes } from "./health/routes";
 import { registerDiscoveryRoutes } from "./discovery/routes";
 import { createToolYourMcpServer } from "./tools/mcp-tools";
@@ -19,6 +20,7 @@ const registry = new RegistryLoader(logger);
 registry.start();
 defsCache.start(logger);
 payloadStore.start();
+runStore.start();
 
 const app = express();
 // SSE POST /mcp/messages reads the raw stream — skip JSON there.
@@ -264,6 +266,33 @@ app.get("/mcp/payloads/:id", (req, res) => {
     expiresAt: new Date(entry.expiresAt).toISOString(),
     originalBytes: entry.bytes,
     data: entry.data,
+  });
+});
+
+/** Poll async MCP run (same API key). Free in-process TTL store (~60m). */
+app.get("/mcp/runs/:id", (req, res) => {
+  const apiKey = extractApiKey(req);
+  if (!apiKey) {
+    res.status(401).json({ error: "Missing X-Api-Key" });
+    return;
+  }
+  const entry = runStore.get(req.params.id);
+  if (!entry) {
+    res.status(404).json({
+      error: "Run not found or expired",
+      hint: "Async runs are short-lived in-process on the accepting MCP instance.",
+    });
+    return;
+  }
+  res.json({
+    runId: entry.id,
+    kind: entry.kind,
+    status: entry.status,
+    createdAt: new Date(entry.createdAt).toISOString(),
+    updatedAt: new Date(entry.updatedAt).toISOString(),
+    expiresAt: new Date(entry.expiresAt).toISOString(),
+    result: entry.result ?? null,
+    error: entry.error ?? null,
   });
 });
 
