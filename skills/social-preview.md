@@ -4,6 +4,7 @@ title: Social Preview
 category: seo
 description: Audit Open Graph and Twitter Card tags for social link previews.
 operationIds: socialMediaIntegration
+workflowId: social-preview-audit-job
 ---
 
 # Social Preview Skill

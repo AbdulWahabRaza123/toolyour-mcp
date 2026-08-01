@@ -379,6 +379,36 @@
       "requiredInput": ["url"]
     },
     {
+      "id": "ship-gate",
+      "title": "Ship gate",
+      "description": "Pass/fail pre-deploy gate: headers, TLS, mixed content, status, speed.",
+      "keywords": [
+        "ship gate",
+        "pass fail deploy",
+        "deploy gate",
+        "go live check",
+        "launch checklist"
+      ],
+      "type": "workflow",
+      "target": "ship-gate-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "content-ship-local",
+      "title": "Content ship local",
+      "description": "Local HTML/content ship checklist without a public URL (MCP free local analysis).",
+      "keywords": [
+        "content ship",
+        "ship this html",
+        "local content audit",
+        "html before publish",
+        "content ready to ship"
+      ],
+      "type": "local",
+      "target": "html-seo-audit",
+      "requiredInput": ["html"]
+    },
+    {
       "id": "secrets-hygiene",
       "title": "Secrets hygiene scan",
       "description": "Scan pasted env/config text for leaked API keys and tokens.",

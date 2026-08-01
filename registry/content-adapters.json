@@ -12,7 +12,7 @@
         "improve seo",
         "fix seo"
       ],
-      "taskIds": ["seo-audit", "seo-analyze", "seo-audit-local"],
+      "taskIds": ["seo-audit", "seo-analyze", "seo-audit-local", "content-ship-local", "local-page-seo"],
       "workflowIds": ["full-seo-audit"],
       "urlOperationIds": ["seoAnalyze", "pageSpeedAnalyzer"],
       "localHandlers": ["html-seo-audit"],

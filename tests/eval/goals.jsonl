@@ -23,5 +23,7 @@
 {"goal":"open graph social preview for https://example.com","expectedJobId":"social-preview-audit","category":"social"}
 {"goal":"diagnose cls layout shift on https://example.com","expectedJobId":"improve-core-web-vitals","category":"cwv"}
 {"goal":"spf dkim dmarc email auth for https://example.com","expectedJobId":"email-auth-security","category":"security"}
+{"goal":"ship gate for https://example.com","expectedJobId":"ship-gate","category":"developer"}
+{"goal":"ship this html before publish","expectedJobId":"content-ship-local","requiredInput":{"html":"<html></html>"},"category":"local"}
 {"goal":"write me a poem about cats","expectedStatus":"suggest","category":"negative"}
 {"goal":"tell me a joke","expectedStatus":"suggest","category":"negative"}

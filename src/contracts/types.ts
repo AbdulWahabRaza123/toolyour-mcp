@@ -83,6 +83,8 @@ export interface McpSkillMeta {
   category: string;
   description: string;
   operationIds: string[];
+  /** Optional backing workflow for run_playbook */
+  workflowId?: string;
 }
 
 export interface McpWorkflowStep {

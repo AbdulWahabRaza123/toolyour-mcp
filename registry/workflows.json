@@ -145,6 +145,19 @@
       ]
     },
     {
+      "id": "ship-gate-job",
+      "title": "Ship Gate",
+      "description": "Pass/fail pre-deploy gate (alias of developer ship checklist): headers, TLS, mixed content, status, speed.",
+      "synthesizer": "developer-ship-checklist",
+      "steps": [
+        { "id": "headers", "operationId": "securityHeadersAnalyzer" },
+        { "id": "tls", "operationId": "sslTlsCertificateChecker" },
+        { "id": "mixed", "operationId": "mixedContentChecker" },
+        { "id": "status", "operationId": "httpStatusChecker" },
+        { "id": "speed", "operationId": "pageSpeedAnalyzer" }
+      ]
+    },
+    {
       "id": "secrets-hygiene-job",
       "title": "Secrets Hygiene Scan",
       "description": "Scan pasted env/config text for leaked secrets (JWT-shaped tokens: invoke jwtDecoder separately).",

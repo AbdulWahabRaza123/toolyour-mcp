@@ -18,6 +18,12 @@ import {
 } from "./content-input";
 import { localDevGuidance } from "./local-dev";
 import { incr } from "../observability/counters";
+import { constants } from "../config";
+import {
+  applyResponseMode,
+  parseResponseMode,
+  type ResponseMode,
+} from "./compact-response";
 
 export interface SolveTaskContext {
   apiKey: string;
@@ -36,16 +42,24 @@ function suggestResponse(
   message?: string
 ) {
   incr("suggestReturns");
-  const manifest = registry.getManifest();
-  const tools = searchTools(manifest, trimmedGoal, undefined, 5);
-  const suggestions = rankTaskSuggestions(trimmedGoal, tasks, 5);
+  const suggestions = rankTaskSuggestions(trimmedGoal, tasks, 5).filter(
+    (s) => s.score >= constants.taskMatchMinScore
+  );
+
+  // Hygiene: do not spam unrelated tools when the goal is out of catalog
+  const includeTools = suggestions.length > 0;
+  const tools = includeTools
+    ? searchTools(registry.getManifest(), trimmedGoal, undefined, 5)
+    : [];
 
   return {
     status: "suggest" as const,
     goal: trimmedGoal,
     message:
       message ||
-      "No high-confidence task match. Review toolSuggestions below (pre-searched from your goal), taskSuggestions, or call discover_tools with a more specific query. Use list_categories to filter by tool family.",
+      (suggestions.length === 0 && tools.length === 0
+        ? "Out of catalog. ToolYour MCP focuses on SEO, security, documents, conversion, and text — not general chat. Try a specific goal (e.g. 'SEO audit for https://…') or call list_categories / discover_tools."
+        : "No high-confidence task match. Review taskSuggestions / toolSuggestions, or call discover_tools with a more specific query."),
     taskSuggestions: suggestions.map((s) => ({
       id: s.task.id,
       title: s.task.title,
@@ -61,7 +75,8 @@ function suggestResponse(
 export async function solveTask(
   goal: string,
   input: Record<string, unknown> | undefined,
-  ctx: SolveTaskContext
+  ctx: SolveTaskContext,
+  responseMode: ResponseMode = "compact"
 ) {
   const trimmedGoal = goal.trim();
   if (!trimmedGoal) {
@@ -74,6 +89,7 @@ export async function solveTask(
     };
   }
 
+  const mode = parseResponseMode(responseMode);
   const tasks = loadTasks();
   const match = matchTask(trimmedGoal, tasks);
   const confident = isConfidentMatch(trimmedGoal, tasks, match);
@@ -97,7 +113,7 @@ export async function solveTask(
         adapterId: bridge.adapterId,
         transport: "mcp",
       });
-      return bridge;
+      return applyResponseMode(bridge, mode);
     }
   } else if (hasContent) {
     const bridge = await tryContentBridge(
@@ -114,7 +130,7 @@ export async function solveTask(
         adapterId: bridge.adapterId,
         transport: "mcp",
       });
-      return bridge;
+      return applyResponseMode(bridge, mode);
     }
   }
 
@@ -150,6 +166,8 @@ export async function solveTask(
         pass_html: "Pass input.html from a rendered page or source file.",
         pass_text: "Pass input.text for copy-focused improvements.",
         pass_code: "Pass input.code (TSX/JSX/HTML) — MCP extracts content automatically.",
+        enhance:
+          "Local analysis is free by default. Set input.enhance=true to also run billed text APIs.",
       },
       missing: ["html", "text", "code"],
     };
@@ -192,18 +210,24 @@ export async function solveTask(
       transport: "mcp",
     });
 
-    return {
-      status: result.status === "completed" ? ("completed" as const) : ("partial" as const),
-      goal: trimmedGoal,
-      matchedTask: {
-        id: task.id,
-        title: task.title,
-        type: task.type,
-        target: task.target,
-        score: match.score,
+    return applyResponseMode(
+      {
+        status:
+          result.status === "completed"
+            ? ("completed" as const)
+            : ("partial" as const),
+        goal: trimmedGoal,
+        matchedTask: {
+          id: task.id,
+          title: task.title,
+          type: task.type,
+          target: task.target,
+          score: match.score,
+        },
+        execution: result,
       },
-      execution: result,
-    };
+      mode
+    );
   }
 
   const route = ctx.registry.getRoute(task.target);
@@ -233,20 +257,23 @@ export async function solveTask(
     transport: "mcp",
   });
 
-  return {
-    status: invoked.isError ? ("partial" as const) : ("completed" as const),
-    goal: trimmedGoal,
-    matchedTask: {
-      id: task.id,
-      title: task.title,
-      type: task.type,
-      target: task.target,
-      score: match.score,
+  return applyResponseMode(
+    {
+      status: invoked.isError ? ("partial" as const) : ("completed" as const),
+      goal: trimmedGoal,
+      matchedTask: {
+        id: task.id,
+        title: task.title,
+        type: task.type,
+        target: task.target,
+        score: match.score,
+      },
+      execution: {
+        operationId: task.target,
+        result: invoked.shaped,
+        httpStatus: invoked.status,
+      },
     },
-    execution: {
-      operationId: task.target,
-      result: invoked.shaped,
-      httpStatus: invoked.status,
-    },
-  };
+    mode
+  );
 }

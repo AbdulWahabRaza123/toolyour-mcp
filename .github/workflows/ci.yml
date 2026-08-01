@@ -24,3 +24,6 @@ jobs:
 
       - name: CI suite
         run: npm run ci
+
+      - name: Offline jobs + eval routing
+        run: npm run validate:jobs

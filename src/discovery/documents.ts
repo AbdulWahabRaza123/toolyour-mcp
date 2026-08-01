@@ -16,9 +16,24 @@ export const MCP_PROTOCOL_VERSION = "2025-06-18";
 
 const META_TOOLS = [
   {
+    name: "plan_task",
+    description:
+      "Free planning pass: ranked workflow/tool/playbook plan + estimated credits. Does not execute.",
+  },
+  {
     name: "solve_task",
     description:
-      "Primary entry: plain-language goal; server routes to a workflow or tool with fuzzy matching and confidence gating. Ambiguous goals return status suggest with ranked options.",
+      "Primary entry: plain-language goal; fuzzy matching + confidence gating. Default compact jobReport. Ambiguous goals return status suggest.",
+  },
+  {
+    name: "run_playbook",
+    description:
+      "Execute a skill's mapped workflow (or local content ship) in one call.",
+  },
+  {
+    name: "verify_task",
+    description:
+      "Re-run a goal and return score/finding deltas vs a baseline jobReport.",
   },
   {
     name: "discover_tools",
@@ -49,7 +64,7 @@ const META_TOOLS = [
   },
   {
     name: "load_skill",
-    description: "Load a skill playbook by id.",
+    description: "Load a skill playbook by id (prefer run_playbook to execute).",
   },
   {
     name: "run_workflow",
@@ -110,7 +125,7 @@ export function buildServerCard() {
     notes: [
       "Catalog tools (converters, SEO, documents, etc.) are dynamic — use discover_tools; only hasApi tools are exposed.",
       "Discovery meta-tools are free; tool/workflow execution shares the REST monthly quota.",
-      "solve_task is the primary entry with fuzzy matching and confidence gating; ambiguous goals return ranked suggestions. Use discover_tools → get_tool_schema → invoke_tool for an explicit operationId.",
+      "solve_task is the primary entry with fuzzy matching and confidence gating; ambiguous goals return ranked suggestions. Use plan_task (free) before execute; run_playbook for skills; verify_task for deltas. Default solve_task responses are compact.",
       "Large responses may include dataRefId — use fetch_payload (free in-process TTL store, no paid blob).",
     ],
   };

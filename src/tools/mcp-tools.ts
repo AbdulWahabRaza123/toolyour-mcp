@@ -7,6 +7,16 @@ import { RegistryLoader, searchTools } from "../registry/loader";
 import { loadSkillContent, loadSkills } from "../skills/loader";
 import { runWorkflow } from "../workflow/engine";
 import { invokeOperation, solveTask } from "../orchestrator/solve-task";
+import { planTask } from "../orchestrator/plan-task";
+import { runPlaybook } from "../orchestrator/run-playbook";
+import {
+  diffJobReports,
+  extractJobReport,
+} from "../orchestrator/verify-task";
+import {
+  applyResponseMode,
+  parseResponseMode,
+} from "../orchestrator/compact-response";
 import { payloadStore } from "../payloads/store";
 import type { Logger } from "../observability/logger";
 
@@ -20,10 +30,6 @@ export interface McpServerContext {
 type TextContent = { type: "text"; text: string };
 type ToolResult = { content: TextContent[]; isError?: boolean };
 
-/**
- * Typed wrapper around McpServer.tool to avoid Zod+SDK TS2589 deep instantiation
- * without silencing the whole module via @ts-nocheck.
- */
 function registerTool(
   server: McpServer,
   name: string,
@@ -55,8 +61,25 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
 
   registerTool(
     server,
+    "plan_task",
+    "Free planning pass: ranked workflow/tool/playbook plan + estimated credits. Does not execute or bill. Typical flow: plan_task → solve_task / run_playbook.",
+    {
+      goal: z
+        .string()
+        .describe("User intent in plain language"),
+      input: z.any().optional(),
+    },
+    async (args) => {
+      const goal = String(args.goal || "");
+      const input = (args.input || {}) as Record<string, unknown>;
+      return textResult(planTask(goal, input, ctx.registry));
+    }
+  );
+
+  registerTool(
+    server,
     "solve_task",
-    "Primary entry point: describe what the user wants in natural language. Server auto-picks workflow or tool with fuzzy matching and confidence gating, extracts URLs from the goal, and runs it. Ambiguous goals return status suggest with ranked taskSuggestions and toolSuggestions. For local/unpublished work, pass input.html, input.text, or input.code — MCP runs free local analysis and text-based tools without a deployed URL. Set input.enhance=false to skip billed API text tools. Suggestions are free; bills quota only when a backend tool/workflow executes.",
+    "Primary entry: plain-language goal → workflow/tool with fuzzy matching + confidence gating. Default responseMode=compact (jobReport without duplicated steps). Use full for raw steps, dataRef to store full payload. Local html/text is free unless input.enhance=true. Ambiguous goals return status suggest.",
     {
       goal: z
         .string()
@@ -67,16 +90,78 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
         .any()
         .optional()
         .describe(
-          "Optional: url, html, text, code, sourceHint (file path), enhance (false to skip billed text tools)"
+          "Optional: url, html, text, code, sourceHint, enhance (true to bill text APIs on local content)"
         ),
+      responseMode: z
+        .enum(["compact", "full", "dataRef"])
+        .optional()
+        .describe("compact (default) | full | dataRef"),
     },
     async (args) => {
       const goal = String(args.goal || "");
       const input = (args.input || {}) as Record<string, unknown>;
-      const result = await solveTask(goal, input, ctx);
+      const mode = parseResponseMode(args.responseMode);
+      const result = await solveTask(goal, input, ctx, mode);
       return textResult(
         result,
-        result.status === "error" || result.status === "partial"
+        (result as { status?: string }).status === "error" ||
+          (result as { status?: string }).status === "partial"
+      );
+    }
+  );
+
+  registerTool(
+    server,
+    "run_playbook",
+    "Run a skill's backing workflow (or local content ship) in one call. Bills like run_workflow. Prefer over load_skill → manual steps.",
+    {
+      skillId: z.string().describe("Skill id from list_skills"),
+      input: z.any().optional(),
+      responseMode: z.enum(["compact", "full", "dataRef"]).optional(),
+    },
+    async (args) => {
+      const skillId = String(args.skillId || "");
+      const input = (args.input || {}) as Record<string, unknown>;
+      const mode = parseResponseMode(args.responseMode);
+      const result = await runPlaybook(skillId, input, ctx, mode);
+      return textResult(
+        result,
+        (result as { status?: string }).status === "error" ||
+          (result as { status?: string }).status === "partial"
+      );
+    }
+  );
+
+  registerTool(
+    server,
+    "verify_task",
+    "Re-run a goal and return score/finding deltas vs a baseline jobReport (from a prior solve_task). Bills like solve_task. Use after applying fixes.",
+    {
+      goal: z.string(),
+      input: z.any().optional(),
+      baseline: z
+        .any()
+        .describe("Prior solve_task result or jobReport object"),
+      responseMode: z.enum(["compact", "full", "dataRef"]).optional(),
+    },
+    async (args) => {
+      const goal = String(args.goal || "");
+      const input = (args.input || {}) as Record<string, unknown>;
+      const mode = parseResponseMode(args.responseMode);
+      const before = extractJobReport(args.baseline);
+      const fresh = await solveTask(goal, input, ctx, "full");
+      const after = extractJobReport(fresh);
+      const delta = diffJobReports(before, after);
+      const compactFresh = applyResponseMode(fresh, mode);
+      return textResult(
+        {
+          status: "verified",
+          goal,
+          delta,
+          after: compactFresh,
+        },
+        (fresh as { status?: string }).status === "error" ||
+          (fresh as { status?: string }).status === "partial"
       );
     }
   );
@@ -214,7 +299,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "list_skills",
-    "List curated ToolYour agent skills (playbooks).",
+    "List curated ToolYour agent skills (playbooks). Use run_playbook(skillId) to execute the mapped workflow.",
     { category: z.string().optional() },
     async (args) => {
       let skills = loadSkills();
@@ -232,7 +317,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "load_skill",
-    "Load full skill playbook markdown for a multi-step agent goal.",
+    "Load full skill playbook markdown. Prefer run_playbook to execute in one step.",
     { skillId: z.string() },
     async (args) => {
       const skillId = String(args.skillId || "");
@@ -252,7 +337,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "fetch_payload",
-    "Fetch a full truncated tool/workflow payload by dataRefId from a summarized response. Free — in-process TTL store (no paid blob). Returns 404 if expired; re-run the tool then.",
+    "Fetch a full truncated tool/workflow payload by dataRefId from a summarized or dataRef response. Free — in-process TTL store. Returns 404 if expired.",
     {
       dataRefId: z
         .string()
@@ -286,21 +371,26 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "run_workflow",
-    "Run a server-side multi-step workflow (bills per underlying tool call).",
+    "Run a server-side multi-step workflow (bills per underlying tool call). Prefer solve_task or run_playbook when you have a goal/skillId.",
     {
       workflowId: z.string(),
       input: z.any().optional(),
+      responseMode: z.enum(["compact", "full", "dataRef"]).optional(),
     },
     async (args) => {
       const workflowId = String(args.workflowId || "");
       const input = (args.input || {}) as Record<string, unknown>;
+      const mode = parseResponseMode(args.responseMode);
       const result = await runWorkflow(workflowId, input, {
         apiKey: ctx.apiKey,
         mcpSessionId: ctx.mcpSessionId,
         registry: ctx.registry,
         logger: ctx.logger,
       });
-      return textResult(result, result.status === "partial");
+      return textResult(
+        applyResponseMode(result, mode),
+        result.status === "partial"
+      );
     }
   );
 

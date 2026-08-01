@@ -66,6 +66,6 @@ export function shouldEnhanceWithBackendTools(
   input: Record<string, unknown> | undefined
 ): boolean {
   const data = flattenInput(input);
-  if (data.enhance === false) return false;
-  return true;
+  // Opt-in only — local HTML/text audits stay free unless enhance:true
+  return data.enhance === true;
 }

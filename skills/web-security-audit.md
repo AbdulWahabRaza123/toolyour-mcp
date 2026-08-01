@@ -4,6 +4,7 @@ title: Web Security Audit
 category: security
 description: Audit a URL for security headers, TLS, cookies, and email auth using ToolYour API tools.
 operationIds: securityHeadersAnalyzer, sslTlsCertificateChecker, cookieSecurityAnalyzer, spfDkimDmarcChecker, cspPolicyEvaluator, corsPolicyChecker, subresourceIntegrityChecker, securityTxtChecker
+workflowId: full-security-audit
 ---
 
 # Web Security Audit Skill

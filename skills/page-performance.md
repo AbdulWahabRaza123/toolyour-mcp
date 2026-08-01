@@ -4,6 +4,7 @@ title: Page Performance
 category: seo
 description: Diagnose Core Web Vitals proxy metrics and prioritized fixes for a URL.
 operationIds: pageSpeedAnalyzer, seoAnalyze, socialMediaIntegration
+workflowId: core-web-vitals-job
 ---
 
 # Page Performance Skill

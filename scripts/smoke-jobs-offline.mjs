@@ -8,7 +8,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { listSynthesizerIds } from "../dist/jobs/synthesize.js";
 import { loadTasks } from "../dist/orchestrator/task-registry.js";
-import { matchTask } from "../dist/orchestrator/match-task.js";
+import { isConfidentMatch, matchTask } from "../dist/orchestrator/match-task.js";
 import { loadWorkflows } from "../dist/workflow/engine.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -83,8 +83,9 @@ const goals = fs
 for (const goal of goals) {
   if (goal.expectedStatus === "suggest") {
     const match = matchTask(goal.goal, tasks);
-    if (!match) ok(`negative goal → suggest: ${goal.goal.slice(0, 40)}…`);
-    else bad(`negative goal matched task ${match.task.id}: ${goal.goal}`);
+    const confident = isConfidentMatch(goal.goal, tasks, match);
+    if (!confident) ok(`negative goal → suggest: ${goal.goal.slice(0, 40)}…`);
+    else bad(`negative goal confidently matched ${match?.task.id}: ${goal.goal}`);
     continue;
   }
   const match = matchTask(goal.goal, tasks);

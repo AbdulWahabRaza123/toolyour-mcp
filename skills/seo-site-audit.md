@@ -4,6 +4,7 @@ title: SEO Site Audit
 category: seo
 description: Crawl a URL and run on-page SEO checks using API-backed ToolYour tools.
 operationIds: seoAnalyze, pageSpeedAnalyzer, bulkUrlSeoAuditor
+workflowId: full-seo-audit
 ---
 
 # SEO Site Audit Skill

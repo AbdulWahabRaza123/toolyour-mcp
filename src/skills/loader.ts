@@ -39,6 +39,7 @@ export function loadSkills(): McpSkillMeta[] {
       category: meta.category || "general",
       description: meta.description || "",
       operationIds,
+      workflowId: meta.workflowId || undefined,
     });
   }
 
