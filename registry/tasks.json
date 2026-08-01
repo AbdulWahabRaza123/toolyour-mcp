@@ -192,7 +192,25 @@
         "speed up page",
         "pagespeed insights",
         "pagespeed",
-        "page speed issues"
+        "page speed issues",
+        "verify core web vitals",
+        "recheck lcp after fix",
+        "cwv after fix"
+      ],
+      "type": "workflow",
+      "target": "core-web-vitals-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "fix-verify-core-web-vitals",
+      "title": "Fix-verify Core Web Vitals",
+      "description": "Re-run CWV diagnosis after performance fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify core web vitals",
+        "verify lcp after fix",
+        "recheck cls after fix",
+        "confirm pagespeed improved",
+        "cwv regression check"
       ],
       "type": "workflow",
       "target": "core-web-vitals-job",
@@ -272,7 +290,25 @@
         "link preview",
         "facebook preview",
         "linkedin preview",
-        "share preview"
+        "share preview",
+        "verify open graph",
+        "recheck social preview",
+        "og tags after fix"
+      ],
+      "type": "workflow",
+      "target": "social-preview-audit-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "fix-verify-social-preview",
+      "title": "Fix-verify social preview",
+      "description": "Re-run OG/Twitter preview audit after fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify social preview",
+        "verify open graph after fix",
+        "recheck og tags",
+        "confirm twitter card fixed",
+        "social preview regression"
       ],
       "type": "workflow",
       "target": "social-preview-audit-job",
@@ -355,7 +391,25 @@
         "security headers",
         "csp check",
         "hsts check",
-        "x-frame-options"
+        "x-frame-options",
+        "verify security headers",
+        "recheck security headers",
+        "security headers after fix"
+      ],
+      "type": "workflow",
+      "target": "security-headers-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "fix-verify-security-headers",
+      "title": "Fix-verify security headers",
+      "description": "Re-run security headers after fixes (use with verify_task + baseline).",
+      "keywords": [
+        "fix verify security headers",
+        "verify headers after fix",
+        "re-audit security headers",
+        "confirm csp fixed",
+        "headers regression check"
       ],
       "type": "workflow",
       "target": "security-headers-job",
@@ -387,7 +441,25 @@
         "pass fail deploy",
         "deploy gate",
         "go live check",
-        "launch checklist"
+        "launch checklist",
+        "verify ship gate",
+        "recheck ship gate",
+        "ship gate after fix"
+      ],
+      "type": "workflow",
+      "target": "ship-gate-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "fix-verify-ship-gate",
+      "title": "Fix-verify ship gate",
+      "description": "Re-run ship gate after deploy fixes (pair with verify_task + baseline).",
+      "keywords": [
+        "fix verify ship gate",
+        "verify ship gate after fix",
+        "recheck deploy gate",
+        "confirm go live after fix",
+        "ship gate regression"
       ],
       "type": "workflow",
       "target": "ship-gate-job",

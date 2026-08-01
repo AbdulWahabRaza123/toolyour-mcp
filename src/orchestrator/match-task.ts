@@ -186,6 +186,20 @@ export function scoreTask(goal: string, task: McpTaskDef): number {
     }
   }
 
+  // Fix→verify loops prefer fix-verify-* wrappers over the original audit task
+  const wantsFixVerify =
+    /\bfix\s*verify\b/.test(g) ||
+    /\bafter\s+fix\b/.test(g) ||
+    (/\bre-?check\b/.test(g) && /\bafter\b/.test(g));
+  if (wantsFixVerify) {
+    if (task.id.startsWith("fix-verify-")) {
+      score += 20;
+    } else if (!task.id.includes("regression") && !task.id.includes("diff")) {
+      // Soft-penalty so the original audit task does not win on shared keywords
+      score = Math.max(0, score - 8);
+    }
+  }
+
   return score;
 }
 

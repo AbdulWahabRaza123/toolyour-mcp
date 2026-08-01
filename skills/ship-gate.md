@@ -15,7 +15,7 @@ Use when the user wants a **go/no-go deploy gate**.
 
 1. `plan_task("ship gate for https://…")` — free estimate
 2. `run_playbook("ship-gate", { url })` or `solve_task("ship gate https://…")`
-3. After fixes: `verify_task` with the previous result as `baseline`
+3. After fixes: `verify_task` with the previous result as `baseline`, or `run_playbook("fix-verify-ship-gate", { url })`
 
 ## Output
 

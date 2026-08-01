@@ -18,6 +18,10 @@ export const SKILL_WORKFLOW_MAP: Record<string, string> = {
   "document-pipeline": "document-convert-pipeline",
   "content-ship": "content-ship-local",
   "ship-gate": "ship-gate-job",
+  "fix-verify-ship-gate": "ship-gate-job",
+  "fix-verify-security-headers": "security-headers-job",
+  "fix-verify-social-preview": "social-preview-audit-job",
+  "fix-verify-core-web-vitals": "core-web-vitals-job",
 };
 
 export function skillWorkflowId(skillId: string): string | undefined {

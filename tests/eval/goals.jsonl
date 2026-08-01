@@ -24,6 +24,10 @@
 {"goal":"diagnose cls layout shift on https://example.com","expectedJobId":"improve-core-web-vitals","category":"cwv"}
 {"goal":"spf dkim dmarc email auth for https://example.com","expectedJobId":"email-auth-security","category":"security"}
 {"goal":"ship gate for https://example.com","expectedJobId":"ship-gate","category":"developer"}
+{"goal":"fix verify ship gate for https://example.com","expectedJobId":"fix-verify-ship-gate","category":"verify"}
+{"goal":"fix verify security headers for https://example.com","expectedJobId":"fix-verify-security-headers","category":"verify"}
+{"goal":"fix verify social preview for https://example.com","expectedJobId":"fix-verify-social-preview","category":"verify"}
+{"goal":"fix verify core web vitals for https://example.com","expectedJobId":"fix-verify-core-web-vitals","category":"verify"}
 {"goal":"ship this html before publish","expectedJobId":"content-ship-local","requiredInput":{"html":"<html></html>"},"category":"local"}
 {"goal":"write me a poem about cats","expectedStatus":"suggest","category":"negative"}
 {"goal":"tell me a joke","expectedStatus":"suggest","category":"negative"}
