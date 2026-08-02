@@ -59,7 +59,7 @@ export function extractUrlFromPayload(
 }
 
 const JWT_RE =
-  /eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/;
+  /eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]*/;
 
 /**
  * Normalize common MCP input aliases before gateway invoke

@@ -12,6 +12,15 @@ describe("normalizeStepInput", () => {
     assert.equal(out.token, token);
   });
 
+  it("extracts alg=none JWT with empty signature segment", async () => {
+    const { normalizeStepInput } = await import("../../dist/gateway/request.js");
+    const token = "eyJhbGciOiJub25lIn0.eyJzdWIiOiIxIn0.";
+    const out = normalizeStepInput("jwtDecoder", {
+      text: `Authorization: Bearer ${token}`,
+    });
+    assert.equal(out.token, token);
+  });
+
   it("maps token to text for secretLeakScanner", async () => {
     const { normalizeStepInput } = await import("../../dist/gateway/request.js");
     const out = normalizeStepInput("secretLeakScanner", {
