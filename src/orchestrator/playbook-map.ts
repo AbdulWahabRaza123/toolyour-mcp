@@ -13,6 +13,8 @@ export const SKILL_WORKFLOW_MAP: Record<string, string> = {
   "web-security-audit": "full-security-audit",
   "dns-email-security": "email-auth-security-job",
   "secrets-and-auth-hygiene": "secrets-hygiene-job",
+  "auth-token-hygiene": "auth-token-hygiene-job",
+  "frontend-supply-chain": "frontend-supply-chain-job",
   "seo-deploy-regression": "seo-deploy-regression-job",
   "crawl-analysis": "internal-link-architecture-job",
   "document-pipeline": "document-convert-pipeline",
@@ -24,6 +26,7 @@ export const SKILL_WORKFLOW_MAP: Record<string, string> = {
   "fix-verify-core-web-vitals": "core-web-vitals-job",
   "fix-verify-seo-audit": "full-seo-audit",
   "fix-verify-email-auth": "email-auth-security-job",
+  "fix-verify-frontend-supply-chain": "frontend-supply-chain-job",
 };
 
 export function skillWorkflowId(skillId: string): string | undefined {

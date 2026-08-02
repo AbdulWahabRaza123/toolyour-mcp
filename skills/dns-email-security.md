@@ -4,6 +4,7 @@ title: DNS and Email Security
 category: security
 description: Check SPF/DKIM/DMARC, general DNS records, and security.txt for a domain.
 operationIds: spfDkimDmarcChecker, dnsLookup, securityTxtChecker
+workflowId: email-auth-security-job
 ---
 
 # DNS and Email Security Skill
@@ -12,8 +13,9 @@ Use when the user asks about **email authentication**, **DNS records**, or **sec
 
 ## Preferred path
 
-1. `run_workflow` / `solve_task` → **`email-auth-security-job`** when available (SPF/DKIM/DMARC → DNS lookup → security.txt).
-2. Otherwise invoke tools in order:
+1. `run_playbook("dns-email-security")` / `solve_task` → **`email-auth-security-job`** (SPF/DKIM/DMARC → DNS lookup → security.txt).
+2. Broader URL harden without email focus → `web-security-audit` (includes security.txt among other URL checks).
+3. Otherwise invoke tools in order:
    - `spfDkimDmarcChecker` — email auth DNS
    - `dnsLookup` — A/AAAA/MX/TXT/NS/CNAME
    - `securityTxtChecker` — RFC 9116 discovery

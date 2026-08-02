@@ -1,7 +1,7 @@
 import { defsCache } from "../registry/defs-cache";
 import type { McpWorkflowDef } from "../contracts";
 import { invokeGatewayRoute } from "../gateway/client";
-import { buildGatewayInvokePayload, extractUrlFromPayload } from "../gateway/request";
+import { buildGatewayInvokePayload, extractUrlFromPayload, normalizeStepInput } from "../gateway/request";
 import { invalidateApiKeyCache, validateApiKey } from "../auth/session";
 import { RegistryLoader } from "../registry/loader";
 import { shapeResponseForLlm } from "../summarize/registry";
@@ -117,6 +117,18 @@ export async function runWorkflow(
           urlB: input.urlB,
         };
       }
+
+      // Prefer original workflow input fields for text/token tools after prior steps
+      if (
+        (step.operationId === "jwtDecoder" ||
+          step.operationId === "secretLeakScanner" ||
+          step.operationId === "jwtSignatureVerifier") &&
+        stepInput !== input
+      ) {
+        stepInput = { ...input, ...stepInput };
+      }
+
+      stepInput = normalizeStepInput(step.operationId, stepInput);
 
       const payload = buildGatewayInvokePayload(route, stepInput);
 

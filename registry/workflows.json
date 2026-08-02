@@ -116,12 +116,26 @@
     {
       "id": "full-security-audit",
       "title": "Full Security Audit",
-      "description": "Security headers, TLS certificate, and cookie flags for a URL; returns merged job report.",
+      "description": "Headers, TLS, cookies, CORS, SRI, and security.txt for a URL; returns merged job report. Paste CSP / email auth via related skills.",
       "synthesizer": "full-security-audit",
       "steps": [
         { "id": "headers", "operationId": "securityHeadersAnalyzer" },
         { "id": "tls", "operationId": "sslTlsCertificateChecker" },
-        { "id": "cookies", "operationId": "cookieSecurityAnalyzer" }
+        { "id": "cookies", "operationId": "cookieSecurityAnalyzer" },
+        { "id": "cors", "operationId": "corsPolicyChecker", "continueOnError": true },
+        { "id": "sri", "operationId": "subresourceIntegrityChecker", "continueOnError": true },
+        { "id": "securityTxt", "operationId": "securityTxtChecker", "continueOnError": true }
+      ]
+    },
+    {
+      "id": "frontend-supply-chain-job",
+      "title": "Frontend Supply Chain Check",
+      "description": "SRI, mixed content, and CORS for a public URL (CSP paste → cspPolicyEvaluator).",
+      "synthesizer": "frontend-supply-chain",
+      "steps": [
+        { "id": "sri", "operationId": "subresourceIntegrityChecker" },
+        { "id": "mixed", "operationId": "mixedContentChecker", "continueOnError": true },
+        { "id": "cors", "operationId": "corsPolicyChecker", "continueOnError": true }
       ]
     },
     {
@@ -160,9 +174,22 @@
     {
       "id": "secrets-hygiene-job",
       "title": "Secrets Hygiene Scan",
-      "description": "Scan pasted env/config text for leaked secrets (JWT-shaped tokens: invoke jwtDecoder separately).",
+      "description": "Scan pasted env/config/logs for leaked secrets; decode JWT-shaped tokens when present.",
       "synthesizer": "secrets-hygiene",
-      "steps": [{ "id": "leak", "operationId": "secretLeakScanner" }]
+      "steps": [
+        { "id": "leak", "operationId": "secretLeakScanner" },
+        { "id": "jwt", "operationId": "jwtDecoder", "continueOnError": true }
+      ]
+    },
+    {
+      "id": "auth-token-hygiene-job",
+      "title": "Auth Token Hygiene",
+      "description": "Decode pasted JWTs and scan surrounding text for leaked secrets (signature/webhook verify via invoke_tool).",
+      "synthesizer": "secrets-hygiene",
+      "steps": [
+        { "id": "jwt", "operationId": "jwtDecoder" },
+        { "id": "leak", "operationId": "secretLeakScanner", "continueOnError": true }
+      ]
     },
     {
       "id": "email-auth-security-job",

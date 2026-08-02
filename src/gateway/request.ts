@@ -57,3 +57,35 @@ export function extractUrlFromPayload(
 
   return undefined;
 }
+
+const JWT_RE =
+  /eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/;
+
+/**
+ * Normalize common MCP input aliases before gateway invoke
+ * (e.g. pasted text containing a JWT → token for jwtDecoder).
+ */
+export function normalizeStepInput(
+  operationId: string,
+  input: Record<string, unknown>
+): Record<string, unknown> {
+  if (operationId === "jwtDecoder" || operationId === "jwtSignatureVerifier") {
+    if (typeof input.token === "string" && input.token.trim()) return input;
+    if (typeof input.jwt === "string" && input.jwt.trim()) {
+      return { ...input, token: input.jwt.trim() };
+    }
+    const blob =
+      (typeof input.text === "string" && input.text) ||
+      (typeof input.content === "string" && input.content) ||
+      "";
+    const match = blob.match(JWT_RE);
+    if (match?.[0]) return { ...input, token: match[0] };
+  }
+  if (operationId === "secretLeakScanner" || operationId === "piiScrub") {
+    if (typeof input.text === "string" && input.text.trim()) return input;
+    if (typeof input.token === "string" && input.token.trim()) {
+      return { ...input, text: input.token.trim() };
+    }
+  }
+  return input;
+}

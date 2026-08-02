@@ -88,28 +88,42 @@ export function synthesizeFullSecurityAudit(params: SynthesizeJobParams): JobRep
   const headers = unwrapToolPayload(stepResults.headers);
   const tls = unwrapToolPayload(stepResults.tls);
   const cookies = unwrapToolPayload(stepResults.cookies);
+  const cors = unwrapToolPayload(stepResults.cors);
+  const sri = unwrapToolPayload(stepResults.sri);
+  const securityTxt = unwrapToolPayload(stepResults.securityTxt);
 
   const findings = mergeFindings(
     findingsFromSecurityPayload(headers, "securityHeaders"),
     findingsFromSecurityPayload(tls, "tls"),
-    findingsFromSecurityPayload(cookies, "cookies")
+    findingsFromSecurityPayload(cookies, "cookies"),
+    findingsFromSecurityPayload(cors, "cors"),
+    findingsFromSecurityPayload(sri, "sri"),
+    findingsFromSecurityPayload(securityTxt, "securityTxt")
   );
 
   const headerScore = scoreFromPayload(headers);
   const cookieScore = scoreFromPayload(cookies);
+  const corsScore = scoreFromPayload(cors);
+  const sriScore = scoreFromPayload(sri);
+  const securityTxtScore = scoreFromPayload(securityTxt);
   const tlsSeverity = String(tls?.severity ?? "");
   const tlsScore =
     tlsSeverity === "fail" ? 25 : tlsSeverity === "warn" ? 60 : typeof tls?.daysRemaining === "number" ? 90 : undefined;
 
-  const numeric = [headerScore, cookieScore, tlsScore].filter(
-    (s): s is number => typeof s === "number"
-  );
+  const numeric = [
+    headerScore,
+    cookieScore,
+    tlsScore,
+    corsScore,
+    sriScore,
+    securityTxtScore,
+  ].filter((s): s is number => typeof s === "number");
   const overall =
     numeric.length > 0
       ? Math.round(numeric.reduce((a, b) => a + b, 0) / numeric.length)
       : undefined;
 
-  const prioritizedActions = rankActions(findings, 12);
+  const prioritizedActions = rankActions(findings, 14);
   const high = findings.filter((f) => f.severity === "high").length;
 
   return {
@@ -119,8 +133,8 @@ export function synthesizeFullSecurityAudit(params: SynthesizeJobParams): JobRep
     url,
     summary: [
       url
-        ? `Security audit for ${url}: headers, TLS certificate, and cookies.`
-        : "Security audit complete (headers, TLS, cookies).",
+        ? `Security audit for ${url}: headers, TLS, cookies, CORS, SRI, security.txt.`
+        : "Security audit complete (headers, TLS, cookies, CORS, SRI, security.txt).",
       high
         ? `${high} high-severity issues need attention first.`
         : "No high-severity issues in this pass.",
@@ -130,7 +144,7 @@ export function synthesizeFullSecurityAudit(params: SynthesizeJobParams): JobRep
     ],
     scores: {
       overall: {
-        label: "Security posture (headers + TLS + cookies)",
+        label: "Security posture (web URL audit)",
         value: overall ?? "—",
         status: scoreFromProxy(overall),
       },
@@ -159,6 +173,21 @@ export function synthesizeFullSecurityAudit(params: SynthesizeJobParams): JobRep
         value: typeof cookieScore === "number" ? cookieScore : "—",
         status: scoreFromProxy(cookieScore),
       },
+      cors: {
+        label: "CORS policy",
+        value: typeof corsScore === "number" ? corsScore : "—",
+        status: scoreFromProxy(corsScore),
+      },
+      sri: {
+        label: "Subresource integrity",
+        value: typeof sriScore === "number" ? sriScore : "—",
+        status: scoreFromProxy(sriScore),
+      },
+      securityTxt: {
+        label: "security.txt",
+        value: typeof securityTxtScore === "number" ? securityTxtScore : "—",
+        status: scoreFromProxy(securityTxtScore),
+      },
     },
     findings,
     prioritizedActions,
@@ -166,12 +195,16 @@ export function synthesizeFullSecurityAudit(params: SynthesizeJobParams): JobRep
       securityHeaders: { data: headers },
       tls: { data: tls },
       cookies: { data: cookies },
+      cors: { data: cors },
+      sri: { data: sri },
+      securityTxt: { data: securityTxt },
     },
     toolsUsed: operationIdsFromSteps(steps),
     steps: stepResults,
     limitations: [
       "TLS check is client-visible certificate inspection — not a full SSL Labs grade.",
       "Cookie analysis only sees Set-Cookie on the fetched response (try app/login URLs).",
+      "Paste CSP text → cspPolicyEvaluator; email auth → dns-email-security / email-auth-security-job.",
       "Does not replace penetration testing or dependency scanning.",
     ],
   };

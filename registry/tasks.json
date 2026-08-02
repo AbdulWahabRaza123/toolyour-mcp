@@ -11,6 +11,8 @@
         "analyze seo",
         "seo analysis",
         "check seo",
+        "seo ready",
+        "is this page seo ready",
         "lighthouse audit",
         "full seo audit",
         "local",
@@ -207,6 +209,9 @@
         "fix performance",
         "improve performance",
         "speed up page",
+        "is my site slow",
+        "why is my site slow",
+        "page feels slow",
         "pagespeed insights",
         "pagespeed",
         "page speed issues",
@@ -305,6 +310,9 @@
         "twitter card",
         "social sharing",
         "link preview",
+        "link preview broken",
+        "why is my link preview broken",
+        "google preview",
         "facebook preview",
         "linkedin preview",
         "share preview",
@@ -385,7 +393,7 @@
     {
       "id": "full-security-audit",
       "title": "Full security audit",
-      "description": "Headers, TLS certificate, and cookie security for a URL.",
+      "description": "Headers, TLS, cookies, CORS, SRI, and security.txt for a URL.",
       "keywords": [
         "security audit",
         "full security audit",
@@ -393,7 +401,9 @@
         "website security",
         "site security check",
         "audit security headers",
-        "tls cookie audit"
+        "tls cookie audit",
+        "https security check",
+        "web security audit"
       ],
       "type": "workflow",
       "target": "full-security-audit",
@@ -406,6 +416,8 @@
       "keywords": [
         "check security headers",
         "security headers",
+        "check my headers",
+        "are my headers secure",
         "csp check",
         "hsts check",
         "x-frame-options",
@@ -458,6 +470,9 @@
         "pass fail deploy",
         "deploy gate",
         "go live check",
+        "can i ship",
+        "ready to go live",
+        "ready to launch",
         "launch checklist",
         "verify ship gate",
         "recheck ship gate",
@@ -500,7 +515,7 @@
     {
       "id": "secrets-hygiene",
       "title": "Secrets hygiene scan",
-      "description": "Scan pasted env/config text for leaked API keys and tokens.",
+      "description": "Scan pasted env/config text for leaked API keys and tokens; decode JWTs when present.",
       "keywords": [
         "secret leak",
         "leaked api key",
@@ -512,6 +527,54 @@
       "type": "workflow",
       "target": "secrets-hygiene-job",
       "requiredInput": ["text"]
+    },
+    {
+      "id": "auth-token-hygiene",
+      "title": "Auth token hygiene",
+      "description": "Decode pasted JWTs and scan surrounding text for leaked secrets.",
+      "keywords": [
+        "jwt decode",
+        "decode jwt",
+        "auth token check",
+        "token hygiene",
+        "verify jwt claims",
+        "jwt hygiene"
+      ],
+      "type": "workflow",
+      "target": "auth-token-hygiene-job",
+      "requiredInput": ["text"]
+    },
+    {
+      "id": "frontend-supply-chain",
+      "title": "Frontend supply chain",
+      "description": "SRI, mixed content, and CORS for a public URL.",
+      "keywords": [
+        "subresource integrity",
+        "sri check",
+        "mixed content",
+        "cors check",
+        "frontend supply chain",
+        "script integrity",
+        "cdn integrity"
+      ],
+      "type": "workflow",
+      "target": "frontend-supply-chain-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "fix-verify-frontend-supply-chain",
+      "title": "Fix-verify frontend supply chain",
+      "description": "Re-run SRI / mixed content / CORS after fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify sri",
+        "verify mixed content after fix",
+        "recheck cors",
+        "frontend supply chain regression",
+        "confirm sri fixed"
+      ],
+      "type": "workflow",
+      "target": "frontend-supply-chain-job",
+      "requiredInput": ["url"]
     },
     {
       "id": "email-auth-security",

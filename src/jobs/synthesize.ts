@@ -15,6 +15,7 @@ import {
 import { synthesizeDeveloperShipChecklist } from "./developer-ship-checklist";
 import { synthesizeSecretsHygiene } from "./secrets-hygiene";
 import { synthesizeEmailAuthSecurity } from "./email-auth-security";
+import { synthesizeFrontendSupplyChain } from "./frontend-supply-chain";
 
 const SYNTHESIZERS: Record<string, (params: SynthesizeJobParams) => JobReport> = {
   "full-seo-audit": synthesizeFullSeoAudit,
@@ -31,6 +32,7 @@ const SYNTHESIZERS: Record<string, (params: SynthesizeJobParams) => JobReport> =
   "developer-ship-checklist": synthesizeDeveloperShipChecklist,
   "secrets-hygiene": synthesizeSecretsHygiene,
   "email-auth-security": synthesizeEmailAuthSecurity,
+  "frontend-supply-chain": synthesizeFrontendSupplyChain,
 };
 
 export function synthesizeJobReport(params: SynthesizeJobParams): JobReport | null {

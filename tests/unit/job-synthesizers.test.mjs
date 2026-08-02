@@ -470,6 +470,77 @@ describe("job synthesizers", () => {
     assert.equal(report.summary.some((s) => /look acceptable/i.test(s)), false);
   });
 
+  it("builds frontend-supply-chain report from SRI + CORS payloads", async () => {
+    const { synthesizeFrontendSupplyChain } = await import(
+      "../../dist/jobs/frontend-supply-chain.js"
+    );
+    const report = synthesizeFrontendSupplyChain({
+      synthesizerId: "frontend-supply-chain",
+      workflowId: "frontend-supply-chain-job",
+      input: { url: "https://example.com" },
+      steps: [
+        { id: "sri", operationId: "subresourceIntegrityChecker" },
+        { id: "mixed", operationId: "mixedContentChecker" },
+        { id: "cors", operationId: "corsPolicyChecker" },
+      ],
+      stepResults: {
+        sri: {
+          status: 200,
+          data: {
+            status: true,
+            result: {
+              score: 40,
+              checks: [
+                {
+                  id: "missing-integrity",
+                  name: "Script without integrity",
+                  present: false,
+                  severity: "fail",
+                  advice: "Add integrity= on third-party scripts.",
+                },
+              ],
+            },
+          },
+        },
+        cors: {
+          status: 200,
+          data: {
+            status: true,
+            result: {
+              score: 55,
+              checks: [
+                {
+                  id: "acao",
+                  name: "Access-Control-Allow-Origin",
+                  present: true,
+                  value: "*",
+                  severity: "warn",
+                  advice: "Avoid wildcard ACAO with credentials.",
+                },
+              ],
+            },
+          },
+        },
+        mixed: {
+          status: 200,
+          data: {
+            status: true,
+            result: {
+              report: {
+                summary: { totalScore: 70 },
+                findings: [],
+              },
+            },
+          },
+        },
+      },
+    });
+    assert.ok(report.findings.length >= 1);
+    assert.equal(report.scores.overall.status, "needs_improvement");
+    assert.match(report.summary.join(" "), /Top fix:/i);
+    assert.ok(report.workstreams?.sri);
+  });
+
   it("merges content-quality-audit workstreams", async () => {
     const { synthesizeContentQualityAudit } = await import("../../dist/jobs/content-quality-audit.js");
     const keywordShaped = {
