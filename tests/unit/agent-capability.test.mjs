@@ -2,7 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { applyResponseMode } from "../../dist/orchestrator/compact-response.js";
 import { planTask } from "../../dist/orchestrator/plan-task.js";
-import { diffJobReports } from "../../dist/orchestrator/verify-task.js";
+import { diffJobReports, extractJobReport } from "../../dist/orchestrator/verify-task.js";
 import { RegistryLoader } from "../../dist/registry/loader.js";
 import { createLogger } from "../../dist/observability/logger.js";
 import { solveTask } from "../../dist/orchestrator/solve-task.js";
@@ -101,6 +101,82 @@ describe("verify delta", () => {
     const delta = diffJobReports(before, after);
     assert.equal(delta.status, "improved");
     assert.equal(delta.resolvedFindings.length, 1);
+    assert.equal(delta.gate, "pass");
+    assert.equal(delta.remainingFixes.length, 0);
+  });
+
+  it("verify delta exposes remainingFixes and fail gate", () => {
+    const report = {
+      schemaVersion: "toolyour.jobReport@1",
+      jobId: "a",
+      workflowId: "a",
+      summary: [],
+      scores: { overall: { label: "o", value: 40, status: "poor" } },
+      findings: [
+        {
+          severity: "high",
+          title: "Missing CSP",
+          whyItMatters: "x",
+          howToFix: ["Add CSP"],
+          workstream: "headers",
+        },
+      ],
+      prioritizedActions: [],
+      toolsUsed: [],
+      steps: {},
+    };
+    const delta = diffJobReports(report, report);
+    assert.equal(delta.gate, "fail");
+    assert.ok(delta.remainingFixes.length >= 1);
+    assert.equal(delta.remainingFixes[0].actions[0], "Add CSP");
+    assert.ok(delta.nextActions.length >= 1);
+  });
+
+  it("does not treat lower numbers as regression when status stays good", () => {
+    const before = {
+      schemaVersion: "toolyour.jobReport@1",
+      jobId: "a",
+      workflowId: "a",
+      summary: [],
+      scores: { lcpMs: { label: "LCP", value: 2200, status: "good" } },
+      findings: [],
+      prioritizedActions: [],
+      toolsUsed: [],
+      steps: {},
+    };
+    const after = {
+      ...before,
+      scores: { lcpMs: { label: "LCP", value: 1800, status: "good" } },
+    };
+    const delta = diffJobReports(before, after);
+    assert.equal(delta.status, "unchanged");
+    assert.equal(delta.scoreDeltas.length, 1);
+  });
+
+  it("extractJobReport peels verify.after and get_run.result", () => {
+    const report = {
+      schemaVersion: "toolyour.jobReport@1",
+      jobId: "a",
+      workflowId: "a",
+      summary: [],
+      scores: {},
+      findings: [],
+      prioritizedActions: [],
+      toolsUsed: [],
+      steps: {},
+    };
+    assert.equal(
+      extractJobReport({ status: "verified", after: { jobReport: report } })
+        ?.jobId,
+      "a"
+    );
+    assert.equal(
+      extractJobReport({
+        runId: "x",
+        result: { execution: { jobReport: report } },
+      })?.jobId,
+      "a"
+    );
   });
 });
 

@@ -33,3 +33,9 @@
 {"goal":"ship this html before publish","expectedJobId":"content-ship-local","requiredInput":{"html":"<html></html>"},"category":"local"}
 {"goal":"write me a poem about cats","expectedStatus":"suggest","category":"negative"}
 {"goal":"tell me a joke","expectedStatus":"suggest","category":"negative"}
+{"goal":"is my site slow https://example.com","expectedJobId":"improve-core-web-vitals","category":"messy"}
+{"goal":"can I ship https://example.com","expectedJobId":"ship-gate","category":"messy"}
+{"goal":"ready to go live https://example.com","expectedJobId":"ship-gate","category":"messy"}
+{"goal":"check my headers https://example.com","expectedJobId":"security-headers","category":"messy"}
+{"goal":"why is my link preview broken https://example.com","expectedJobId":"social-preview-audit","category":"messy"}
+{"goal":"is this page seo ready https://example.com","expectedJobId":"seo-audit","category":"messy"}

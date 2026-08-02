@@ -1,0 +1,364 @@
+{
+  "core-web-vitals": {
+    "input": { "url": "https://example.com" },
+    "steps": [
+      { "id": "speed", "operationId": "pageSpeedAnalyzer" },
+      { "id": "seo", "operationId": "seoAnalyze" }
+    ],
+    "stepResults": {
+      "speed": {
+        "status": 200,
+        "operationId": "pageSpeedAnalyzer",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "page-speed-analyzer",
+          "url": "https://example.com",
+          "data": { "url": "https://example.com", "loadTime": 840, "suggestions": [] },
+          "report": {
+            "summary": { "totalScore": 58, "grade": "D", "topPriorities": ["Likely LCP contributor"] },
+            "metrics": {
+              "totalScore": 58,
+              "proxies": { "lcpScore": 45, "tbtScore": 60, "fcpScore": 55, "clsScore": 70 },
+              "ttfbMs": 840
+            },
+            "evidence": {
+              "assetOptimizer": {
+                "compressImages": [
+                  {
+                    "src": "https://example.com/hero.jpg",
+                    "bytes": 450000,
+                    "reason": "Likely LCP candidate"
+                  }
+                ],
+                "deferScripts": [],
+                "fixDimensions": [],
+                "preloadHints": []
+              }
+            },
+            "findings": [
+              {
+                "title": "Likely LCP contributor: large image asset",
+                "severity": "high",
+                "whyItMatters": "LCP delay",
+                "howToFix": ["Compress hero image to WebP"]
+              }
+            ]
+          }
+        }
+      },
+      "seo": {
+        "status": 200,
+        "operationId": "seoAnalyze",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "seo-audit",
+          "url": "https://example.com",
+          "data": { "url": "https://example.com", "overallScore": 72 },
+          "report": {
+            "summary": { "totalScore": 72, "grade": "C", "topPriorities": ["Fix meta description"] },
+            "findings": [
+              {
+                "title": "Meta description missing",
+                "severity": "high",
+                "whyItMatters": "CTR suffers",
+                "howToFix": ["Add a 120–160 character meta description"]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "full-seo-audit": {
+    "input": { "url": "https://example.com" },
+    "steps": [
+      { "id": "seo", "operationId": "seoAnalyze" },
+      { "id": "speed", "operationId": "pageSpeedAnalyzer" }
+    ],
+    "stepResults": {
+      "seo": {
+        "status": 200,
+        "operationId": "seoAnalyze",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "seo-audit",
+          "url": "https://example.com",
+          "data": { "url": "https://example.com", "overallScore": 72 },
+          "report": {
+            "summary": { "totalScore": 72, "grade": "C", "topPriorities": ["Fix meta"] },
+            "findings": [
+              {
+                "title": "Meta description missing",
+                "severity": "high",
+                "whyItMatters": "CTR",
+                "howToFix": ["Add meta description"]
+              }
+            ]
+          }
+        }
+      },
+      "speed": {
+        "status": 200,
+        "operationId": "pageSpeedAnalyzer",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "page-speed-analyzer",
+          "url": "https://example.com",
+          "data": { "url": "https://example.com", "loadTime": 840 },
+          "report": {
+            "summary": { "totalScore": 58, "grade": "D", "topPriorities": ["LCP"] },
+            "metrics": {
+              "totalScore": 58,
+              "proxies": { "lcpScore": 45, "tbtScore": 60, "fcpScore": 55, "clsScore": 70 },
+              "ttfbMs": 840
+            },
+            "evidence": {
+              "assetOptimizer": {
+                "compressImages": [
+                  { "src": "https://example.com/hero.jpg", "bytes": 450000, "reason": "LCP" }
+                ],
+                "deferScripts": [],
+                "fixDimensions": [],
+                "preloadHints": []
+              }
+            },
+            "findings": [
+              {
+                "title": "Likely LCP contributor: large image asset",
+                "severity": "high",
+                "whyItMatters": "LCP",
+                "howToFix": ["Compress hero"]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "full-seo-optimization": {
+    "input": { "url": "https://example.com" },
+    "steps": [
+      { "id": "seo", "operationId": "seoAnalyze" },
+      { "id": "content", "operationId": "contentOptimization" },
+      { "id": "speed", "operationId": "pageSpeedAnalyzer" }
+    ],
+    "stepResults": {
+      "seo": {
+        "status": 200,
+        "operationId": "seoAnalyze",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "seo-audit",
+          "url": "https://example.com",
+          "data": { "overallScore": 70 },
+          "report": {
+            "summary": { "totalScore": 70, "grade": "C", "topPriorities": ["Meta"] },
+            "findings": [
+              {
+                "title": "Meta description missing",
+                "severity": "medium",
+                "whyItMatters": "CTR",
+                "howToFix": ["Add meta"]
+              }
+            ]
+          }
+        }
+      },
+      "content": {
+        "status": 200,
+        "operationId": "contentOptimization",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "content-optimization",
+          "url": "https://example.com",
+          "data": { "wordCount": 120 },
+          "report": {
+            "summary": { "totalScore": 55, "grade": "F", "topPriorities": ["H1"] },
+            "findings": [
+              {
+                "title": "Missing H1 heading",
+                "severity": "high",
+                "whyItMatters": "Structure",
+                "howToFix": ["Add one H1"]
+              }
+            ]
+          }
+        }
+      },
+      "speed": {
+        "status": 200,
+        "operationId": "pageSpeedAnalyzer",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "page-speed-analyzer",
+          "url": "https://example.com",
+          "data": { "loadTime": 900 },
+          "report": {
+            "summary": { "totalScore": 60, "grade": "D", "topPriorities": ["Speed"] },
+            "metrics": {
+              "proxies": { "lcpScore": 50, "tbtScore": 50, "fcpScore": 50, "clsScore": 50 },
+              "ttfbMs": 900
+            },
+            "findings": []
+          }
+        }
+      }
+    }
+  },
+  "internal-link-architecture": {
+    "input": { "url": "https://example.com" },
+    "steps": [{ "id": "links", "operationId": "internalLinking" }],
+    "stepResults": {
+      "links": {
+        "status": 200,
+        "operationId": "internalLinking",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "internal-linking",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": { "totalScore": 50, "grade": "D", "topPriorities": ["Orphans"] },
+            "findings": [
+              {
+                "title": "Orphan page detected",
+                "severity": "high",
+                "whyItMatters": "Crawl",
+                "howToFix": ["Add internal links"]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "technical-seo-audit": {
+    "input": { "url": "https://example.com" },
+    "steps": [
+      { "id": "seo", "operationId": "seoAnalyze" },
+      { "id": "speed", "operationId": "pageSpeedAnalyzer" }
+    ],
+    "stepResults": {
+      "seo": {
+        "status": 200,
+        "operationId": "seoAnalyze",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "seo-audit",
+          "url": "https://example.com",
+          "data": { "overallScore": 65 },
+          "report": {
+            "summary": { "totalScore": 65, "grade": "C", "topPriorities": ["Robots"] },
+            "findings": [
+              {
+                "title": "Robots directives review",
+                "severity": "medium",
+                "whyItMatters": "Indexation",
+                "howToFix": ["Review robots.txt"]
+              }
+            ]
+          }
+        }
+      },
+      "speed": {
+        "status": 200,
+        "operationId": "pageSpeedAnalyzer",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "page-speed-analyzer",
+          "url": "https://example.com",
+          "data": { "loadTime": 700 },
+          "report": {
+            "summary": { "totalScore": 70, "grade": "C", "topPriorities": [] },
+            "metrics": {
+              "proxies": { "lcpScore": 60, "tbtScore": 60, "fcpScore": 60, "clsScore": 60 },
+              "ttfbMs": 700
+            },
+            "findings": []
+          }
+        }
+      }
+    }
+  },
+  "social-preview-audit": {
+    "input": { "url": "https://example.com" },
+    "steps": [{ "id": "social", "operationId": "socialMediaIntegration" }],
+    "stepResults": {
+      "social": {
+        "status": 200,
+        "operationId": "socialMediaIntegration",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "social-media-integration",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": { "totalScore": 40, "grade": "F", "topPriorities": ["OG image"] },
+            "findings": [
+              {
+                "title": "Missing og:image",
+                "severity": "high",
+                "whyItMatters": "Previews",
+                "howToFix": ["Add og:image"]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "content-quality-audit": {
+    "input": { "url": "https://example.com" },
+    "steps": [{ "id": "content", "operationId": "contentOptimization" }],
+    "stepResults": {
+      "content": {
+        "status": 200,
+        "operationId": "contentOptimization",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "content-optimization",
+          "url": "https://example.com",
+          "data": { "wordCount": 80 },
+          "report": {
+            "summary": { "totalScore": 45, "grade": "F", "topPriorities": ["Thin content"] },
+            "findings": [
+              {
+                "title": "Thin content",
+                "severity": "medium",
+                "whyItMatters": "Quality",
+                "howToFix": ["Expand body copy"]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "keyword-opportunity-review": {
+    "input": { "url": "https://example.com" },
+    "steps": [{ "id": "keywords", "operationId": "keywordChecker" }],
+    "stepResults": {
+      "keywords": {
+        "status": 200,
+        "operationId": "keywordChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "keyword-checker",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": { "totalScore": 55, "grade": "D", "topPriorities": ["Primary keyword"] },
+            "findings": [
+              {
+                "title": "Primary keyword underused",
+                "severity": "medium",
+                "whyItMatters": "Relevance",
+                "howToFix": ["Use primary keyword in H1"]
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
