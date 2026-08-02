@@ -22,7 +22,8 @@
     "smoke:jobs:offline": "npm run build && node scripts/smoke-jobs-offline.mjs",
     "smoke:jobs:live": "node scripts/test-mcp-use-cases.mjs",
     "smoke:live:agent": "node scripts/smoke-live-agent-loop.mjs",
-    "smoke:staging": "node scripts/smoke-staging.mjs"
+    "smoke:staging": "node scripts/smoke-staging.mjs",
+    "ci:ship-gate": "node scripts/ci-ship-gate.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",

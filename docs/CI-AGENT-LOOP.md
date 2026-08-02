@@ -29,18 +29,36 @@ Agents and CI should treat ToolYour as a **poll-first** harness. Webhooks are op
 - CI should still poll `get_run` as source of truth.  
 - Multi-replica: set `REDIS_URL` on MCP so `get_run` works across instances.
 
-## Minimal GitHub Actions sketch
+## Ship-gate script (this repo)
 
-```yaml
-# Pseudocode — wire secrets TOOLYOUR_API_KEY + PREVIEW_URL
-- name: Ship-gate via MCP
-  run: |
-    node scripts/ci-ship-gate.mjs
+```bash
+TOOLYOUR_API_KEY=ty_... SHIP_URL=https://preview.example.com \
+  node scripts/ci-ship-gate.mjs
 ```
 
-`scripts/ci-ship-gate.mjs` (team-owned): call MCP HTTP/SSE or REST-adjacent invoke, poll until done, exit `1` if `delta.gate === "fail"` or high severity `remainingFixes` remain.
+- Exit `0` when `delta.gate === "pass"` (or local jobReport has no high findings / poor scores).  
+- Exit `1` on `fail` / errors.  
+- Exit `0` with `SKIP` if no API key (optional local).  
+- `REQUIRE_PASS=false` prints the report without failing the job.
+
+## GitHub Actions example
+
+Copy [`examples/github-actions/ship-gate.yml`](../examples/github-actions/ship-gate.yml) into your app repo. Wire `secrets.TOOLYOUR_API_KEY` and a preview `SHIP_URL`.
+
+Or use the SDK in your own Node step:
+
+```typescript
+import { verifyUntilPass } from "@toolyour/sdk/mcp";
+const r = await verifyUntilPass({
+  apiKey: process.env.TOOLYOUR_API_KEY!,
+  goal: `ship gate for ${process.env.SHIP_URL}`,
+  input: { url: process.env.SHIP_URL! },
+});
+if (r.gate !== "pass") process.exit(1);
+```
 
 ## Related
 
 - [`HARNESS-MIGRATION.md`](./HARNESS-MIGRATION.md)  
-- Customer docs: `/developers/docs/mcp-quickstart`
+- Customer docs: `/developers/docs/mcp-quickstart`  
+- npm: `@toolyour/sdk` (`verifyUntilPass`)

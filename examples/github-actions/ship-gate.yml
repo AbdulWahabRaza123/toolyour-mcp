@@ -1,0 +1,43 @@
+# Example: ToolYour MCP ship-gate on a preview URL
+#
+# Copy into your app repo (not enabled in this MCP package CI by default).
+# Requires secrets: TOOLYOUR_API_KEY
+# Requires env: SHIP_URL (preview / staging URL)
+#
+# Docs: docs/CI-AGENT-LOOP.md · docs/HARNESS-MIGRATION.md
+
+name: ToolYour ship-gate (example)
+
+on:
+  workflow_dispatch:
+    inputs:
+      ship_url:
+        description: "Public URL to run ship-gate against"
+        required: true
+        type: string
+  # Uncomment when you have preview URLs per PR:
+  # pull_request:
+  #   types: [opened, synchronize, reopened]
+
+jobs:
+  ship-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ToolYour MCP scripts
+        uses: actions/checkout@v4
+        with:
+          repository: AbdulWahabRaza123/toolyour-mcp
+          path: toolyour-mcp
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run ship-gate
+        working-directory: toolyour-mcp
+        env:
+          TOOLYOUR_API_KEY: ${{ secrets.TOOLYOUR_API_KEY }}
+          SHIP_URL: ${{ inputs.ship_url || vars.SHIP_URL }}
+          REQUIRE_PASS: "true"
+        run: node scripts/ci-ship-gate.mjs
