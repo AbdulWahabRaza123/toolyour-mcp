@@ -20,6 +20,10 @@ export const SKILL_WORKFLOW_MAP: Record<string, string> = {
   "seo-deploy-regression": "seo-deploy-regression-job",
   "seo-staging-diff": "seo-deploy-regression-diff-job",
   "crawl-analysis": "internal-link-architecture-job",
+  "crawl-readiness": "crawl-readiness-job",
+  "structured-data-audit": "structured-data-audit-job",
+  "ai-overview-readiness": "ai-overview-readiness-job",
+  "site-icons-audit": "site-icons-audit-job",
   "document-pipeline": "document-convert-pipeline",
   "content-ship": "content-ship-local",
   "ship-gate": "ship-gate-job",
@@ -32,6 +36,12 @@ export const SKILL_WORKFLOW_MAP: Record<string, string> = {
   "fix-verify-web-security-audit": "full-security-audit",
   "fix-verify-email-auth": "email-auth-security-job",
   "fix-verify-frontend-supply-chain": "frontend-supply-chain-job",
+  "fix-verify-technical-seo": "technical-seo-audit-job",
+  "fix-verify-seo-deploy-regression": "seo-deploy-regression-job",
+  "fix-verify-crawl-readiness": "crawl-readiness-job",
+  "fix-verify-structured-data": "structured-data-audit-job",
+  "fix-verify-ai-overview-readiness": "ai-overview-readiness-job",
+  "fix-verify-site-icons": "site-icons-audit-job",
 };
 
 export function skillWorkflowId(skillId: string): string | undefined {

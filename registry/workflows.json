@@ -201,6 +201,42 @@
         { "id": "dns", "operationId": "dnsLookup" },
         { "id": "securityTxt", "operationId": "securityTxtChecker" }
       ]
+    },
+    {
+      "id": "crawl-readiness-job",
+      "title": "Crawl Readiness",
+      "description": "robots.txt, sitemap XML, and redirect-chain hygiene for launch/index readiness.",
+      "synthesizer": "crawl-readiness",
+      "steps": [
+        { "id": "robots", "operationId": "robotsTxtChecker" },
+        { "id": "sitemap", "operationId": "sitemapXmlValidator" },
+        { "id": "redirects", "operationId": "redirectChainAnalyzer", "continueOnError": true }
+      ]
+    },
+    {
+      "id": "structured-data-audit-job",
+      "title": "Structured Data Audit",
+      "description": "Schema markup, meta tags, and social preview tags for a URL.",
+      "synthesizer": "structured-data-audit",
+      "steps": [
+        { "id": "schema", "operationId": "schemaMarkupValidator" },
+        { "id": "meta", "operationId": "metaTagsAnalyzer" },
+        { "id": "social", "operationId": "socialMediaIntegration", "continueOnError": true }
+      ]
+    },
+    {
+      "id": "ai-overview-readiness-job",
+      "title": "AI Overview Readiness",
+      "description": "Structural GEO / AI Overview extractability heuristics (not live AIO rank).",
+      "synthesizer": "ai-overview-readiness",
+      "steps": [{ "id": "aio", "operationId": "aiOverviewReadinessChecker" }]
+    },
+    {
+      "id": "site-icons-audit-job",
+      "title": "Site Icons Audit",
+      "description": "Favicon, apple-touch, and common icon fallback reachability.",
+      "synthesizer": "site-icons-audit",
+      "steps": [{ "id": "icons", "operationId": "siteIconsChecker" }]
     }
   ]
 }

@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-07-27T15:59:02.948Z",
+  "generatedAt": "2026-08-03T18:38:51.176Z",
   "stats": {
-    "totalOpenApiRoutes": 280,
-    "hasApiIncluded": 279,
+    "totalOpenApiRoutes": 281,
+    "hasApiIncluded": 280,
     "excluded": 1
   },
   "categories": [
@@ -1518,6 +1518,14 @@
       "name": "AI Overview readiness checker (structural heuristics)",
       "category": "SEO APIs",
       "description": "AI Overview readiness checker (structural heuristics)",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "siteIconsChecker",
+      "name": "Favicon and apple-touch icon reachability",
+      "category": "SEO APIs",
+      "description": "Favicon and apple-touch icon reachability",
       "inputShape": "query",
       "backend": "node"
     },
@@ -5185,6 +5193,21 @@
       "responseHint": "Returns JSON response",
       "validatePaths": [
         "seo-apis/ai-overview-readiness-checker"
+      ]
+    },
+    "siteIconsChecker": {
+      "operationId": "siteIconsChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/site-icons-checker",
+      "category": "SEO APIs",
+      "name": "Favicon and apple-touch icon reachability",
+      "description": "Favicon and apple-touch icon reachability",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/site-icons-checker"
       ]
     },
     "seoChangeDiff": {

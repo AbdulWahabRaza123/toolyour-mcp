@@ -608,6 +608,67 @@
       "type": "workflow",
       "target": "email-auth-security-job",
       "requiredInput": ["url"]
+    },
+    {
+      "id": "crawl-readiness",
+      "title": "Crawl readiness",
+      "description": "robots.txt, sitemap XML, and redirect hygiene for launch/index readiness.",
+      "keywords": [
+        "crawl readiness",
+        "robots sitemap check",
+        "index readiness",
+        "pre launch crawl",
+        "check robots and sitemap",
+        "redirect chain before launch"
+      ],
+      "type": "workflow",
+      "target": "crawl-readiness-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "structured-data-audit",
+      "title": "Structured data audit",
+      "description": "Schema markup, meta tags, and social preview tags for a URL.",
+      "keywords": [
+        "structured data audit",
+        "schema markup audit",
+        "meta tags audit",
+        "json ld check",
+        "og tags and schema"
+      ],
+      "type": "workflow",
+      "target": "structured-data-audit-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "ai-overview-readiness",
+      "title": "AI Overview readiness",
+      "description": "Structural GEO / AI Overview extractability heuristics (not live AIO rank).",
+      "keywords": [
+        "ai overview readiness",
+        "geo readiness",
+        "citation readiness",
+        "ai overview checker",
+        "overview extractability"
+      ],
+      "type": "workflow",
+      "target": "ai-overview-readiness-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "site-icons-audit",
+      "title": "Site icons audit",
+      "description": "Favicon and apple-touch-icon declaration and reachability check.",
+      "keywords": [
+        "favicon checker",
+        "apple touch icon",
+        "site icons",
+        "missing favicon",
+        "favicon 404"
+      ],
+      "type": "workflow",
+      "target": "site-icons-audit-job",
+      "requiredInput": ["url"]
     }
   ]
 }

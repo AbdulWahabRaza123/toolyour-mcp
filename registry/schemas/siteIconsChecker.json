@@ -1,0 +1,12 @@
+{
+  "operationId": "siteIconsChecker",
+  "gatewayPath": "/api/v1/seo-apis/site-icons-checker",
+  "method": "GET",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}
