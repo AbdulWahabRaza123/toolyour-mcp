@@ -1,0 +1,12 @@
+{
+  "operationId": "qrCodeGenerator",
+  "gatewayPath": "/api/v1/marketing-apis/qr-code-generator",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

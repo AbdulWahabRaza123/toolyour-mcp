@@ -669,6 +669,51 @@
       "type": "workflow",
       "target": "site-icons-audit-job",
       "requiredInput": ["url"]
+    },
+    {
+      "id": "campaign-tracking-setup",
+      "title": "Campaign tracking setup",
+      "description": "UTM builder, ads macros, and UTM parser for campaign URLs.",
+      "keywords": ["utm builder", "campaign tracking", "ads utm", "utm macros"],
+      "type": "workflow",
+      "target": "campaign-tracking-setup-job",
+      "requiredInput": []
+    },
+    {
+      "id": "paid-ads-copy-gate",
+      "title": "Paid ads copy gate",
+      "description": "Ads copy character limits and Google RSA preview.",
+      "keywords": ["ads copy", "rsa preview", "meta ads limit", "google ads characters"],
+      "type": "workflow",
+      "target": "paid-ads-copy-gate-job",
+      "requiredInput": []
+    },
+    {
+      "id": "growth-unit-economics",
+      "title": "Growth unit economics",
+      "description": "ROAS, CPC, CTR, CPA, and CAC calculators.",
+      "keywords": ["roas", "cpc", "ctr", "cpa", "cac", "unit economics"],
+      "type": "workflow",
+      "target": "growth-unit-economics-job",
+      "requiredInput": []
+    },
+    {
+      "id": "email-campaign-qa",
+      "title": "Email campaign QA",
+      "description": "Email subject tester and spam-word heuristics.",
+      "keywords": ["email subject", "spam words", "email qa"],
+      "type": "workflow",
+      "target": "email-campaign-qa-job",
+      "requiredInput": []
+    },
+    {
+      "id": "landing-conversion-check",
+      "title": "Landing conversion check",
+      "description": "CTA finder, form inventory, and marketing tag extractor.",
+      "keywords": ["landing page cta", "form fields", "gtm pixel", "conversion check"],
+      "type": "workflow",
+      "target": "landing-conversion-check-job",
+      "requiredInput": ["url"]
     }
   ]
 }

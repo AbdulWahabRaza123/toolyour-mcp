@@ -1,0 +1,12 @@
+{
+  "operationId": "marketingTagExtractor",
+  "gatewayPath": "/api/v1/marketing-apis/marketing-tag-extractor",
+  "method": "GET",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

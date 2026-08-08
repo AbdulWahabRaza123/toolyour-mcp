@@ -1,0 +1,12 @@
+{
+  "operationId": "aiEmailSubjectVariants",
+  "gatewayPath": "/api/v1/marketing-apis/ai-email-subject-variants",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

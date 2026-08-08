@@ -1,0 +1,12 @@
+{
+  "operationId": "emailUnsubscribeChecker",
+  "gatewayPath": "/api/v1/marketing-apis/email-unsubscribe-checker",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

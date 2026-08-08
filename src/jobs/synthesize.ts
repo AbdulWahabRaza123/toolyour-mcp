@@ -22,6 +22,13 @@ import {
   synthesizeSiteIconsAudit,
   synthesizeStructuredDataAudit,
 } from "./crawl-and-structure";
+import {
+  synthesizeCampaignTracking,
+  synthesizeEmailCampaignQa,
+  synthesizeGrowthUnitEconomics,
+  synthesizeLandingConversionCheck,
+  synthesizePaidAdsCopyGate,
+} from "./marketing-jobs";
 
 const SYNTHESIZERS: Record<string, (params: SynthesizeJobParams) => JobReport> = {
   "full-seo-audit": synthesizeFullSeoAudit,
@@ -43,6 +50,11 @@ const SYNTHESIZERS: Record<string, (params: SynthesizeJobParams) => JobReport> =
   "structured-data-audit": synthesizeStructuredDataAudit,
   "ai-overview-readiness": synthesizeAiOverviewReadiness,
   "site-icons-audit": synthesizeSiteIconsAudit,
+  "campaign-tracking": synthesizeCampaignTracking,
+  "paid-ads-copy-gate": synthesizePaidAdsCopyGate,
+  "growth-unit-economics": synthesizeGrowthUnitEconomics,
+  "email-campaign-qa": synthesizeEmailCampaignQa,
+  "landing-conversion-check": synthesizeLandingConversionCheck,
 };
 
 export function synthesizeJobReport(params: SynthesizeJobParams): JobReport | null {

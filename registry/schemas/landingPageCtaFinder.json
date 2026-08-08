@@ -1,0 +1,12 @@
+{
+  "operationId": "landingPageCtaFinder",
+  "gatewayPath": "/api/v1/marketing-apis/landing-page-cta-finder",
+  "method": "GET",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

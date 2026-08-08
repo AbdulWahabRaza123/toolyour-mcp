@@ -1,0 +1,12 @@
+{
+  "operationId": "cpcCalculator",
+  "gatewayPath": "/api/v1/marketing-apis/cpc-calculator",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

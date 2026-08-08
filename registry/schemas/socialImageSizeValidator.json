@@ -1,0 +1,12 @@
+{
+  "operationId": "socialImageSizeValidator",
+  "gatewayPath": "/api/v1/marketing-apis/social-image-size-validator",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

@@ -1,0 +1,12 @@
+{
+  "operationId": "emailSubjectLineTester",
+  "gatewayPath": "/api/v1/marketing-apis/email-subject-line-tester",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

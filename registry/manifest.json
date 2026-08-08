@@ -1,10 +1,10 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-08-03T18:38:51.176Z",
+  "generatedAt": "2026-08-08T06:16:12.441Z",
   "stats": {
-    "totalOpenApiRoutes": 281,
-    "hasApiIncluded": 280,
-    "excluded": 1
+    "totalOpenApiRoutes": 310,
+    "hasApiIncluded": 308,
+    "excluded": 2
   },
   "categories": [
     "AI Models",
@@ -13,6 +13,7 @@
     "Convertors",
     "Documents",
     "File Extract",
+    "Marketing APIs",
     "Office",
     "SEO APIs",
     "SEO Tools",
@@ -2166,6 +2167,230 @@
       "name": "youtube caption formatter",
       "category": "YouTube Tools",
       "description": "youtube caption formatter",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "landingPageCtaFinder",
+      "name": "Find CTAs on a landing page",
+      "category": "Marketing APIs",
+      "description": "Find CTAs on a landing page",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "formFieldInventory",
+      "name": "Inventory form fields on a page",
+      "category": "Marketing APIs",
+      "description": "Inventory form fields on a page",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "marketingTagExtractor",
+      "name": "Extract marketing tags from a page",
+      "category": "Marketing APIs",
+      "description": "Extract marketing tags from a page",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "utmBuilder",
+      "name": "Build UTM campaign URL",
+      "category": "Marketing APIs",
+      "description": "Build UTM campaign URL",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "utmParser",
+      "name": "Parse UTM parameters from a URL",
+      "category": "Marketing APIs",
+      "description": "Parse UTM parameters from a URL",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "adsUtmBuilder",
+      "name": "Build ads UTM URL with platform macros",
+      "category": "Marketing APIs",
+      "description": "Build ads UTM URL with platform macros",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "qrCodeGenerator",
+      "name": "Generate QR code SVG",
+      "category": "Marketing APIs",
+      "description": "Generate QR code SVG",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "adsCopyCounter",
+      "name": "Count ads copy against platform limits",
+      "category": "Marketing APIs",
+      "description": "Count ads copy against platform limits",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "googleAdsRsaPreview",
+      "name": "Preview Google Ads RSA assets",
+      "category": "Marketing APIs",
+      "description": "Preview Google Ads RSA assets",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "emailSubjectLineTester",
+      "name": "Score an email subject line",
+      "category": "Marketing APIs",
+      "description": "Score an email subject line",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "emailSpamWordChecker",
+      "name": "Check text for spammy tokens",
+      "category": "Marketing APIs",
+      "description": "Check text for spammy tokens",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "roasCalculator",
+      "name": "Calculate ROAS",
+      "category": "Marketing APIs",
+      "description": "Calculate ROAS",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "cpcCalculator",
+      "name": "Calculate CPC",
+      "category": "Marketing APIs",
+      "description": "Calculate CPC",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "ctrCalculator",
+      "name": "Calculate CTR",
+      "category": "Marketing APIs",
+      "description": "Calculate CTR",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "cpaCalculator",
+      "name": "Calculate CPA",
+      "category": "Marketing APIs",
+      "description": "Calculate CPA",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "cacCalculator",
+      "name": "Calculate CAC",
+      "category": "Marketing APIs",
+      "description": "Calculate CAC",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "utmBulkBuilder",
+      "name": "Bulk-build UTM URLs",
+      "category": "Marketing APIs",
+      "description": "Bulk-build UTM URLs",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "utmNamingConventionChecker",
+      "name": "Check UTM naming conventions",
+      "category": "Marketing APIs",
+      "description": "Check UTM naming conventions",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "emailLinkExtractor",
+      "name": "Extract links from email HTML",
+      "category": "Marketing APIs",
+      "description": "Extract links from email HTML",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "emailUnsubscribeChecker",
+      "name": "Check unsubscribe link presence",
+      "category": "Marketing APIs",
+      "description": "Check unsubscribe link presence",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "socialCaptionCounter",
+      "name": "Count social caption length",
+      "category": "Marketing APIs",
+      "description": "Count social caption length",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "socialImageSizeValidator",
+      "name": "Validate social image dimensions",
+      "category": "Marketing APIs",
+      "description": "Validate social image dimensions",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "engagementRateCalculator",
+      "name": "Calculate engagement rate",
+      "category": "Marketing APIs",
+      "description": "Calculate engagement rate",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "cpmCalculator",
+      "name": "Calculate CPM",
+      "category": "Marketing APIs",
+      "description": "Calculate CPM",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "abTestSampleSizeCalculator",
+      "name": "Estimate A/B test sample size",
+      "category": "Marketing APIs",
+      "description": "Estimate A/B test sample size",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "abTestSignificanceCalculator",
+      "name": "Estimate A/B test significance",
+      "category": "Marketing APIs",
+      "description": "Estimate A/B test significance",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "aiAdHeadlineVariants",
+      "name": "Deterministic ad headline variants",
+      "category": "Marketing APIs",
+      "description": "Deterministic ad headline variants",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "aiEmailSubjectVariants",
+      "name": "Deterministic email subject variants",
+      "category": "Marketing APIs",
+      "description": "Deterministic email subject variants",
       "inputShape": "json",
       "backend": "node"
     },
@@ -6408,6 +6633,426 @@
       "responseHint": "Returns Node API envelope JSON",
       "validatePaths": [
         "youtube-tools/youtube-caption-formatter"
+      ]
+    },
+    "landingPageCtaFinder": {
+      "operationId": "landingPageCtaFinder",
+      "method": "GET",
+      "gatewayPath": "/api/v1/marketing-apis/landing-page-cta-finder",
+      "category": "Marketing APIs",
+      "name": "Find CTAs on a landing page",
+      "description": "Find CTAs on a landing page",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/landing-page-cta-finder"
+      ]
+    },
+    "formFieldInventory": {
+      "operationId": "formFieldInventory",
+      "method": "GET",
+      "gatewayPath": "/api/v1/marketing-apis/form-field-inventory",
+      "category": "Marketing APIs",
+      "name": "Inventory form fields on a page",
+      "description": "Inventory form fields on a page",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/form-field-inventory"
+      ]
+    },
+    "marketingTagExtractor": {
+      "operationId": "marketingTagExtractor",
+      "method": "GET",
+      "gatewayPath": "/api/v1/marketing-apis/marketing-tag-extractor",
+      "category": "Marketing APIs",
+      "name": "Extract marketing tags from a page",
+      "description": "Extract marketing tags from a page",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/marketing-tag-extractor"
+      ]
+    },
+    "utmBuilder": {
+      "operationId": "utmBuilder",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/utm-builder",
+      "category": "Marketing APIs",
+      "name": "Build UTM campaign URL",
+      "description": "Build UTM campaign URL",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/utm-builder"
+      ]
+    },
+    "utmParser": {
+      "operationId": "utmParser",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/utm-parser",
+      "category": "Marketing APIs",
+      "name": "Parse UTM parameters from a URL",
+      "description": "Parse UTM parameters from a URL",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/utm-parser"
+      ]
+    },
+    "adsUtmBuilder": {
+      "operationId": "adsUtmBuilder",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/ads-utm-builder",
+      "category": "Marketing APIs",
+      "name": "Build ads UTM URL with platform macros",
+      "description": "Build ads UTM URL with platform macros",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/ads-utm-builder"
+      ]
+    },
+    "qrCodeGenerator": {
+      "operationId": "qrCodeGenerator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/qr-code-generator",
+      "category": "Marketing APIs",
+      "name": "Generate QR code SVG",
+      "description": "Generate QR code SVG",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/qr-code-generator"
+      ]
+    },
+    "adsCopyCounter": {
+      "operationId": "adsCopyCounter",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/ads-copy-counter",
+      "category": "Marketing APIs",
+      "name": "Count ads copy against platform limits",
+      "description": "Count ads copy against platform limits",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/ads-copy-counter"
+      ]
+    },
+    "googleAdsRsaPreview": {
+      "operationId": "googleAdsRsaPreview",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/google-ads-rsa-preview",
+      "category": "Marketing APIs",
+      "name": "Preview Google Ads RSA assets",
+      "description": "Preview Google Ads RSA assets",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/google-ads-rsa-preview"
+      ]
+    },
+    "emailSubjectLineTester": {
+      "operationId": "emailSubjectLineTester",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/email-subject-line-tester",
+      "category": "Marketing APIs",
+      "name": "Score an email subject line",
+      "description": "Score an email subject line",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/email-subject-line-tester"
+      ]
+    },
+    "emailSpamWordChecker": {
+      "operationId": "emailSpamWordChecker",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/email-spam-word-checker",
+      "category": "Marketing APIs",
+      "name": "Check text for spammy tokens",
+      "description": "Check text for spammy tokens",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/email-spam-word-checker"
+      ]
+    },
+    "roasCalculator": {
+      "operationId": "roasCalculator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/roas-calculator",
+      "category": "Marketing APIs",
+      "name": "Calculate ROAS",
+      "description": "Calculate ROAS",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/roas-calculator"
+      ]
+    },
+    "cpcCalculator": {
+      "operationId": "cpcCalculator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/cpc-calculator",
+      "category": "Marketing APIs",
+      "name": "Calculate CPC",
+      "description": "Calculate CPC",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/cpc-calculator"
+      ]
+    },
+    "ctrCalculator": {
+      "operationId": "ctrCalculator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/ctr-calculator",
+      "category": "Marketing APIs",
+      "name": "Calculate CTR",
+      "description": "Calculate CTR",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/ctr-calculator"
+      ]
+    },
+    "cpaCalculator": {
+      "operationId": "cpaCalculator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/cpa-calculator",
+      "category": "Marketing APIs",
+      "name": "Calculate CPA",
+      "description": "Calculate CPA",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/cpa-calculator"
+      ]
+    },
+    "cacCalculator": {
+      "operationId": "cacCalculator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/cac-calculator",
+      "category": "Marketing APIs",
+      "name": "Calculate CAC",
+      "description": "Calculate CAC",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/cac-calculator"
+      ]
+    },
+    "utmBulkBuilder": {
+      "operationId": "utmBulkBuilder",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/utm-bulk-builder",
+      "category": "Marketing APIs",
+      "name": "Bulk-build UTM URLs",
+      "description": "Bulk-build UTM URLs",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/utm-bulk-builder"
+      ]
+    },
+    "utmNamingConventionChecker": {
+      "operationId": "utmNamingConventionChecker",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/utm-naming-convention-checker",
+      "category": "Marketing APIs",
+      "name": "Check UTM naming conventions",
+      "description": "Check UTM naming conventions",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/utm-naming-convention-checker"
+      ]
+    },
+    "emailLinkExtractor": {
+      "operationId": "emailLinkExtractor",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/email-link-extractor",
+      "category": "Marketing APIs",
+      "name": "Extract links from email HTML",
+      "description": "Extract links from email HTML",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/email-link-extractor"
+      ]
+    },
+    "emailUnsubscribeChecker": {
+      "operationId": "emailUnsubscribeChecker",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/email-unsubscribe-checker",
+      "category": "Marketing APIs",
+      "name": "Check unsubscribe link presence",
+      "description": "Check unsubscribe link presence",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/email-unsubscribe-checker"
+      ]
+    },
+    "socialCaptionCounter": {
+      "operationId": "socialCaptionCounter",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/social-caption-counter",
+      "category": "Marketing APIs",
+      "name": "Count social caption length",
+      "description": "Count social caption length",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/social-caption-counter"
+      ]
+    },
+    "socialImageSizeValidator": {
+      "operationId": "socialImageSizeValidator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/social-image-size-validator",
+      "category": "Marketing APIs",
+      "name": "Validate social image dimensions",
+      "description": "Validate social image dimensions",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/social-image-size-validator"
+      ]
+    },
+    "engagementRateCalculator": {
+      "operationId": "engagementRateCalculator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/engagement-rate-calculator",
+      "category": "Marketing APIs",
+      "name": "Calculate engagement rate",
+      "description": "Calculate engagement rate",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/engagement-rate-calculator"
+      ]
+    },
+    "cpmCalculator": {
+      "operationId": "cpmCalculator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/cpm-calculator",
+      "category": "Marketing APIs",
+      "name": "Calculate CPM",
+      "description": "Calculate CPM",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/cpm-calculator"
+      ]
+    },
+    "abTestSampleSizeCalculator": {
+      "operationId": "abTestSampleSizeCalculator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/ab-test-sample-size-calculator",
+      "category": "Marketing APIs",
+      "name": "Estimate A/B test sample size",
+      "description": "Estimate A/B test sample size",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/ab-test-sample-size-calculator"
+      ]
+    },
+    "abTestSignificanceCalculator": {
+      "operationId": "abTestSignificanceCalculator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/ab-test-significance-calculator",
+      "category": "Marketing APIs",
+      "name": "Estimate A/B test significance",
+      "description": "Estimate A/B test significance",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/ab-test-significance-calculator"
+      ]
+    },
+    "aiAdHeadlineVariants": {
+      "operationId": "aiAdHeadlineVariants",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/ai-ad-headline-variants",
+      "category": "Marketing APIs",
+      "name": "Deterministic ad headline variants",
+      "description": "Deterministic ad headline variants",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/ai-ad-headline-variants"
+      ]
+    },
+    "aiEmailSubjectVariants": {
+      "operationId": "aiEmailSubjectVariants",
+      "method": "POST",
+      "gatewayPath": "/api/v1/marketing-apis/ai-email-subject-variants",
+      "category": "Marketing APIs",
+      "name": "Deterministic email subject variants",
+      "description": "Deterministic email subject variants",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "marketing-apis/ai-email-subject-variants"
       ]
     },
     "piiScrub": {

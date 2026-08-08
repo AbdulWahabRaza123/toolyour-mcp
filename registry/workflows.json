@@ -237,6 +237,61 @@
       "description": "Favicon, apple-touch, and common icon fallback reachability.",
       "synthesizer": "site-icons-audit",
       "steps": [{ "id": "icons", "operationId": "siteIconsChecker" }]
+    },
+    {
+      "id": "campaign-tracking-setup-job",
+      "title": "Campaign Tracking Setup",
+      "description": "UTM builder, ads-platform UTM macros, and UTM parser hygiene.",
+      "synthesizer": "campaign-tracking",
+      "steps": [
+        { "id": "utm", "operationId": "utmBuilder" },
+        { "id": "adsUtm", "operationId": "adsUtmBuilder", "continueOnError": true },
+        { "id": "parse", "operationId": "utmParser", "continueOnError": true }
+      ]
+    },
+    {
+      "id": "paid-ads-copy-gate-job",
+      "title": "Paid Ads Copy Gate",
+      "description": "Ads copy character limits plus Google RSA preview.",
+      "synthesizer": "paid-ads-copy-gate",
+      "steps": [
+        { "id": "counter", "operationId": "adsCopyCounter" },
+        { "id": "rsa", "operationId": "googleAdsRsaPreview", "continueOnError": true }
+      ]
+    },
+    {
+      "id": "growth-unit-economics-job",
+      "title": "Growth Unit Economics",
+      "description": "ROAS, CPC, CTR, CPA, and CAC calculators in one job.",
+      "synthesizer": "growth-unit-economics",
+      "steps": [
+        { "id": "roas", "operationId": "roasCalculator", "continueOnError": true },
+        { "id": "cpc", "operationId": "cpcCalculator", "continueOnError": true },
+        { "id": "ctr", "operationId": "ctrCalculator", "continueOnError": true },
+        { "id": "cpa", "operationId": "cpaCalculator", "continueOnError": true },
+        { "id": "cac", "operationId": "cacCalculator", "continueOnError": true }
+      ]
+    },
+    {
+      "id": "email-campaign-qa-job",
+      "title": "Email Campaign QA",
+      "description": "Subject-line tester and spam-word heuristics (not DNS deliverability).",
+      "synthesizer": "email-campaign-qa",
+      "steps": [
+        { "id": "subject", "operationId": "emailSubjectLineTester" },
+        { "id": "spam", "operationId": "emailSpamWordChecker", "continueOnError": true }
+      ]
+    },
+    {
+      "id": "landing-conversion-check-job",
+      "title": "Landing Conversion Check",
+      "description": "CTA finder, form inventory, and marketing tag extractor for a URL.",
+      "synthesizer": "landing-conversion-check",
+      "steps": [
+        { "id": "cta", "operationId": "landingPageCtaFinder" },
+        { "id": "forms", "operationId": "formFieldInventory", "continueOnError": true },
+        { "id": "tags", "operationId": "marketingTagExtractor", "continueOnError": true }
+      ]
     }
   ]
 }

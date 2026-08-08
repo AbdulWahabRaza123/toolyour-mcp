@@ -1,0 +1,12 @@
+{
+  "operationId": "formFieldInventory",
+  "gatewayPath": "/api/v1/marketing-apis/form-field-inventory",
+  "method": "GET",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

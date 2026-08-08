@@ -1,0 +1,12 @@
+{
+  "operationId": "googleAdsRsaPreview",
+  "gatewayPath": "/api/v1/marketing-apis/google-ads-rsa-preview",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}
