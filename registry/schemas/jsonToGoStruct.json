@@ -1,0 +1,12 @@
+{
+  "operationId": "jsonToGoStruct",
+  "gatewayPath": "/api/v1/developer-apis/json-to-go-struct",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

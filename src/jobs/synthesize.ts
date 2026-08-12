@@ -29,6 +29,11 @@ import {
   synthesizeLandingConversionCheck,
   synthesizePaidAdsCopyGate,
 } from "./marketing-jobs";
+import {
+  synthesizeDevAuthDebug,
+  synthesizeDevFormatTransform,
+  synthesizeDevJsonPipeline,
+} from "./developer-jobs";
 
 const SYNTHESIZERS: Record<string, (params: SynthesizeJobParams) => JobReport> = {
   "full-seo-audit": synthesizeFullSeoAudit,
@@ -55,6 +60,9 @@ const SYNTHESIZERS: Record<string, (params: SynthesizeJobParams) => JobReport> =
   "growth-unit-economics": synthesizeGrowthUnitEconomics,
   "email-campaign-qa": synthesizeEmailCampaignQa,
   "landing-conversion-check": synthesizeLandingConversionCheck,
+  "dev-json-pipeline": synthesizeDevJsonPipeline,
+  "dev-auth-debug": synthesizeDevAuthDebug,
+  "dev-format-transform": synthesizeDevFormatTransform,
 };
 
 export function synthesizeJobReport(params: SynthesizeJobParams): JobReport | null {

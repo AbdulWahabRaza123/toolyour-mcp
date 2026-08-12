@@ -1,0 +1,12 @@
+{
+  "operationId": "yamlToJson",
+  "gatewayPath": "/api/v1/developer-apis/yaml-to-json",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

@@ -1,0 +1,12 @@
+{
+  "operationId": "base64EncoderDecoder",
+  "gatewayPath": "/api/v1/developer-apis/base64-encoder-decoder",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

@@ -5,16 +5,7 @@
   "request": {
     "type": "object",
     "additionalProperties": true,
-    "description": "Tool-specific input fields.",
-    "required": [
-      "text"
-    ],
-    "properties": {
-      "text": {
-        "type": "string",
-        "description": "Required input: text"
-      }
-    }
+    "description": "Tool-specific input fields."
   },
   "response": null,
   "responseHint": "Returns Node API envelope JSON"

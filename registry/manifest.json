@@ -1,16 +1,17 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-08-08T06:16:12.441Z",
+  "generatedAt": "2026-08-12T18:05:27.271Z",
   "stats": {
-    "totalOpenApiRoutes": 310,
-    "hasApiIncluded": 308,
-    "excluded": 2
+    "totalOpenApiRoutes": 342,
+    "hasApiIncluded": 339,
+    "excluded": 3
   },
   "categories": [
     "AI Models",
     "Archive",
     "Calculators",
     "Convertors",
+    "Developer APIs",
     "Documents",
     "File Extract",
     "Marketing APIs",
@@ -2380,17 +2381,265 @@
     },
     {
       "operationId": "aiAdHeadlineVariants",
-      "name": "Deterministic ad headline variants",
+      "name": "Template ad headline variants (not LLM)",
       "category": "Marketing APIs",
-      "description": "Deterministic ad headline variants",
+      "description": "Template ad headline variants (not LLM)",
       "inputShape": "json",
       "backend": "node"
     },
     {
       "operationId": "aiEmailSubjectVariants",
-      "name": "Deterministic email subject variants",
+      "name": "Template email subject variants (not LLM)",
       "category": "Marketing APIs",
-      "description": "Deterministic email subject variants",
+      "description": "Template email subject variants (not LLM)",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "httpHeadersChecker",
+      "name": "Fetch and inspect HTTP response headers",
+      "category": "Developer APIs",
+      "description": "Fetch and inspect HTTP response headers",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "jsonFormatter",
+      "name": "Format / pretty-print JSON",
+      "category": "Developer APIs",
+      "description": "Format / pretty-print JSON",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "jsonValidator",
+      "name": "Validate JSON syntax",
+      "category": "Developer APIs",
+      "description": "Validate JSON syntax",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "base64EncoderDecoder",
+      "name": "Encode or decode Base64 text",
+      "category": "Developer APIs",
+      "description": "Encode or decode Base64 text",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "urlEncoderDecoder",
+      "name": "Encode or decode URL components",
+      "category": "Developer APIs",
+      "description": "Encode or decode URL components",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "uuidGenerator",
+      "name": "Generate UUIDs",
+      "category": "Developer APIs",
+      "description": "Generate UUIDs",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "timestampConverter",
+      "name": "Convert unix ↔ human timestamps",
+      "category": "Developer APIs",
+      "description": "Convert unix ↔ human timestamps",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "regexTester",
+      "name": "Test a regular expression against input",
+      "category": "Developer APIs",
+      "description": "Test a regular expression against input",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "jsonToTypescript",
+      "name": "Generate TypeScript types from JSON",
+      "category": "Developer APIs",
+      "description": "Generate TypeScript types from JSON",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "jsonToZod",
+      "name": "Generate Zod schema from JSON",
+      "category": "Developer APIs",
+      "description": "Generate Zod schema from JSON",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "jsonToGoStruct",
+      "name": "Generate Go structs from JSON",
+      "category": "Developer APIs",
+      "description": "Generate Go structs from JSON",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "jsonToPython",
+      "name": "Generate Python typed dicts/dataclasses from JSON",
+      "category": "Developer APIs",
+      "description": "Generate Python typed dicts/dataclasses from JSON",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "yamlToJson",
+      "name": "Convert YAML to JSON",
+      "category": "Developer APIs",
+      "description": "Convert YAML to JSON",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "jsonToYaml",
+      "name": "Convert JSON to YAML",
+      "category": "Developer APIs",
+      "description": "Convert JSON to YAML",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "xmlFormatter",
+      "name": "Format / pretty-print XML",
+      "category": "Developer APIs",
+      "description": "Format / pretty-print XML",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "jwtGenerator",
+      "name": "Generate a signed JWT (test/dev use)",
+      "category": "Developer APIs",
+      "description": "Generate a signed JWT (test/dev use)",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "httpHeadersCheckerPost",
+      "name": "Fetch HTTP headers (POST body.url)",
+      "category": "Developer APIs",
+      "description": "Fetch HTTP headers (POST body.url)",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "apiRequestBuilder",
+      "name": "Build HTTP request / cURL from fields",
+      "category": "Developer APIs",
+      "description": "Build HTTP request / cURL from fields",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "userAgentParser",
+      "name": "Parse a User-Agent string",
+      "category": "Developer APIs",
+      "description": "Parse a User-Agent string",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "ipAddressTools",
+      "name": "IP address parse / classify helpers",
+      "category": "Developer APIs",
+      "description": "IP address parse / classify helpers",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "htmlFormatter",
+      "name": "Format HTML",
+      "category": "Developer APIs",
+      "description": "Format HTML",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "cssFormatter",
+      "name": "Format CSS",
+      "category": "Developer APIs",
+      "description": "Format CSS",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "jsFormatter",
+      "name": "Format JavaScript",
+      "category": "Developer APIs",
+      "description": "Format JavaScript",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "sqlFormatter",
+      "name": "Format SQL",
+      "category": "Developer APIs",
+      "description": "Format SQL",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "sqlValidator",
+      "name": "Validate SQL syntax (local heuristics)",
+      "category": "Developer APIs",
+      "description": "Validate SQL syntax (local heuristics)",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "regexGenerator",
+      "name": "Build a regex from guided options (not LLM)",
+      "category": "Developer APIs",
+      "description": "Build a regex from guided options (not LLM)",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "cronExpressionGenerator",
+      "name": "Build a cron expression",
+      "category": "Developer APIs",
+      "description": "Build a cron expression",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "cronExpressionParser",
+      "name": "Parse / explain a cron expression",
+      "category": "Developer APIs",
+      "description": "Parse / explain a cron expression",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "cssMinifier",
+      "name": "Minify CSS",
+      "category": "Developer APIs",
+      "description": "Minify CSS",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "jsMinifier",
+      "name": "Minify JavaScript",
+      "category": "Developer APIs",
+      "description": "Minify JavaScript",
+      "inputShape": "json",
+      "backend": "node"
+    },
+    {
+      "operationId": "colorConverter",
+      "name": "Convert color formats (hex/rgb/hsl)",
+      "category": "Developer APIs",
+      "description": "Convert color formats (hex/rgb/hsl)",
       "inputShape": "json",
       "backend": "node"
     },
@@ -7030,8 +7279,8 @@
       "method": "POST",
       "gatewayPath": "/api/v1/marketing-apis/ai-ad-headline-variants",
       "category": "Marketing APIs",
-      "name": "Deterministic ad headline variants",
-      "description": "Deterministic ad headline variants",
+      "name": "Template ad headline variants (not LLM)",
+      "description": "Template ad headline variants (not LLM)",
       "backend": "node",
       "multipart": false,
       "jsonBody": true,
@@ -7045,14 +7294,479 @@
       "method": "POST",
       "gatewayPath": "/api/v1/marketing-apis/ai-email-subject-variants",
       "category": "Marketing APIs",
-      "name": "Deterministic email subject variants",
-      "description": "Deterministic email subject variants",
+      "name": "Template email subject variants (not LLM)",
+      "description": "Template email subject variants (not LLM)",
       "backend": "node",
       "multipart": false,
       "jsonBody": true,
       "responseHint": "Returns JSON response",
       "validatePaths": [
         "marketing-apis/ai-email-subject-variants"
+      ]
+    },
+    "httpHeadersChecker": {
+      "operationId": "httpHeadersChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/developer-apis/http-headers-checker",
+      "category": "Developer APIs",
+      "name": "Fetch and inspect HTTP response headers",
+      "description": "Fetch and inspect HTTP response headers",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/http-headers-checker"
+      ]
+    },
+    "jsonFormatter": {
+      "operationId": "jsonFormatter",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/json-formatter",
+      "category": "Developer APIs",
+      "name": "Format / pretty-print JSON",
+      "description": "Format / pretty-print JSON",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/json-formatter"
+      ]
+    },
+    "jsonValidator": {
+      "operationId": "jsonValidator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/json-validator",
+      "category": "Developer APIs",
+      "name": "Validate JSON syntax",
+      "description": "Validate JSON syntax",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/json-validator"
+      ]
+    },
+    "base64EncoderDecoder": {
+      "operationId": "base64EncoderDecoder",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/base64-encoder-decoder",
+      "category": "Developer APIs",
+      "name": "Encode or decode Base64 text",
+      "description": "Encode or decode Base64 text",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/base64-encoder-decoder"
+      ]
+    },
+    "urlEncoderDecoder": {
+      "operationId": "urlEncoderDecoder",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/url-encoder-decoder",
+      "category": "Developer APIs",
+      "name": "Encode or decode URL components",
+      "description": "Encode or decode URL components",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/url-encoder-decoder"
+      ]
+    },
+    "uuidGenerator": {
+      "operationId": "uuidGenerator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/uuid-generator",
+      "category": "Developer APIs",
+      "name": "Generate UUIDs",
+      "description": "Generate UUIDs",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/uuid-generator"
+      ]
+    },
+    "timestampConverter": {
+      "operationId": "timestampConverter",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/timestamp-converter",
+      "category": "Developer APIs",
+      "name": "Convert unix ↔ human timestamps",
+      "description": "Convert unix ↔ human timestamps",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/timestamp-converter"
+      ]
+    },
+    "regexTester": {
+      "operationId": "regexTester",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/regex-tester",
+      "category": "Developer APIs",
+      "name": "Test a regular expression against input",
+      "description": "Test a regular expression against input",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/regex-tester"
+      ]
+    },
+    "jsonToTypescript": {
+      "operationId": "jsonToTypescript",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/json-to-typescript",
+      "category": "Developer APIs",
+      "name": "Generate TypeScript types from JSON",
+      "description": "Generate TypeScript types from JSON",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/json-to-typescript"
+      ]
+    },
+    "jsonToZod": {
+      "operationId": "jsonToZod",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/json-to-zod",
+      "category": "Developer APIs",
+      "name": "Generate Zod schema from JSON",
+      "description": "Generate Zod schema from JSON",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/json-to-zod"
+      ]
+    },
+    "jsonToGoStruct": {
+      "operationId": "jsonToGoStruct",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/json-to-go-struct",
+      "category": "Developer APIs",
+      "name": "Generate Go structs from JSON",
+      "description": "Generate Go structs from JSON",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/json-to-go-struct"
+      ]
+    },
+    "jsonToPython": {
+      "operationId": "jsonToPython",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/json-to-python",
+      "category": "Developer APIs",
+      "name": "Generate Python typed dicts/dataclasses from JSON",
+      "description": "Generate Python typed dicts/dataclasses from JSON",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/json-to-python"
+      ]
+    },
+    "yamlToJson": {
+      "operationId": "yamlToJson",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/yaml-to-json",
+      "category": "Developer APIs",
+      "name": "Convert YAML to JSON",
+      "description": "Convert YAML to JSON",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/yaml-to-json"
+      ]
+    },
+    "jsonToYaml": {
+      "operationId": "jsonToYaml",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/json-to-yaml",
+      "category": "Developer APIs",
+      "name": "Convert JSON to YAML",
+      "description": "Convert JSON to YAML",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/json-to-yaml"
+      ]
+    },
+    "xmlFormatter": {
+      "operationId": "xmlFormatter",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/xml-formatter",
+      "category": "Developer APIs",
+      "name": "Format / pretty-print XML",
+      "description": "Format / pretty-print XML",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/xml-formatter"
+      ]
+    },
+    "jwtGenerator": {
+      "operationId": "jwtGenerator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/jwt-generator",
+      "category": "Developer APIs",
+      "name": "Generate a signed JWT (test/dev use)",
+      "description": "Generate a signed JWT (test/dev use)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/jwt-generator"
+      ]
+    },
+    "httpHeadersCheckerPost": {
+      "operationId": "httpHeadersCheckerPost",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/http-headers-checker",
+      "category": "Developer APIs",
+      "name": "Fetch HTTP headers (POST body.url)",
+      "description": "Fetch HTTP headers (POST body.url)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/http-headers-checker"
+      ]
+    },
+    "apiRequestBuilder": {
+      "operationId": "apiRequestBuilder",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/api-request-builder",
+      "category": "Developer APIs",
+      "name": "Build HTTP request / cURL from fields",
+      "description": "Build HTTP request / cURL from fields",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/api-request-builder"
+      ]
+    },
+    "userAgentParser": {
+      "operationId": "userAgentParser",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/user-agent-parser",
+      "category": "Developer APIs",
+      "name": "Parse a User-Agent string",
+      "description": "Parse a User-Agent string",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/user-agent-parser"
+      ]
+    },
+    "ipAddressTools": {
+      "operationId": "ipAddressTools",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/ip-address-tools",
+      "category": "Developer APIs",
+      "name": "IP address parse / classify helpers",
+      "description": "IP address parse / classify helpers",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/ip-address-tools"
+      ]
+    },
+    "htmlFormatter": {
+      "operationId": "htmlFormatter",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/html-formatter",
+      "category": "Developer APIs",
+      "name": "Format HTML",
+      "description": "Format HTML",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/html-formatter"
+      ]
+    },
+    "cssFormatter": {
+      "operationId": "cssFormatter",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/css-formatter",
+      "category": "Developer APIs",
+      "name": "Format CSS",
+      "description": "Format CSS",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/css-formatter"
+      ]
+    },
+    "jsFormatter": {
+      "operationId": "jsFormatter",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/js-formatter",
+      "category": "Developer APIs",
+      "name": "Format JavaScript",
+      "description": "Format JavaScript",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/js-formatter"
+      ]
+    },
+    "sqlFormatter": {
+      "operationId": "sqlFormatter",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/sql-formatter",
+      "category": "Developer APIs",
+      "name": "Format SQL",
+      "description": "Format SQL",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/sql-formatter"
+      ]
+    },
+    "sqlValidator": {
+      "operationId": "sqlValidator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/sql-validator",
+      "category": "Developer APIs",
+      "name": "Validate SQL syntax (local heuristics)",
+      "description": "Validate SQL syntax (local heuristics)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/sql-validator"
+      ]
+    },
+    "regexGenerator": {
+      "operationId": "regexGenerator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/regex-generator",
+      "category": "Developer APIs",
+      "name": "Build a regex from guided options (not LLM)",
+      "description": "Build a regex from guided options (not LLM)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/regex-generator"
+      ]
+    },
+    "cronExpressionGenerator": {
+      "operationId": "cronExpressionGenerator",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/cron-expression-generator",
+      "category": "Developer APIs",
+      "name": "Build a cron expression",
+      "description": "Build a cron expression",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/cron-expression-generator"
+      ]
+    },
+    "cronExpressionParser": {
+      "operationId": "cronExpressionParser",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/cron-expression-parser",
+      "category": "Developer APIs",
+      "name": "Parse / explain a cron expression",
+      "description": "Parse / explain a cron expression",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/cron-expression-parser"
+      ]
+    },
+    "cssMinifier": {
+      "operationId": "cssMinifier",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/css-minifier",
+      "category": "Developer APIs",
+      "name": "Minify CSS",
+      "description": "Minify CSS",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/css-minifier"
+      ]
+    },
+    "jsMinifier": {
+      "operationId": "jsMinifier",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/js-minifier",
+      "category": "Developer APIs",
+      "name": "Minify JavaScript",
+      "description": "Minify JavaScript",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/js-minifier"
+      ]
+    },
+    "colorConverter": {
+      "operationId": "colorConverter",
+      "method": "POST",
+      "gatewayPath": "/api/v1/developer-apis/color-converter",
+      "category": "Developer APIs",
+      "name": "Convert color formats (hex/rgb/hsl)",
+      "description": "Convert color formats (hex/rgb/hsl)",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": true,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "developer-apis/color-converter"
       ]
     },
     "piiScrub": {

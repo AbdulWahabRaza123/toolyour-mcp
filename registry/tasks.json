@@ -884,6 +884,97 @@
       "type": "workflow",
       "target": "landing-conversion-check-job",
       "requiredInput": ["url"]
+    },
+    {
+      "id": "dev-json-pipeline",
+      "title": "Dev JSON pipeline",
+      "description": "Validate and format JSON, then generate Zod (or invoke TypeScript/Go/Python).",
+      "keywords": [
+        "json to zod",
+        "json to typescript",
+        "validate json",
+        "format json",
+        "json codegen",
+        "json pipeline",
+        "yaml to json schema"
+      ],
+      "type": "workflow",
+      "target": "dev-json-pipeline-job",
+      "requiredInput": ["text"]
+    },
+    {
+      "id": "fix-verify-dev-json-pipeline",
+      "title": "Fix-verify dev JSON pipeline",
+      "description": "Re-run JSON validate/format/Zod after fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify json pipeline",
+        "verify json after fix",
+        "recheck json zod",
+        "confirm json schema fixed"
+      ],
+      "type": "workflow",
+      "target": "dev-json-pipeline-job",
+      "requiredInput": ["text"]
+    },
+    {
+      "id": "dev-auth-debug",
+      "title": "Dev auth debug",
+      "description": "Generate a test JWT and decode claims; headers/request builder via invoke_tool.",
+      "keywords": [
+        "generate jwt",
+        "jwt generator",
+        "debug auth token",
+        "test jwt",
+        "auth debug",
+        "decode generated jwt"
+      ],
+      "type": "workflow",
+      "target": "dev-auth-debug-job",
+      "requiredInput": ["text"]
+    },
+    {
+      "id": "fix-verify-dev-auth-debug",
+      "title": "Fix-verify dev auth debug",
+      "description": "Re-run JWT generate/decode after auth fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify jwt",
+        "verify auth token after fix",
+        "recheck jwt claims",
+        "confirm jwt fixed"
+      ],
+      "type": "workflow",
+      "target": "dev-auth-debug-job",
+      "requiredInput": ["text"]
+    },
+    {
+      "id": "dev-format-transform",
+      "title": "Dev format transform",
+      "description": "YAML↔JSON, XML pretty-print, and related formatters.",
+      "keywords": [
+        "yaml to json",
+        "json to yaml",
+        "format xml",
+        "format html css",
+        "sql formatter",
+        "dev format transform"
+      ],
+      "type": "workflow",
+      "target": "dev-format-transform-job",
+      "requiredInput": ["text"]
+    },
+    {
+      "id": "fix-verify-dev-format-transform",
+      "title": "Fix-verify dev format transform",
+      "description": "Re-run YAML/JSON/XML format pipeline after fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify format transform",
+        "verify yaml json after fix",
+        "recheck xml format",
+        "confirm format fixed"
+      ],
+      "type": "workflow",
+      "target": "dev-format-transform-job",
+      "requiredInput": ["text"]
     }
   ]
 }

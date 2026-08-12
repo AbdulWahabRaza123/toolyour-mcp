@@ -1,0 +1,12 @@
+{
+  "operationId": "userAgentParser",
+  "gatewayPath": "/api/v1/developer-apis/user-agent-parser",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

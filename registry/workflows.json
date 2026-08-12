@@ -292,6 +292,38 @@
         { "id": "forms", "operationId": "formFieldInventory", "continueOnError": true },
         { "id": "tags", "operationId": "marketingTagExtractor", "continueOnError": true }
       ]
+    },
+    {
+      "id": "dev-json-pipeline-job",
+      "title": "Dev JSON Pipeline",
+      "description": "Validate and format JSON, then generate a Zod schema.",
+      "synthesizer": "dev-json-pipeline",
+      "steps": [
+        { "id": "validate", "operationId": "jsonValidator" },
+        { "id": "format", "operationId": "jsonFormatter", "continueOnError": true },
+        { "id": "zod", "operationId": "jsonToZod", "continueOnError": true }
+      ]
+    },
+    {
+      "id": "dev-auth-debug-job",
+      "title": "Dev Auth Debug",
+      "description": "Generate a test JWT and decode claims (signature not verified).",
+      "synthesizer": "dev-auth-debug",
+      "steps": [
+        { "id": "generate", "operationId": "jwtGenerator" },
+        { "id": "decode", "operationId": "jwtDecoder", "continueOnError": true }
+      ]
+    },
+    {
+      "id": "dev-format-transform-job",
+      "title": "Dev Format Transform",
+      "description": "YAML→JSON, format JSON, and pretty-print XML for agent pipelines.",
+      "synthesizer": "dev-format-transform",
+      "steps": [
+        { "id": "yaml", "operationId": "yamlToJson" },
+        { "id": "format", "operationId": "jsonFormatter", "continueOnError": true },
+        { "id": "xml", "operationId": "xmlFormatter", "continueOnError": true }
+      ]
     }
   ]
 }

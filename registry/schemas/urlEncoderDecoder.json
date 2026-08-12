@@ -1,0 +1,12 @@
+{
+  "operationId": "urlEncoderDecoder",
+  "gatewayPath": "/api/v1/developer-apis/url-encoder-decoder",
+  "method": "POST",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}
