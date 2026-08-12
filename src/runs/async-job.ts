@@ -1,10 +1,5 @@
 import type { Logger } from "../observability/logger";
 import { validateApiKey } from "../auth/session";
-import {
-  applyResponseMode,
-  parseResponseMode,
-  type ResponseMode,
-} from "../orchestrator/compact-response";
 import { buildRunPath, runStore, type StoredRun } from "./store";
 import { notifyJobFinishedOptional } from "./webhook";
 
@@ -24,44 +19,47 @@ export interface AsyncAcceptResponse {
   message: string;
 }
 
+function storeStatusFromResult(shaped: unknown): "completed" | "partial" | "error" {
+  const st =
+    shaped && typeof shaped === "object"
+      ? String((shaped as { status?: string }).status || "")
+      : "";
+  if (st === "partial") return "partial";
+  if (st === "error") return "error";
+  // suggest / need_input / need_workflow / completed / verified → job finished successfully
+  return "completed";
+}
+
 /**
  * Accept an async job: return runId immediately and execute work in the background.
  * Webhook delivery is optional best-effort and never blocks or fails the run.
+ *
+ * Callers must apply responseMode inside work() — this function does not reshape results
+ * (re-applying dataRef would double-store and corrupt payloads).
  */
 export async function acceptAsyncJob(opts: {
   kind: StoredRun["kind"];
   apiKey: string;
   logger: Logger;
-  responseMode?: ResponseMode | string;
   work: () => Promise<unknown>;
 }): Promise<AsyncAcceptResponse> {
   const session = await validateApiKey(opts.apiKey, "", "node", opts.logger);
 
-  const run = runStore.create({
+  const run = await runStore.create({
     userId: session.userId,
     apiKeyId: session.apiKeyId,
     kind: opts.kind,
   });
 
-  const mode = parseResponseMode(opts.responseMode);
-
   void (async () => {
-    runStore.markRunning(run.id);
+    await runStore.markRunning(run.id);
     try {
-      const raw = await opts.work();
-      const shaped =
-        raw && typeof raw === "object"
-          ? applyResponseMode(raw as Record<string, unknown>, mode)
-          : raw;
-      const status =
-        shaped &&
-        typeof shaped === "object" &&
-        ((shaped as { status?: string }).status === "partial" ||
-          (shaped as { status?: string }).status === "error")
-          ? ((shaped as { status: string }).status as "partial" | "error")
-          : "completed";
-      const finished = runStore.finish(run.id, status, shaped);
-      // Fire-and-forget: webhook must never affect stored result
+      const shaped = await opts.work();
+      const finished = await runStore.finish(
+        run.id,
+        storeStatusFromResult(shaped),
+        shaped
+      );
       if (finished) {
         void notifyJobFinishedOptional(opts.apiKey, finished, opts.logger);
       }
@@ -70,7 +68,7 @@ export async function acceptAsyncJob(opts: {
         message: e instanceof Error ? e.message : String(e),
         code: (e as { code?: string })?.code,
       };
-      const finished = runStore.finish(run.id, "error", null, err);
+      const finished = await runStore.finish(run.id, "error", null, err);
       if (finished) {
         void notifyJobFinishedOptional(opts.apiKey, finished, opts.logger);
       }

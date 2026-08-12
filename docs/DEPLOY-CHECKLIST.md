@@ -47,14 +47,17 @@ node scripts/test-mcp-local.mjs
 
 ```bash
 curl -s https://api.toolyour.com/health/mcp
-# MCP client: solve_task("technical seo audit https://example.com")
+# Agent loop smoke (webhook optional):
+MCP_API_KEY=ty_... npm run smoke:live:agent
 ```
 
 Confirm:
 
+- [ ] Multi-replica MCP has `REDIS_URL` set (otherwise async `get_run` is sticky to one instance)
 - [ ] `/developers/mcp` lists job workflows (from `brand.mcpJobWorkflows`)
 - [ ] Customer docs `/developers/docs/mcp-skills` shows new workflows
 - [ ] No blog/docs promise workflows that 404
+- [ ] `get_run` returns `resultStatus` for async jobs
 
 ## 5. Platform coupling reminder
 

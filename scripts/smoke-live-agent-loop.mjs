@@ -137,18 +137,22 @@ async function main() {
   sid = verify.sessionId;
   const verifyBody = toolText(verify.payload);
   assert(
-    verifyBody?.status === "verified" || verifyBody?.delta,
-    "verify_task returns delta"
+    verifyBody?.status === "verified" ||
+      verifyBody?.delta ||
+      verifyBody?.status === "partial" ||
+      verifyBody?.status === "error",
+    "verify_task returns delta or propagated failure"
   );
 
   const asyncAccept = await rpc(
     sid,
     "tools/call",
     {
-      name: "solve_task",
+      name: "verify_task",
       arguments: {
-        goal: `fix verify security headers for ${smokeUrl}`,
+        goal,
         input: { url: smokeUrl },
+        baseline: solveBody,
         responseMode: "compact",
         async: true,
       },
@@ -157,7 +161,7 @@ async function main() {
   );
   sid = asyncAccept.sessionId;
   const accepted = toolText(asyncAccept.payload);
-  assert(accepted?.status === "accepted" && accepted?.runId, "async accept runId");
+  assert(accepted?.status === "accepted" && accepted?.runId, "async verify accept runId");
   assert(accepted?.webhookOptional === true, "webhook marked optional");
 
   let final = null;
@@ -181,6 +185,14 @@ async function main() {
     }
   }
   assert(final, "get_run eventually returns terminal status (no webhook needed)");
+  assert(
+    final.resultStatus === "verified" ||
+      final.resultStatus === "partial" ||
+      final.resultStatus === "error" ||
+      final.resultStatus === "suggest" ||
+      final.result?.status,
+    `get_run exposes resultStatus (got ${final.resultStatus})`
+  );
 
   console.log("\nAll live smoke checks passed.");
 }

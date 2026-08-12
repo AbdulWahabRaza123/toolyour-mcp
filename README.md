@@ -38,10 +38,15 @@ TOOLS_MONGO_URI=mongodb://... npm run build:registry --prefix ../docs
 ```bash
 npm run validate:jobs    # build + lint + unit + offline job parity
 npm run smoke:jobs:live  # requires MCP_API_KEY + gateway at :8888
-npm test                 # alias: test:mcp
+npm run smoke:live:agent # plan → solve → verify (+ async get_run); needs MCP_API_KEY
+npm run test:mcp         # unit + contract + integration
 ```
 
 See [`docs/DEPLOY-CHECKLIST.md`](docs/DEPLOY-CHECKLIST.md) for deploy order and live smoke steps.
+
+### Async runs (multi-replica)
+
+Set `REDIS_URL` on the Railway MCP service when running more than one replica. Without Redis, `get_run` only works on the instance that accepted `async:true`. Webhooks stay optional — poll `get_run` and read **`resultStatus`**.
 
 ## Job workflows (`solve_task`)
 

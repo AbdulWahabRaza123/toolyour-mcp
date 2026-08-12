@@ -10,24 +10,75 @@ const manifest = JSON.parse(
 );
 const ops = new Set(Object.keys(manifest.routes));
 
-const skillsDir = path.join(root, "skills");
-let failed = 0;
-
-for (const file of fs.readdirSync(skillsDir).filter((f) => f.endsWith(".md"))) {
-  const raw = fs.readFileSync(path.join(skillsDir, file), "utf8");
-  const m = raw.match(/^operationIds:\s*(.+)$/m);
-  if (!m) continue;
-  for (const id of m[1].split(",").map((s) => s.trim()).filter(Boolean)) {
-    if (!ops.has(id)) {
-      console.error(`[lint-skills] ${file}: unknown operationId ${id}`);
-      failed++;
-    }
-  }
-}
-
 const workflows = JSON.parse(
   fs.readFileSync(path.join(root, "registry", "workflows.json"), "utf8")
 );
+const workflowIds = new Set((workflows.workflows || []).map((w) => w.id));
+const localWorkflowIds = new Set(["content-ship-local"]);
+
+function loadSkillWorkflowMap() {
+  const src = fs.readFileSync(
+    path.join(root, "src/orchestrator/playbook-map.ts"),
+    "utf8"
+  );
+  const block = src.match(
+    /export const SKILL_WORKFLOW_MAP[^=]*=\s*\{([\s\S]*?)\n\};/
+  );
+  if (!block) return {};
+  const map = {};
+  for (const m of block[1].matchAll(/"([^"]+)":\s*"([^"]+)"/g)) {
+    map[m[1]] = m[2];
+  }
+  return map;
+}
+
+const SKILL_WORKFLOW_MAP = loadSkillWorkflowMap();
+
+const skillsDir = path.join(root, "skills");
+let failed = 0;
+
+function parseFrontmatter(raw) {
+  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!match) return {};
+  const meta = {};
+  for (const line of match[1].split("\n")) {
+    const idx = line.indexOf(":");
+    if (idx === -1) continue;
+    meta[line.slice(0, idx).trim()] = line.slice(idx + 1).trim();
+  }
+  return meta;
+}
+
+for (const file of fs.readdirSync(skillsDir).filter((f) => f.endsWith(".md"))) {
+  const raw = fs.readFileSync(path.join(skillsDir, file), "utf8").replace(/^\uFEFF/, "");
+  const meta = parseFrontmatter(raw);
+  const id = meta.id || file.replace(/\.md$/, "");
+
+  const m = raw.match(/^operationIds:\s*(.+)$/m);
+  if (m) {
+    for (const opId of m[1].split(",").map((s) => s.trim()).filter(Boolean)) {
+      if (!ops.has(opId)) {
+        console.error(`[lint-skills] ${file}: unknown operationId ${opId}`);
+        failed++;
+      }
+    }
+  }
+
+  const mapped = meta.workflowId || SKILL_WORKFLOW_MAP[id];
+  if (!mapped && id !== "content-ship") {
+    console.error(`[lint-skills] ${file}: no workflowId (frontmatter or map)`);
+    failed++;
+  } else if (mapped && !workflowIds.has(mapped) && !localWorkflowIds.has(mapped)) {
+    console.error(`[lint-skills] ${file}: unknown workflow ${mapped}`);
+    failed++;
+  }
+
+  if (!meta.description?.trim()) {
+    console.error(`[lint-skills] ${file}: empty description`);
+    failed++;
+  }
+}
+
 for (const wf of workflows.workflows || []) {
   for (const step of wf.steps || []) {
     if (!ops.has(step.operationId)) {

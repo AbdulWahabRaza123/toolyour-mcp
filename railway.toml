@@ -9,3 +9,7 @@ dockerfilePath = "Dockerfile"
 startCommand = "npm start"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
+
+# Required secrets: SAAS_INTERNAL_SECRET, SAAS_VALIDATE_URL, GATEWAY_URL
+# Multi-replica: set REDIS_URL (or REDIS_PUBLIC_URL) so async get_run works across instances.
+# Optional: LOG_LEVEL=info

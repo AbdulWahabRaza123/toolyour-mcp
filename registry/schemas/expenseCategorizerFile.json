@@ -4,8 +4,6 @@
   "method": "POST",
   "request": {
     "type": "object",
-    "additionalProperties": true,
-    "description": "Tool-specific input fields.",
     "required": [
       "file"
     ],
@@ -13,7 +11,7 @@
       "file": {
         "type": "string",
         "format": "binary",
-        "description": "Required input: file"
+        "description": "Bank export file — .csv, .txt, or .tsv only (max 10 MB)"
       }
     }
   },

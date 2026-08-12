@@ -20,6 +20,9 @@ export interface WorkflowRunContext {
   mcpSessionId?: string;
   registry: RegistryLoader;
   logger: Logger;
+  mcpTool?: string;
+  skillId?: string;
+  workflowId?: string;
 }
 
 export interface WorkflowRunResult {
@@ -138,6 +141,9 @@ export async function runWorkflow(
         requestId: randomUUID(),
         mcpSessionId: ctx.mcpSessionId,
         operationId: step.operationId,
+        mcpTool: ctx.mcpTool,
+        skillId: ctx.skillId,
+        workflowId: ctx.workflowId || workflowId,
         body: payload.body,
         formFields: payload.formFields,
         query: payload.query,

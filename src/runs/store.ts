@@ -56,11 +56,15 @@ class RunStore {
     await stopRedisRuns();
   }
 
-  create(partial: {
+  /**
+   * Persist accepted run locally and await Redis when enabled so other replicas
+   * can poll immediately after accept (no fire-and-forget race).
+   */
+  async create(partial: {
     userId: string;
     apiKeyId: string;
     kind: StoredRun["kind"];
-  }): StoredRun {
+  }): Promise<StoredRun> {
     this.sweep();
     while (
       (this.entries.size >= RUN_MAX_ENTRIES ||
@@ -85,24 +89,24 @@ class RunStore {
       bytes: 0,
     };
     this.entries.set(entry.id, entry);
-    void redisPutRun(entry);
+    await redisPutRun(entry);
     return entry;
   }
 
-  markRunning(id: string) {
+  async markRunning(id: string): Promise<void> {
     const entry = this.entries.get(id);
     if (!entry) return;
     entry.status = "running";
     entry.updatedAt = Date.now();
-    void redisPutRun(entry);
+    await redisPutRun(entry);
   }
 
-  finish(
+  async finish(
     id: string,
     status: "completed" | "partial" | "error",
     result: unknown,
     error?: unknown
-  ): StoredRun | null {
+  ): Promise<StoredRun | null> {
     const entry = this.entries.get(id);
     if (!entry) return null;
     this.totalBytes = Math.max(0, this.totalBytes - entry.bytes);
@@ -114,7 +118,7 @@ class RunStore {
     entry.updatedAt = Date.now();
     entry.expiresAt = Date.now() + RUN_TTL_MS;
     this.totalBytes += entry.bytes;
-    void redisPutRun(entry);
+    await redisPutRun(entry);
     return entry;
   }
 
@@ -134,9 +138,7 @@ class RunStore {
     try {
       const remote = await redisGetRun(id);
       if (remote) {
-        // Warm local cache for subsequent polls on this instance
-        this.entries.set(remote.id, remote);
-        this.totalBytes += remote.bytes || 0;
+        this.warmLocal(remote);
         return remote;
       }
     } catch (e) {
@@ -157,6 +159,31 @@ class RunStore {
       return null;
     }
     return entry;
+  }
+
+  /**
+   * True when the session may read this run (same user, or same key if user ids missing).
+   */
+  ownsRun(
+    entry: StoredRun,
+    session: { userId: string; apiKeyId: string }
+  ): boolean {
+    if (entry.userId && session.userId) {
+      return entry.userId === session.userId;
+    }
+    if (entry.apiKeyId && session.apiKeyId) {
+      return entry.apiKeyId === session.apiKeyId;
+    }
+    return false;
+  }
+
+  private warmLocal(remote: StoredRun) {
+    const existing = this.entries.get(remote.id);
+    if (existing) {
+      this.totalBytes = Math.max(0, this.totalBytes - existing.bytes);
+    }
+    this.entries.set(remote.id, remote);
+    this.totalBytes += remote.bytes || 0;
   }
 
   deleteLocal(id: string) {

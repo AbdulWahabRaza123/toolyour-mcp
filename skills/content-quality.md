@@ -4,13 +4,18 @@ title: Content Quality
 category: content
 description: Audit content structure, readability, and keyword signals for a URL.
 operationIds: contentOptimization, rankCheckerKeywords
+workflowId: content-quality-audit-job
 ---
 
 # Content Quality Skill
 
-For **content depth, headings, readability, or thin content** on a live URL:
+Audit content depth, headings, readability, and keyword signals.
 
-1. Prefer `solve_task` with *"content quality audit for {url}"* → `content-quality-audit-job`.
-2. Read `jobReport.workstreams.contentQuality` and `keywordSignals`.
-3. For **unpublished HTML** (no URL), use `solve_task` with `input.html` → `seo-audit-local` / `local-page-seo`.
-4. Summarize prioritized fixes — do not paste full page HTML.
+## Preferred path
+
+1. **Live URL:** `run_playbook("content-quality", { url: "https://…" })`
+2. **Unpublished HTML:** `run_playbook("content-ship", { html: "…", enhance: false })`
+3. Read `jobReport.workstreams.contentQuality` and `keywordSignals`
+4. After fixes: `verify_task` with baseline
+
+Do not paste full page HTML into chat — summarize `jobReport` only.

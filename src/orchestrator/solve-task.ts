@@ -52,14 +52,44 @@ function suggestResponse(
     ? searchTools(registry.getManifest(), trimmedGoal, undefined, 5)
     : [];
 
+  const exampleGoals = [
+    "SEO audit for https://example.com",
+    "check security headers for https://example.com",
+    "ship gate for https://example.com",
+    "why is LCP slow on https://example.com",
+    "convert docx to pdf",
+  ];
+
+  const nextActions =
+    suggestions.length > 0
+      ? [
+          `Re-call solve_task with a clearer goal (include a URL), e.g. "${suggestions[0].task.title} for https://…"`,
+          suggestions[0].task.type === "workflow"
+            ? `Or run_playbook / solve_task targeting task id "${suggestions[0].task.id}"`
+            : `Or invoke_tool with operationId from toolSuggestions`,
+          "Or call discover_tools with a more specific query, then get_tool_schema → invoke_tool",
+        ]
+      : [
+          "Call list_categories, then discover_tools with a specific keyword (e.g. 'security headers', 'docx pdf')",
+          "Rephrase as an SEO, security, document, conversion, or text goal — include https://… when relevant",
+          "Do not retry the same vague chat-style goal; ToolYour is not a general assistant",
+        ];
+
   return {
     status: "suggest" as const,
+    code: MCP_ERROR_CODES.AMBIGUOUS_GOAL,
     goal: trimmedGoal,
     message:
       message ||
       (suggestions.length === 0 && tools.length === 0
         ? "Out of catalog. ToolYour MCP focuses on SEO, security, documents, conversion, and text — not general chat. Try a specific goal (e.g. 'SEO audit for https://…') or call list_categories / discover_tools."
         : "No high-confidence task match. Review taskSuggestions / toolSuggestions, or call discover_tools with a more specific query."),
+    hint:
+      suggestions.length > 0
+        ? "Pick the top taskSuggestion and re-call solve_task with a URL or required input — do not invent an operationId."
+        : "This goal is outside the catalog — narrow to an SEO/security/document/conversion task.",
+    nextActions,
+    exampleGoals,
     taskSuggestions: suggestions.map((s) => ({
       id: s.task.id,
       title: s.task.title,
@@ -85,6 +115,9 @@ export async function solveTask(
       error: {
         code: MCP_ERROR_CODES.INVALID_INPUT,
         message: "goal is required",
+        hint: "Pass a non-empty plain-language goal, e.g. 'SEO audit for https://example.com'.",
+        nextActions: ["Call solve_task again with goal set"],
+        retryable: false,
       },
     };
   }
@@ -151,8 +184,8 @@ export async function solveTask(
     const guidance = localDevGuidance();
     return {
       status: "need_input" as const,
-      goal: trimmedGoal,
       code: MCP_ERROR_CODES.LOCAL_PREVIEW_REQUIRED,
+      goal: trimmedGoal,
       matchedTask: {
         id: task.id,
         title: task.title,
@@ -162,12 +195,15 @@ export async function solveTask(
       },
       message: guidance.message,
       options: guidance.options,
-      hint: {
-        pass_html: "Pass input.html from a rendered page or source file.",
-        pass_text: "Pass input.text for copy-focused improvements.",
-        pass_code: "Pass input.code (TSX/JSX/HTML) — MCP extracts content automatically.",
-        enhance:
-          "Local analysis is free by default. Set input.enhance=true to also run billed text APIs.",
+      hint: "Pass rendered HTML (or text/code) in input — local analysis is free unless enhance=true.",
+      nextActions: [
+        "Re-call solve_task with input.html from the page source",
+        "Or pass input.text / input.code",
+        "Set input.enhance=true only if you want billed text APIs",
+      ],
+      exampleInput: {
+        html: "<!doctype html><html><head><title>…</title></head><body>…</body></html>",
+        enhance: false,
       },
       missing: ["html", "text", "code"],
     };
@@ -180,17 +216,33 @@ export async function solveTask(
   );
 
   if (!normalized.ok) {
+    const missing = normalized.missing;
+    const exampleInput: Record<string, string> = {};
+    for (const field of missing) {
+      if (field === "url") exampleInput.url = "https://example.com";
+      else if (field === "html") exampleInput.html = "<html>…</html>";
+      else if (field === "text") exampleInput.text = "Paste copy here";
+      else exampleInput[field] = `value for ${field}`;
+    }
     return {
       status: "need_input" as const,
+      code: MCP_ERROR_CODES.NEED_INPUT,
       goal: trimmedGoal,
       matchedTask: {
         id: task.id,
         title: task.title,
         type: task.type,
         target: task.target,
+        score: match.score,
       },
-      missing: normalized.missing,
-      message: `Provide required input fields: ${normalized.missing.join(", ")}`,
+      missing,
+      message: `Provide required input fields: ${missing.join(", ")}`,
+      hint: `Matched "${task.title}" — re-call solve_task with input.${missing[0]} set.`,
+      nextActions: [
+        `Re-call solve_task(goal, { ${missing.map((m) => `${m}: …`).join(", ")} })`,
+        "Extract a URL from the user message when possible",
+      ],
+      exampleInput,
     };
   }
 
@@ -200,6 +252,8 @@ export async function solveTask(
       mcpSessionId: ctx.mcpSessionId,
       registry: ctx.registry,
       logger: ctx.logger,
+      mcpTool: "solve_task",
+      workflowId: task.target,
     });
 
     ctx.logger.info("solve_task", {
@@ -242,7 +296,7 @@ export async function solveTask(
   }
 
   const invoked = await invokeOperation(
-    { ...ctx, registry: ctx.registry },
+    { ...ctx, registry: ctx.registry, mcpTool: "solve_task" },
     route,
     task.target,
     normalized.data

@@ -4,15 +4,18 @@ title: Crawl Analysis
 category: seo
 description: Crawl URLs and produce a compact analysis for LLM consumption.
 operationIds: linkExtractor, internalLinking, seoAnalyze
+workflowId: internal-link-architecture-job
 ---
 
 # Crawl Analysis Skill
 
-For **crawl-only** or **site structure** analysis:
+Site structure, internal links, orphans, and broken destinations for one seed URL.
 
-1. Prefer `solve_task` with goals like *"find orphan pages on {url}"* or *"improve internal linking {url}"* → workflow `internal-link-architecture-job`.
-2. Read `jobReport.scores` for `orphanPages`, `brokenLinks`, and `hubPages` counts/status; fix **broken links first** (`prioritizedActions` ranks them #1).
-3. Read `jobReport.workstreams.linkGraph` for orphans, broken links, hub pages, and suggested links.
-4. Invoke crawl API tools with the seed URL when you need a single tool only.
-5. Use summarized JSON from MCP — never request full HTML in context.
-6. Report: status codes, depth, broken links, orphan pages, hub candidates, and prioritized link actions.
+## Preferred path
+
+1. `run_playbook("crawl-analysis", { url: "https://…" })` → `internal-link-architecture-job`
+2. Read `jobReport.workstreams.linkGraph` — fix **broken links first**
+3. Read orphan pages and hub candidates from `jobReport.scores`
+4. After fixes: `verify_task` with baseline
+
+Prefer this playbook over manual `discover_tools` → `invoke_tool` chains.

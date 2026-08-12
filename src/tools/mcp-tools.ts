@@ -2,17 +2,15 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { randomUUID } from "crypto";
 import { MCP_ERROR_CODES } from "../contracts";
+import { formatCaughtError } from "../contracts/agent-error";
 import { constants } from "../config";
 import { RegistryLoader, searchTools } from "../registry/loader";
-import { loadSkillContent, loadSkills } from "../skills/loader";
+import { loadSkillContent, loadSkills, enrichAllSkills } from "../skills/loader";
 import { runWorkflow } from "../workflow/engine";
 import { invokeOperation, solveTask } from "../orchestrator/solve-task";
 import { planTask } from "../orchestrator/plan-task";
 import { runPlaybook } from "../orchestrator/run-playbook";
-import {
-  diffJobReports,
-  extractJobReport,
-} from "../orchestrator/verify-task";
+import { executeVerifyTask } from "../orchestrator/verify-task";
 import {
   applyResponseMode,
   parseResponseMode,
@@ -20,6 +18,8 @@ import {
 import { payloadStore } from "../payloads/store";
 import { acceptAsyncJob, wantsAsync } from "../runs/async-job";
 import { runStore } from "../runs/store";
+import { serializeRunPoll } from "../runs/serialize";
+import { validateApiKey } from "../auth/session";
 import type { Logger } from "../observability/logger";
 
 export interface McpServerContext {
@@ -115,7 +115,6 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
             kind: "solve_task",
             apiKey: ctx.apiKey,
             logger: ctx.logger,
-            responseMode: mode,
             work: () => solveTask(goal, input, ctx, mode),
           })
         );
@@ -149,12 +148,19 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
             kind: "run_playbook",
             apiKey: ctx.apiKey,
             logger: ctx.logger,
-            responseMode: mode,
             work: () => runPlaybook(skillId, input, ctx, mode),
           })
         );
       }
       const result = await runPlaybook(skillId, input, ctx, mode);
+      if ((result as { status?: string }).status !== "error") {
+        ctx.logger.info("run_playbook_tool", {
+          mcpSessionId: ctx.mcpSessionId,
+          skillId,
+          workflowId: (result as { workflowId?: string }).workflowId,
+          transport: "mcp",
+        });
+      }
       return textResult(
         result,
         (result as { status?: string }).status === "error" ||
@@ -166,33 +172,44 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "verify_task",
-    "Re-run a goal and return score/finding deltas vs a baseline jobReport (from a prior solve_task). Bills like solve_task. Use after applying fixes.",
+    "Re-run a goal and return deltas vs a baseline jobReport (prior solve_task, verify.after, or get_run payload). Includes remainingFixes, nextActions, and gate (pass|fail). Bills like solve_task. Use after applying fixes. Optional async:true → poll get_run.",
     {
       goal: z.string(),
       input: z.any().optional(),
       baseline: z
         .any()
-        .describe("Prior solve_task result or jobReport object"),
+        .describe(
+          "Prior solve_task result, verify_task.after, get_run payload, or raw jobReport"
+        ),
       responseMode: z.enum(["compact", "full", "dataRef"]).optional(),
+      async: z
+        .boolean()
+        .optional()
+        .describe(
+          "If true, return runId immediately; poll get_run (result.status verified|error|…)"
+        ),
     },
     async (args) => {
       const goal = String(args.goal || "");
       const input = (args.input || {}) as Record<string, unknown>;
       const mode = parseResponseMode(args.responseMode);
-      const before = extractJobReport(args.baseline);
-      const fresh = await solveTask(goal, input, ctx, "full");
-      const after = extractJobReport(fresh);
-      const delta = diffJobReports(before, after);
-      const compactFresh = applyResponseMode(fresh, mode);
+      const baseline = args.baseline;
+      const work = () =>
+        executeVerifyTask(goal, input, baseline, ctx, mode);
+      if (wantsAsync(args.async)) {
+        return textResult(
+          await acceptAsyncJob({
+            kind: "verify_task",
+            apiKey: ctx.apiKey,
+            logger: ctx.logger,
+            work,
+          })
+        );
+      }
+      const result = await work();
       return textResult(
-        {
-          status: "verified",
-          goal,
-          delta,
-          after: compactFresh,
-        },
-        (fresh as { status?: string }).status === "error" ||
-          (fresh as { status?: string }).status === "partial"
+        result,
+        result.status === "error" || result.status === "partial"
       );
     }
   );
@@ -281,6 +298,12 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
             error: {
               code: MCP_ERROR_CODES.TOOL_NOT_API_BACKED,
               message: "Tool not available for API / MCP",
+              hint: "Only hasApi tools are exposed. Call discover_tools for an API-backed alternative.",
+              nextActions: [
+                "discover_tools(query) → get_tool_schema → invoke_tool",
+                "Or solve_task with a plain-language goal",
+              ],
+              retryable: false,
             },
           },
           true
@@ -295,7 +318,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
 
       try {
         const invoked = await invokeOperation(
-          ctx,
+          { ...ctx, mcpTool: "invoke_tool" },
           route,
           operationId,
           (args.input || {}) as Record<string, unknown>,
@@ -312,17 +335,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
 
         return textResult(invoked.shaped, invoked.isError);
       } catch (e) {
-        const err = e as Error & { code?: string; retryable?: boolean };
-        return textResult(
-          {
-            error: {
-              code: err.code || MCP_ERROR_CODES.GATEWAY_ERROR,
-              message: err.message,
-              retryable: err.retryable,
-            },
-          },
-          true
-        );
+        return textResult({ error: formatCaughtError(e) }, true);
       }
     }
   );
@@ -330,10 +343,10 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "list_skills",
-    "List curated ToolYour agent skills (playbooks). Use run_playbook(skillId) to execute the mapped workflow.",
+    "List curated ToolYour agent skills (playbooks). Each entry includes workflowId and runnable. Prefer run_playbook(skillId) over load_skill + manual steps. fix-verify-* skills re-run audits — use verify_task for deltas.",
     { category: z.string().optional() },
     async (args) => {
-      let skills = loadSkills();
+      let skills = enrichAllSkills(loadSkills());
       const category =
         typeof args.category === "string" ? args.category : undefined;
       if (category) {
@@ -402,7 +415,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "get_run",
-    "Poll an async solve_task / run_playbook / run_workflow run by runId. Free. Uses in-process TTL; with REDIS_URL also readable across MCP replicas. Webhook notify is optional.",
+    "Poll an async solve_task / run_playbook / run_workflow / verify_task by runId. Free. status=completed means finished — always read resultStatus (suggest|need_input|verified|error|…). REDIS_URL enables cross-replica; webhook optional.",
     {
       runId: z.string().describe("UUID returned when async:true"),
     },
@@ -421,16 +434,36 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
           true
         );
       }
-      return textResult({
-        runId: entry.id,
-        kind: entry.kind,
-        status: entry.status,
-        createdAt: new Date(entry.createdAt).toISOString(),
-        updatedAt: new Date(entry.updatedAt).toISOString(),
-        expiresAt: new Date(entry.expiresAt).toISOString(),
-        result: entry.result ?? null,
-        error: entry.error ?? null,
-      });
+      try {
+        const session = await validateApiKey(
+          ctx.apiKey,
+          "",
+          "node",
+          ctx.logger
+        );
+        if (!runStore.ownsRun(entry, session)) {
+          return textResult(
+            {
+              error: {
+                code: MCP_ERROR_CODES.UNAUTHORIZED,
+                message: "Run not found or not owned by this API key",
+              },
+            },
+            true
+          );
+        }
+      } catch {
+        return textResult(
+          {
+            error: {
+              code: MCP_ERROR_CODES.UNAUTHORIZED,
+              message: "Unauthorized",
+            },
+          },
+          true
+        );
+      }
+      return textResult(serializeRunPoll(entry));
     }
   );
 
@@ -454,6 +487,13 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
           mcpSessionId: ctx.mcpSessionId,
           registry: ctx.registry,
           logger: ctx.logger,
+          mcpTool: "run_workflow",
+          workflowId,
+        });
+        ctx.logger.info("run_workflow", {
+          mcpSessionId: ctx.mcpSessionId,
+          workflowId,
+          transport: "mcp",
         });
         return applyResponseMode(result, mode);
       };
@@ -463,7 +503,6 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
             kind: "run_workflow",
             apiKey: ctx.apiKey,
             logger: ctx.logger,
-            responseMode: mode,
             work,
           })
         );

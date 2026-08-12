@@ -2,12 +2,17 @@ import fs from "fs";
 import path from "path";
 import { getEnv } from "../config";
 import type { McpSkillMeta } from "../contracts";
+import { skillWorkflowId } from "../orchestrator/playbook-map";
+
+export type { EnrichedSkillMeta } from "./enrich";
+export { enrichAllSkills, enrichSkillMeta, resolveSkillWorkflowId, skillForWorkflow } from "./enrich";
 
 function parseFrontmatter(content: string): {
   meta: Record<string, string>;
   body: string;
 } {
-  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
+  const normalized = content.replace(/^\uFEFF/, "");
+  const match = normalized.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
   if (!match) return { meta: {}, body: content };
   const meta: Record<string, string> = {};
   for (const line of match[1].split("\n")) {
@@ -39,7 +44,7 @@ export function loadSkills(): McpSkillMeta[] {
       category: meta.category || "general",
       description: meta.description || "",
       operationIds,
-      workflowId: meta.workflowId || undefined,
+      workflowId: meta.workflowId || skillWorkflowId(id) || undefined,
     });
   }
 

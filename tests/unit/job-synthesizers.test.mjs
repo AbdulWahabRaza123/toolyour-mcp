@@ -527,7 +527,7 @@ describe("job synthesizers", () => {
             status: true,
             result: {
               report: {
-                summary: { totalScore: 70 },
+                summary: { totalScore: 85 },
                 findings: [],
               },
             },

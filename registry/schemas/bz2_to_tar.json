@@ -4,8 +4,17 @@
   "method": "POST",
   "request": {
     "type": "object",
-    "additionalProperties": true,
-    "description": "Tool-specific input fields."
+    "required": [
+      "file"
+    ],
+    "properties": {
+      "file": {
+        "type": "string",
+        "format": "binary",
+        "description": "Input file to convert or process"
+      }
+    },
+    "additionalProperties": true
   },
   "response": null,
   "responseHint": "Returns ToolFileResponse with downloadUrl"

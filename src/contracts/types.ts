@@ -35,6 +35,10 @@ export interface McpConstants {
 export interface McpErrorBody {
   code: string;
   message: string;
+  /** Short agent instruction — what to do next */
+  hint?: string;
+  /** Ordered concrete next steps for harnesses */
+  nextActions?: string[];
   retryable?: boolean;
   retryAfterMs?: number;
   suggestedTool?: string;
@@ -83,8 +87,13 @@ export interface McpSkillMeta {
   category: string;
   description: string;
   operationIds: string[];
-  /** Optional backing workflow for run_playbook */
+  /** Resolved backing workflow for run_playbook */
   workflowId?: string;
+  /** True when run_playbook can execute without manual discover/invoke steps */
+  runnable?: boolean;
+  /** fix-verify-* re-runs the audit; use verify_task for deltas */
+  verifyOnly?: boolean;
+  verifyHint?: string;
 }
 
 export interface McpWorkflowStep {

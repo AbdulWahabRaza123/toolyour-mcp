@@ -175,6 +175,20 @@
       "requiredInput": ["urls"]
     },
     {
+      "id": "fix-verify-seo-deploy-regression",
+      "title": "Fix-verify SEO deploy regression",
+      "description": "Re-run bulk SEO scorecard after deploy fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify seo deploy regression",
+        "verify bulk seo after fix",
+        "recheck post deploy seo",
+        "confirm seo regression cleared"
+      ],
+      "type": "workflow",
+      "target": "seo-deploy-regression-job",
+      "requiredInput": ["urls"]
+    },
+    {
       "id": "seo-deploy-regression-diff",
       "title": "SEO deploy regression with template diff",
       "description": "Bulk URL scorecard plus one staging-vs-production SEO Change Diff.",
@@ -299,6 +313,20 @@
       "requiredInput": ["url"]
     },
     {
+      "id": "fix-verify-technical-seo",
+      "title": "Fix-verify technical SEO",
+      "description": "Re-run technical SEO audit after fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify technical seo",
+        "verify technical seo after fix",
+        "recheck crawlability",
+        "confirm technical seo fixed"
+      ],
+      "type": "workflow",
+      "target": "technical-seo-audit-job",
+      "requiredInput": ["url"]
+    },
+    {
       "id": "social-preview-audit",
       "title": "Social preview audit",
       "description": "Audit Open Graph and Twitter Card tags for social link previews.",
@@ -404,6 +432,20 @@
         "tls cookie audit",
         "https security check",
         "web security audit"
+      ],
+      "type": "workflow",
+      "target": "full-security-audit",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "fix-verify-web-security-audit",
+      "title": "Fix-verify full security audit",
+      "description": "Re-run full security audit after fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify security audit",
+        "verify web security after fix",
+        "recheck full security audit",
+        "confirm security audit fixed"
       ],
       "type": "workflow",
       "target": "full-security-audit",
@@ -626,6 +668,20 @@
       "requiredInput": ["url"]
     },
     {
+      "id": "fix-verify-crawl-readiness",
+      "title": "Fix-verify crawl readiness",
+      "description": "Re-run robots/sitemap/redirect checks after fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify crawl readiness",
+        "verify robots after fix",
+        "recheck sitemap",
+        "confirm crawl readiness fixed"
+      ],
+      "type": "workflow",
+      "target": "crawl-readiness-job",
+      "requiredInput": ["url"]
+    },
+    {
       "id": "structured-data-audit",
       "title": "Structured data audit",
       "description": "Schema markup, meta tags, and social preview tags for a URL.",
@@ -635,6 +691,20 @@
         "meta tags audit",
         "json ld check",
         "og tags and schema"
+      ],
+      "type": "workflow",
+      "target": "structured-data-audit-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "fix-verify-structured-data",
+      "title": "Fix-verify structured data",
+      "description": "Re-run schema/meta/social audit after fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify structured data",
+        "verify schema after fix",
+        "recheck json ld",
+        "confirm structured data fixed"
       ],
       "type": "workflow",
       "target": "structured-data-audit-job",
@@ -656,6 +726,20 @@
       "requiredInput": ["url"]
     },
     {
+      "id": "fix-verify-ai-overview-readiness",
+      "title": "Fix-verify AI Overview readiness",
+      "description": "Re-run GEO / AI Overview heuristics after fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify ai overview",
+        "verify geo readiness after fix",
+        "recheck ai overview readiness",
+        "confirm citation readiness fixed"
+      ],
+      "type": "workflow",
+      "target": "ai-overview-readiness-job",
+      "requiredInput": ["url"]
+    },
+    {
       "id": "site-icons-audit",
       "title": "Site icons audit",
       "description": "Favicon and apple-touch-icon declaration and reachability check.",
@@ -671,13 +755,41 @@
       "requiredInput": ["url"]
     },
     {
+      "id": "fix-verify-site-icons",
+      "title": "Fix-verify site icons",
+      "description": "Re-run favicon / apple-touch checks after fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify favicon",
+        "verify site icons after fix",
+        "recheck apple touch icon",
+        "confirm favicon fixed"
+      ],
+      "type": "workflow",
+      "target": "site-icons-audit-job",
+      "requiredInput": ["url"]
+    },
+    {
       "id": "campaign-tracking-setup",
       "title": "Campaign tracking setup",
       "description": "UTM builder, ads macros, and UTM parser for campaign URLs.",
       "keywords": ["utm builder", "campaign tracking", "ads utm", "utm macros"],
       "type": "workflow",
       "target": "campaign-tracking-setup-job",
-      "requiredInput": []
+      "requiredInput": ["url", "utm_source", "utm_medium", "utm_campaign"]
+    },
+    {
+      "id": "fix-verify-campaign-tracking-setup",
+      "title": "Fix-verify campaign tracking",
+      "description": "Re-run UTM / ads tracking helpers after fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify campaign tracking",
+        "verify utm after fix",
+        "recheck ads macros",
+        "confirm campaign tracking fixed"
+      ],
+      "type": "workflow",
+      "target": "campaign-tracking-setup-job",
+      "requiredInput": ["url", "utm_source", "utm_medium", "utm_campaign"]
     },
     {
       "id": "paid-ads-copy-gate",
@@ -686,7 +798,23 @@
       "keywords": ["ads copy", "rsa preview", "meta ads limit", "google ads characters"],
       "type": "workflow",
       "target": "paid-ads-copy-gate-job",
-      "requiredInput": []
+      "requiredInput": ["platform"]
+    },
+    {
+      "id": "fix-verify-paid-ads-copy-gate",
+      "title": "Fix-verify paid ads copy",
+      "description": "Re-run ads copy limits / RSA preview after fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify paid ads copy",
+        "fix verify ads copy",
+        "verify rsa after fix",
+        "google rsa",
+        "recheck meta ads limit",
+        "confirm ads copy fixed"
+      ],
+      "type": "workflow",
+      "target": "paid-ads-copy-gate-job",
+      "requiredInput": ["platform"]
     },
     {
       "id": "growth-unit-economics",
@@ -695,7 +823,21 @@
       "keywords": ["roas", "cpc", "ctr", "cpa", "cac", "unit economics"],
       "type": "workflow",
       "target": "growth-unit-economics-job",
-      "requiredInput": []
+      "requiredInput": ["spend"]
+    },
+    {
+      "id": "fix-verify-growth-unit-economics",
+      "title": "Fix-verify growth unit economics",
+      "description": "Re-run ROAS/CPC/CTR/CPA/CAC calculators after plan changes (pair with verify_task).",
+      "keywords": [
+        "fix verify unit economics",
+        "verify roas after fix",
+        "recheck cac cpa",
+        "confirm growth metrics fixed"
+      ],
+      "type": "workflow",
+      "target": "growth-unit-economics-job",
+      "requiredInput": ["spend"]
     },
     {
       "id": "email-campaign-qa",
@@ -704,13 +846,41 @@
       "keywords": ["email subject", "spam words", "email qa"],
       "type": "workflow",
       "target": "email-campaign-qa-job",
-      "requiredInput": []
+      "requiredInput": ["subject"]
+    },
+    {
+      "id": "fix-verify-email-campaign-qa",
+      "title": "Fix-verify email campaign QA",
+      "description": "Re-run email subject / spam heuristics after copy fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify email qa",
+        "verify email subject after fix",
+        "recheck spam words",
+        "confirm email campaign fixed"
+      ],
+      "type": "workflow",
+      "target": "email-campaign-qa-job",
+      "requiredInput": ["subject"]
     },
     {
       "id": "landing-conversion-check",
       "title": "Landing conversion check",
       "description": "CTA finder, form inventory, and marketing tag extractor.",
       "keywords": ["landing page cta", "form fields", "gtm pixel", "conversion check"],
+      "type": "workflow",
+      "target": "landing-conversion-check-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "fix-verify-landing-conversion-check",
+      "title": "Fix-verify landing conversion check",
+      "description": "Re-run CTA / forms / marketing tag checks after fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify landing conversion",
+        "verify cta after fix",
+        "recheck form fields",
+        "confirm landing page fixed"
+      ],
       "type": "workflow",
       "target": "landing-conversion-check-job",
       "requiredInput": ["url"]

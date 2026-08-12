@@ -4,8 +4,22 @@
   "method": "POST",
   "request": {
     "type": "object",
-    "additionalProperties": true,
-    "description": "Tool-specific input fields."
+    "required": [
+      "file",
+      "prompt"
+    ],
+    "properties": {
+      "file": {
+        "type": "string",
+        "format": "binary",
+        "description": "Document or image (PDF, DOCX, TXT, CSV, or common image types — max 10 MB)"
+      },
+      "prompt": {
+        "type": "string",
+        "description": "Instructions for the AI analysis",
+        "example": "Summarize the key points and list action items."
+      }
+    }
   },
   "response": null,
   "responseHint": "Returns Node API envelope JSON"

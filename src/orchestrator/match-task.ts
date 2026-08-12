@@ -53,6 +53,20 @@ const SYNONYM_MAP: Record<string, string[]> = {
   lcp: ["largest contentful paint", "core web vitals"],
   inp: ["interaction to next paint", "core web vitals"],
   ttfb: ["time to first byte"],
+  slow: ["page speed", "core web vitals", "lcp", "pagespeed"],
+  "site slow": ["core web vitals", "pagespeed", "page speed"],
+  "page slow": ["core web vitals", "pagespeed"],
+  "feels slow": ["core web vitals", "page speed"],
+  "go live": ["ship gate", "deploy gate", "launch checklist"],
+  "can i ship": ["ship gate", "go live check"],
+  "ready to launch": ["ship gate", "go live check"],
+  "ready to go live": ["ship gate", "go live"],
+  "before launch": ["ship gate", "go live check"],
+  "link preview": ["social preview", "open graph"],
+  "google preview": ["social preview", "open graph"],
+  "check my headers": ["security headers"],
+  "headers secure": ["security headers"],
+  "seo ready": ["seo audit", "check seo"],
   "open graph tags": ["og", "social preview"],
   "social preview": ["open graph", "twitter card", "og"],
   "security header": ["security headers", "headers analyzer"],
@@ -203,6 +217,19 @@ export function scoreTask(goal: string, task: McpTaskDef): number {
   return score;
 }
 
+/** Tie-break equal scores: prefer tasks whose id/title tokens appear in the goal. */
+function taskSpecificity(goal: string, task: McpTaskDef): number {
+  const g = normalizeGoalText(goal);
+  let specificity = 0;
+  for (const token of task.id.split("-")) {
+    if (token.length >= 3 && g.includes(token)) specificity += 1;
+  }
+  for (const token of significantTokens(task.title)) {
+    if (g.includes(token)) specificity += 1;
+  }
+  return specificity;
+}
+
 export function matchTask(
   goal: string,
   tasks: McpTaskDef[],
@@ -213,7 +240,12 @@ export function matchTask(
   for (const task of tasks) {
     const score = scoreTask(goal, task);
     if (score < minScore) continue;
-    if (!best || score > best.score) {
+    if (
+      !best ||
+      score > best.score ||
+      (score === best.score &&
+        taskSpecificity(goal, task) > taskSpecificity(goal, best.task))
+    ) {
       best = { task, score };
     }
   }
@@ -281,6 +313,9 @@ export function normalizeTaskInput(
   if (!data.url) {
     const fromGoal = extractUrlFromText(goal);
     if (fromGoal) data.url = fromGoal;
+  }
+  if (!data.url && typeof data.baseUrl === "string" && data.baseUrl.trim()) {
+    data.url = data.baseUrl.trim();
   }
 
   // Multi-URL goals: "compare https://a vs https://b"

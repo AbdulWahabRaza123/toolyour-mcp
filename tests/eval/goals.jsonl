@@ -30,6 +30,15 @@
 {"goal":"fix verify core web vitals for https://example.com","expectedJobId":"fix-verify-core-web-vitals","category":"verify"}
 {"goal":"fix verify seo audit for https://example.com","expectedJobId":"fix-verify-seo-audit","category":"verify"}
 {"goal":"fix verify email auth for https://example.com","expectedJobId":"fix-verify-email-auth","category":"verify"}
+{"goal":"fix verify campaign tracking after utm changes","expectedJobId":"fix-verify-campaign-tracking-setup","category":"verify"}
+{"goal":"fix verify paid ads copy for google rsa","expectedJobId":"fix-verify-paid-ads-copy-gate","category":"verify"}
+{"goal":"fix verify growth unit economics after spend update","expectedJobId":"fix-verify-growth-unit-economics","category":"verify"}
+{"goal":"fix verify email campaign qa after subject rewrite","expectedJobId":"fix-verify-email-campaign-qa","category":"verify"}
+{"goal":"fix verify crawl readiness for https://example.com","expectedJobId":"fix-verify-crawl-readiness","category":"verify"}
+{"goal":"fix verify structured data for https://example.com","expectedJobId":"fix-verify-structured-data","category":"verify"}
+{"goal":"fix verify seo deploy regression after deploy","expectedJobId":"fix-verify-seo-deploy-regression","requiredInput":{"urls":["https://example.com/"]},"category":"verify"}
+{"goal":"fix verify technical seo for https://example.com","expectedJobId":"fix-verify-technical-seo","category":"verify"}
+{"goal":"fix verify web security audit for https://example.com","expectedJobId":"fix-verify-web-security-audit","category":"verify"}
 {"goal":"ship this html before publish","expectedJobId":"content-ship-local","requiredInput":{"html":"<html></html>"},"category":"local"}
 {"goal":"write me a poem about cats","expectedStatus":"suggest","category":"negative"}
 {"goal":"tell me a joke","expectedStatus":"suggest","category":"negative"}

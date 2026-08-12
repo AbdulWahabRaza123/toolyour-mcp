@@ -4,8 +4,6 @@
   "method": "POST",
   "request": {
     "type": "object",
-    "additionalProperties": true,
-    "description": "Tool-specific input fields.",
     "required": [
       "file"
     ],
@@ -13,7 +11,27 @@
       "file": {
         "type": "string",
         "format": "binary",
-        "description": "Required input: file"
+        "description": "Document to scrub (PDF, DOCX, TXT, etc. — max 10 MB)"
+      },
+      "redactEmails": {
+        "type": "boolean",
+        "default": true
+      },
+      "redactPhones": {
+        "type": "boolean",
+        "default": true
+      },
+      "redactNames": {
+        "type": "boolean",
+        "default": true
+      },
+      "redactOrganizations": {
+        "type": "boolean",
+        "default": false
+      },
+      "redactLocations": {
+        "type": "boolean",
+        "default": false
       }
     }
   },

@@ -15,6 +15,9 @@ export interface GatewayInvokeOptions {
   requestId?: string;
   mcpSessionId?: string;
   operationId?: string;
+  mcpTool?: string;
+  skillId?: string;
+  workflowId?: string;
   body?: unknown;
   formFields?: Record<string, string>;
   query?: Record<string, string>;
@@ -89,6 +92,9 @@ async function invokeGatewayRouteUnlocked(
   if (opts.sessionToken) headers["Authorization"] = `Bearer ${opts.sessionToken}`;
   if (opts.mcpSessionId) headers["X-Mcp-Session-Id"] = opts.mcpSessionId;
   if (opts.operationId) headers["X-Mcp-Operation-Id"] = opts.operationId;
+  if (opts.mcpTool) headers["X-Mcp-Tool"] = opts.mcpTool;
+  if (opts.skillId) headers["X-Mcp-Skill-Id"] = opts.skillId;
+  if (opts.workflowId) headers["X-Mcp-Workflow-Id"] = opts.workflowId;
 
   let body: BodyInit | undefined;
   if (route.multipart && opts.formFields) {

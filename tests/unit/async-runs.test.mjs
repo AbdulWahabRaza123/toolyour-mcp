@@ -14,14 +14,14 @@ describe("async runs", () => {
 
   it("stores and finishes a run", async () => {
     await runStore.start();
-    const run = runStore.create({
+    const run = await runStore.create({
       userId: "u1",
       apiKeyId: "k1",
       kind: "solve_task",
     });
     assert.equal(run.status, "accepted");
-    runStore.markRunning(run.id);
-    const finished = runStore.finish(run.id, "completed", {
+    await runStore.markRunning(run.id);
+    const finished = await runStore.finish(run.id, "completed", {
       status: "completed",
       jobReport: { summary: ["ok"] },
     });
@@ -33,6 +33,32 @@ describe("async runs", () => {
       status: "completed",
       jobReport: { summary: ["ok"] },
     });
+  });
+
+  it("ownsRun requires matching user", async () => {
+    await runStore.start();
+    const run = await runStore.create({
+      userId: "u1",
+      apiKeyId: "k1",
+      kind: "solve_task",
+    });
+    assert.equal(runStore.ownsRun(run, { userId: "u1", apiKeyId: "k2" }), true);
+    assert.equal(runStore.ownsRun(run, { userId: "u2", apiKeyId: "k1" }), false);
+  });
+
+  it("serializeRunPoll exposes resultStatus separately from run status", async () => {
+    const { serializeRunPoll } = await import("../../dist/runs/serialize.js");
+    await runStore.start();
+    const run = await runStore.create({
+      userId: "u1",
+      apiKeyId: "k1",
+      kind: "solve_task",
+    });
+    await runStore.finish(run.id, "completed", { status: "suggest", toolSuggestions: [] });
+    const entry = await runStore.get(run.id);
+    const poll = serializeRunPoll(entry);
+    assert.equal(poll.status, "completed");
+    assert.equal(poll.resultStatus, "suggest");
   });
 
   it("HMAC signature is stable for webhook body", () => {
@@ -53,12 +79,12 @@ describe("optional webhook fault tolerance", () => {
     );
     const { createLogger } = await import("../../dist/observability/logger.js");
     await runStore.start();
-    const run = runStore.create({
+    const run = await runStore.create({
       userId: "u1",
       apiKeyId: "k1",
       kind: "solve_task",
     });
-    runStore.finish(run.id, "completed", { ok: true });
+    await runStore.finish(run.id, "completed", { ok: true });
     const finished = await runStore.get(run.id);
     assert.ok(finished);
     const result = await notifyJobFinishedOptional(

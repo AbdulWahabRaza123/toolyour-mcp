@@ -9,7 +9,7 @@ import {
   isConfidentMatch,
 } from "./task-registry";
 import { loadSkills } from "../skills/loader";
-import { skillWorkflowId } from "./playbook-map";
+import { enrichAllSkills, skillForWorkflow } from "../skills/enrich";
 
 const CREDITS_PER_STEP = 3;
 const CREDITS_PER_TOOL = 2;
@@ -27,6 +27,7 @@ export interface PlanTaskResult {
     score?: number;
     requiredInput?: string[];
     steps?: string[];
+    workflowId?: string;
   };
   alternatives: Array<{
     kind: "workflow" | "tool" | "local" | "playbook";
@@ -48,6 +49,15 @@ function estimateCredits(kind: string, stepCount: number): number {
   return 0;
 }
 
+function playbookHit(goal: string, skill: { id: string; title: string; description: string }): boolean {
+  const blob = `${skill.id} ${skill.title} ${skill.description}`.toLowerCase();
+  const tokens = goal
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((t) => t.length > 3);
+  return tokens.some((t) => blob.includes(t));
+}
+
 /**
  * Free planning pass — no tool execution, no billing.
  */
@@ -62,7 +72,7 @@ export function planTask(
   const confident = isConfidentMatch(trimmedGoal, tasks, match);
   const ranked = rankTaskSuggestions(trimmedGoal, tasks, 5);
   const workflows = loadWorkflows();
-  const skills = loadSkills();
+  const skills = enrichAllSkills(loadSkills());
 
   const alternatives: PlanTaskResult["alternatives"] = ranked.map((m) => ({
     kind: m.task.type as "workflow" | "tool" | "local",
@@ -71,22 +81,14 @@ export function planTask(
     score: m.score,
   }));
 
-  // Playbook hints
-  for (const skill of skills.slice(0, 20)) {
-    const wf = skillWorkflowId(skill.id);
-    if (!wf) continue;
-    const blob = `${skill.id} ${skill.title} ${skill.description}`.toLowerCase();
-    const hit = trimmedGoal
-      .toLowerCase()
-      .split(/\s+/)
-      .filter((t) => t.length > 3)
-      .some((t) => blob.includes(t));
-    if (hit) {
+  for (const skill of skills) {
+    if (!skill.runnable || skill.verifyOnly) continue;
+    if (playbookHit(trimmedGoal, skill)) {
       alternatives.push({
         kind: "playbook",
         id: skill.id,
         title: skill.title,
-        score: 3,
+        score: 4,
       });
     }
   }
@@ -104,16 +106,18 @@ export function planTask(
     : [];
 
   if (!match || !confident) {
+    const topPlaybook = alternatives.find((a) => a.kind === "playbook");
     return {
       status: "plan",
       goal: trimmedGoal,
       free: true,
       estimatedCredits: 0,
       confidence: match ? "low" : "none",
-      alternatives: alternatives.slice(0, 5),
+      alternatives: alternatives.slice(0, 8),
       toolHints,
-      next:
-        alternatives.length || toolHints.length
+      next: topPlaybook
+        ? `Call run_playbook("${topPlaybook.id}", input) or clarify the goal for solve_task.`
+        : alternatives.length || toolHints.length
           ? "Clarify the goal or call solve_task / run_playbook / discover_tools with a more specific phrase."
           : "Out of catalog. ToolYour MCP covers SEO, security, documents, conversion, and text — not general chat.",
     };
@@ -131,6 +135,33 @@ export function planTask(
     estimatedCredits = estimateCredits("tool", 1);
   }
 
+  const playbookSkill =
+    task.type === "workflow" ? skillForWorkflow(task.target, skills) : undefined;
+
+  if (playbookSkill) {
+    return {
+      status: "plan",
+      goal: trimmedGoal,
+      free: true,
+      estimatedCredits,
+      confidence: match.score >= 8 ? "high" : "medium",
+      recommended: {
+        kind: "playbook",
+        id: playbookSkill.id,
+        title: playbookSkill.title,
+        score: match.score,
+        requiredInput: task.requiredInput,
+        steps,
+        workflowId: task.target,
+      },
+      alternatives: alternatives
+        .filter((a) => a.id !== playbookSkill.id && a.id !== task.target)
+        .slice(0, 4),
+      toolHints,
+      next: `Call run_playbook("${playbookSkill.id}", input) — ~${estimatedCredits} credits estimated. After fixes: verify_task with baseline jobReport.`,
+    };
+  }
+
   return {
     status: "plan",
     goal: trimmedGoal,
@@ -144,12 +175,15 @@ export function planTask(
       score: match.score,
       requiredInput: task.requiredInput,
       steps,
+      workflowId: task.type === "workflow" ? task.target : undefined,
     },
     alternatives: alternatives.filter((a) => a.id !== task.target).slice(0, 4),
     toolHints,
     next:
       task.type === "local"
         ? "Call solve_task with input.html / input.text (enhance defaults false; set enhance:true to bill text APIs)."
-        : `Call solve_task(goal) or run_workflow("${task.target}") — ~${estimatedCredits} credits estimated.`,
+        : task.type === "workflow"
+          ? `Call run_workflow("${task.target}", input) or list_skills for a matching playbook — ~${estimatedCredits} credits estimated.`
+          : `Call solve_task(goal) or invoke_tool — ~${estimatedCredits} credits estimated.`,
   };
 }

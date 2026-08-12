@@ -4,16 +4,19 @@
   "method": "POST",
   "request": {
     "type": "object",
-    "additionalProperties": true,
-    "description": "Tool-specific input fields.",
     "required": [
-      "file"
+      "jobDescription",
+      "resume"
     ],
     "properties": {
-      "file": {
+      "jobDescription": {
+        "type": "string",
+        "description": "Job posting text to compare against the resume"
+      },
+      "resume": {
         "type": "string",
         "format": "binary",
-        "description": "Required input: file"
+        "description": "Resume file (PDF, DOCX, or TXT — max 10 MB)"
       }
     }
   },

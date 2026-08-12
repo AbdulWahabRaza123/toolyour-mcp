@@ -1,6 +1,7 @@
 import { constants } from "../config";
 import { incr } from "../observability/counters";
 import { buildDataRefPath, payloadStore } from "../payloads/store";
+import { normalizeHttpError } from "../contracts/agent-error";
 
 function isToolFileResponse(data: unknown): boolean {
   if (!data || typeof data !== "object") return false;
@@ -130,7 +131,7 @@ export function shapeResponseForLlm(
   if (status < 200 || status >= 300) {
     return {
       status,
-      error: typeof data === "object" ? data : { message: text.slice(0, 500) },
+      error: normalizeHttpError(status, data, text),
     };
   }
 

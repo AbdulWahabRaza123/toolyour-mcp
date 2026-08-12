@@ -9,9 +9,11 @@ import { RegistryLoader } from "./registry/loader";
 import { defsCache } from "./registry/defs-cache";
 import { payloadStore } from "./payloads/store";
 import { runStore } from "./runs/store";
+import { serializeRunPoll } from "./runs/serialize";
 import { registerHealthRoutes } from "./health/routes";
 import { registerDiscoveryRoutes } from "./discovery/routes";
 import { createToolYourMcpServer } from "./tools/mcp-tools";
+import { validateApiKey } from "./auth/session";
 
 const env = getEnv();
 const logger = createLogger(env.logLevel);
@@ -269,31 +271,29 @@ app.get("/mcp/payloads/:id", (req, res) => {
   });
 });
 
-/** Poll async MCP run (same API key). Memory + optional Redis TTL (~60m). */
+/** Poll async MCP run (same user / API key). Memory + optional Redis TTL (~60m). */
 app.get("/mcp/runs/:id", async (req, res) => {
   const apiKey = extractApiKey(req);
   if (!apiKey) {
     res.status(401).json({ error: "Missing X-Api-Key" });
     return;
   }
+  let session;
+  try {
+    session = await validateApiKey(apiKey, "", "node", logger);
+  } catch {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
   const entry = await runStore.get(req.params.id);
-  if (!entry) {
+  if (!entry || !runStore.ownsRun(entry, session)) {
     res.status(404).json({
       error: "Run not found or expired",
       hint: "Async runs TTL ~60m. With REDIS_URL, get_run works across MCP replicas; without Redis, poll the same instance that accepted the job.",
     });
     return;
   }
-  res.json({
-    runId: entry.id,
-    kind: entry.kind,
-    status: entry.status,
-    createdAt: new Date(entry.createdAt).toISOString(),
-    updatedAt: new Date(entry.updatedAt).toISOString(),
-    expiresAt: new Date(entry.expiresAt).toISOString(),
-    result: entry.result ?? null,
-    error: entry.error ?? null,
-  });
+  res.json(serializeRunPoll(entry));
 });
 
 app.listen(env.port, () => {

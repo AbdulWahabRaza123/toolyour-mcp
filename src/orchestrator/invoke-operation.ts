@@ -13,6 +13,9 @@ export interface InvokeOperationContext {
   mcpSessionId: string;
   logger: Logger;
   registry?: RegistryLoader;
+  mcpTool?: string;
+  skillId?: string;
+  workflowId?: string;
 }
 
 export async function invokeOperation(
@@ -39,6 +42,12 @@ export async function invokeOperation(
               message: "Input failed schema validation",
               missing: validation.missing,
               issues: validation.issues,
+              hint: "Call get_tool_schema(operationId), fix required fields, then invoke_tool again.",
+              nextActions: [
+                "get_tool_schema for this operationId",
+                "Re-invoke with missing fields filled",
+              ],
+              retryable: false,
             },
           },
           isError: true,
@@ -62,6 +71,9 @@ export async function invokeOperation(
     requestId: reqId,
     mcpSessionId: ctx.mcpSessionId,
     operationId,
+    mcpTool: ctx.mcpTool || "invoke_tool",
+    skillId: ctx.skillId,
+    workflowId: ctx.workflowId,
     body: payload.body,
     formFields: payload.formFields,
     query: payload.query,

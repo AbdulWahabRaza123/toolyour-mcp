@@ -4,18 +4,17 @@
   "method": "POST",
   "request": {
     "type": "object",
-    "additionalProperties": true,
-    "description": "Tool-specific input fields.",
     "required": [
-      "file"
+      "csvFile"
     ],
     "properties": {
-      "file": {
+      "csvFile": {
         "type": "string",
         "format": "binary",
-        "description": "Required input: file"
+        "description": "Input file to convert or process"
       }
-    }
+    },
+    "additionalProperties": true
   },
   "response": null,
   "responseHint": "Returns JSON response"

@@ -2,7 +2,7 @@ import type { Logger } from "../observability/logger";
 import type { RegistryLoader } from "../registry/loader";
 import { runWorkflow } from "../workflow/engine";
 import { loadSkillContent, loadSkills } from "../skills/loader";
-import { skillWorkflowId } from "./playbook-map";
+import { resolveSkillWorkflowId } from "../skills/enrich";
 import { tryContentBridge } from "./content-bridge";
 import { hasDirectContent, extractContentBundle } from "./content-input";
 import { MCP_ERROR_CODES } from "../contracts";
@@ -38,8 +38,7 @@ export async function runPlaybook(
   }
 
   const content = loadSkillContent(id);
-  const workflowId =
-    (meta as { workflowId?: string }).workflowId || skillWorkflowId(id);
+  const workflowId = resolveSkillWorkflowId(meta);
 
   // Local content ship — no public URL required
   if (
@@ -50,11 +49,21 @@ export async function runPlaybook(
     if (!hasDirectContent(extractContentBundle(input))) {
       return {
         status: "need_input" as const,
+        code: MCP_ERROR_CODES.NEED_INPUT,
         skillId: id,
         skill: meta,
         message:
           "Pass input.html or input.text for local content ship (enhance defaults to false).",
         missing: ["html", "text"],
+        hint: "Local content ship needs HTML or text in input — no public URL required.",
+        nextActions: [
+          "Re-call run_playbook with input.html or input.text",
+          "Set enhance:true only if you want billed text APIs",
+        ],
+        exampleInput: {
+          html: "<!doctype html><html><body>…</body></html>",
+          enhance: false,
+        },
         playbook: content,
       };
     }
@@ -107,6 +116,16 @@ export async function runPlaybook(
     mcpSessionId: ctx.mcpSessionId,
     registry: ctx.registry,
     logger: ctx.logger,
+    mcpTool: "run_playbook",
+    skillId: id,
+    workflowId,
+  });
+
+  ctx.logger.info("run_playbook", {
+    mcpSessionId: ctx.mcpSessionId,
+    skillId: id,
+    workflowId,
+    transport: "mcp",
   });
 
   return applyResponseMode(
