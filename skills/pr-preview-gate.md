@@ -9,7 +9,9 @@ workflowId: ship-gate-job
 
 # PR Preview Gate
 
-Use when the URL is a **preview, PR, or ephemeral deploy** and the user wants a go/no-go before merge.
+Use when the URL is a **preview, PR, or ephemeral deploy** and the user wants a go/no-go **on that live link**.
+
+If they have **changed files** and no preview URL, use `pr-code-gate` instead — do not ask them to deploy first.
 
 ## Preferred path
 

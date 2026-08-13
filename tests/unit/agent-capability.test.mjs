@@ -60,6 +60,15 @@ describe("plan_task", () => {
     assert.equal(plan.confidence, "none");
     assert.equal(plan.toolHints.length, 0);
   });
+
+  it("asks for workspace files on PR goals, not a URL", () => {
+    const registry = new RegistryLoader(createLogger("error"));
+    registry.reload(true);
+    const plan = planTask("ship this PR before merge", {}, registry);
+    assert.ok(plan.recommended || plan.alternatives.length > 0);
+    assert.match(String(plan.next), /workspace|input\.(text|html|code)/i);
+    assert.equal(/extract a url/i.test(String(plan.next)), false);
+  });
 });
 
 describe("suggest hygiene", () => {

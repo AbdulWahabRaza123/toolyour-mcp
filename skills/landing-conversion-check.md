@@ -9,6 +9,10 @@ workflowId: landing-conversion-check-job
 
 # Landing Conversion Check
 
+CTA finder, forms, and marketing tags for a **live landing URL**.
+
+If the user has HTML or copy in the workspace (not a live link), use `content-ship` / `seo-audit-local` or paste copy into `emailSubjectLineTester` / ads counters — do not demand a fetch.
+
 ## Inputs
 
 | Field | Required | Notes |

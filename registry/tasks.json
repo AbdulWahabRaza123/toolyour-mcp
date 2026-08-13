@@ -571,6 +571,28 @@
       "requiredInput": ["text"]
     },
     {
+      "id": "pr-code-gate",
+      "title": "PR code gate",
+      "description": "Payload-first PR/ship check on workspace files: secrets/JWT plus format/validate via invoke_tool. Does not fetch a live URL.",
+      "keywords": [
+        "pr code gate",
+        "ship this pr",
+        "pull request",
+        "before merge",
+        "changed files",
+        "my code",
+        "without deploy",
+        "not deployed",
+        "check my pr",
+        "ship this pr before merge",
+        "format pr files",
+        "scan pr for secrets"
+      ],
+      "type": "workflow",
+      "target": "secrets-hygiene-job",
+      "requiredInput": ["text"]
+    },
+    {
       "id": "auth-token-hygiene",
       "title": "Auth token hygiene",
       "description": "Decode pasted JWTs and scan surrounding text for leaked secrets.",

@@ -9,6 +9,8 @@ workflowId: paid-ads-copy-gate-job
 
 # Paid Ads Copy Gate
 
+Pass **copy fields** from the brief (`headline`, `headlines[]`, `descriptions[]`). Do not ask for a landing URL unless the user asked to audit a live page.
+
 ## Inputs
 
 | Field | Required | Notes |

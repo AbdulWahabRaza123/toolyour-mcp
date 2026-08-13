@@ -32,12 +32,20 @@ export function enrichSkillMeta(skill: McpSkillMeta): EnrichedSkillMeta {
 /** Primary playbook skill for a workflow (excludes fix-verify aliases). */
 export function skillForWorkflow(
   workflowId: string,
-  skills: McpSkillMeta[]
+  skills: McpSkillMeta[],
+  preferredSkillId?: string
 ): McpSkillMeta | undefined {
-  return skills.find(
+  if (preferredSkillId) {
+    const preferred = skills.find((s) => s.id === preferredSkillId);
+    if (preferred && resolveSkillWorkflowId(preferred) === workflowId) {
+      return preferred;
+    }
+  }
+  const runnable = skills.filter(
     (s) =>
       resolveSkillWorkflowId(s) === workflowId && !s.id.startsWith("fix-verify-")
   );
+  return runnable.find((s) => s.id !== "pr-code-gate") || runnable[0];
 }
 
 export function enrichAllSkills(skills: McpSkillMeta[]): EnrichedSkillMeta[] {

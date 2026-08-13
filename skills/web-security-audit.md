@@ -9,7 +9,9 @@ workflowId: full-security-audit
 
 # Web Security Audit Skill
 
-Use this playbook when the user wants a **web / HTTPS security posture check** for a public URL or domain.
+Use this playbook when the user wants a **web / HTTPS security posture check** for a **public URL** or domain.
+
+**Payload first:** pasted env, JWT, CSP string, or config → `secrets-and-auth-hygiene` / `cspPolicyEvaluator` / `pr-code-gate`. Do not demand a live URL for those. TLS, mixed content, and live headers stay fetch-only.
 
 ## Preferred path
 

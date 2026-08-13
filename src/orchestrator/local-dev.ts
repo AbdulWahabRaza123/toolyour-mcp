@@ -95,32 +95,32 @@ export function localDevGuidance(): {
 } {
   return {
     message:
-      "Live URL tools cannot reach your machine from the cloud. Use one of these MCP-only options:",
+      "Read workspace files and pass their contents. Ask for a live URL only if the user wants link analysis, or the job cannot run without a fetch (PageSpeed, TLS, mixed content, live headers).",
     options: [
       {
         mode: "pass_html",
         description:
-          "Agent reads page HTML (index.html, layout output) and calls solve_task with input.html",
+          "Read page HTML (index.html, layout output) and call solve_task with input.html — do not ask for a URL",
       },
       {
         mode: "pass_text",
         description:
-          "Pass input.text for copy tools (headlines, jargon, snippets, PII scrub) — no URL needed",
+          "Pass input.text for copy, JSON, env, or secrets checks — no URL needed",
       },
       {
         mode: "pass_code",
         description:
-          "Pass input.code from TSX/JSX/HTML source files — MCP extracts text and runs matching tools",
+          "Pass input.code from TSX/JSX/HTML/source files — MCP cannot read disk; the host agent must attach contents",
       },
       {
         mode: "tunnel_url",
         description:
-          "Expose local dev via Cloudflare Tunnel or ngrok, then pass the public preview URL",
+          "Only if the user asked to analyze a live/preview site: expose via Cloudflare Tunnel or ngrok, then pass that https:// URL",
       },
       {
         mode: "deployed_url",
         description:
-          "Use staging/production URL for full audit including page speed",
+          "Only if the user asked to fetch a staging/production URL (PageSpeed, TLS, live headers)",
       },
     ],
   };

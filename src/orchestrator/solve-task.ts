@@ -24,6 +24,15 @@ import {
   parseResponseMode,
   type ResponseMode,
 } from "./compact-response";
+import {
+  fetchEquivalentTaskId,
+  hasLiveUrlSignal,
+  hasPayloadInput,
+  localEquivalentTaskId,
+  payloadNeedInput,
+  taskRequiresUrl,
+  urlNeedInput,
+} from "./payload-intent";
 
 export interface SolveTaskContext {
   apiKey: string;
@@ -53,17 +62,17 @@ function suggestResponse(
     : [];
 
   const exampleGoals = [
+    "SEO audit for this HTML (pass input.html from the repo)",
+    "format and validate this JSON from my PR",
     "SEO audit for https://example.com",
-    "check security headers for https://example.com",
     "ship gate for https://example.com",
-    "why is LCP slow on https://example.com",
     "convert docx to pdf",
   ];
 
   const nextActions =
     suggestions.length > 0
       ? [
-          `Re-call solve_task with a clearer goal (include a URL), e.g. "${suggestions[0].task.title} for https://…"`,
+          `Re-call solve_task with a clearer goal. Prefer workspace file contents (input.text / input.html / input.code) unless the user asked to analyze a live link.`,
           suggestions[0].task.type === "workflow"
             ? `Or run_playbook / solve_task targeting task id "${suggestions[0].task.id}"`
             : `Or invoke_tool with operationId from toolSuggestions`,
@@ -71,7 +80,7 @@ function suggestResponse(
         ]
       : [
           "Call list_categories, then discover_tools with a specific keyword (e.g. 'security headers', 'docx pdf')",
-          "Rephrase as an SEO, security, document, conversion, or text goal — include https://… when relevant",
+          "Rephrase as an SEO, security, document, conversion, or text goal — pass file contents first; include https://… only for live-link analysis",
           "Do not retry the same vague chat-style goal; ToolYour is not a general assistant",
         ];
 
@@ -86,7 +95,7 @@ function suggestResponse(
         : "No high-confidence task match. Review taskSuggestions / toolSuggestions, or call discover_tools with a more specific query."),
     hint:
       suggestions.length > 0
-        ? "Pick the top taskSuggestion and re-call solve_task with a URL or required input — do not invent an operationId."
+        ? "Pick the top taskSuggestion and re-call solve_task with workspace file contents (or a URL only if the user asked to analyze a live link) — do not invent an operationId."
         : "This goal is outside the catalog — narrow to an SEO/security/document/conversion task.",
     nextActions,
     exampleGoals,
@@ -127,7 +136,7 @@ export async function solveTask(
   const match = matchTask(trimmedGoal, tasks);
   const confident = isConfidentMatch(trimmedGoal, tasks, match);
   const bundle = extractContentBundle(input);
-  const hasContent = hasDirectContent(bundle);
+  const hasContent = hasDirectContent(bundle) || hasPayloadInput(input);
 
   if (match && confident) {
     const bridge = await tryContentBridge(
@@ -178,28 +187,57 @@ export async function solveTask(
     );
   }
 
-  const { task } = match;
+  let { task } = match;
+  const live = hasLiveUrlSignal(trimmedGoal, input);
+
+  if (!live && taskRequiresUrl(task)) {
+    const altId = localEquivalentTaskId(task.id);
+    const alt = altId ? tasks.find((t) => t.id === altId) : undefined;
+    if (alt) {
+      task = alt;
+    }
+  } else if (live && !hasContent) {
+    const fetchId = fetchEquivalentTaskId(task.id);
+    const fetchTask = fetchId ? tasks.find((t) => t.id === fetchId) : undefined;
+    if (fetchTask) {
+      task = fetchTask;
+    }
+  }
+
+  const matchedMeta = {
+    id: task.id,
+    title: task.title,
+    type: task.type,
+    target: task.target,
+    score: match.score,
+  };
 
   if (task.type === "local") {
+    if (hasContent) {
+      const bridge = await tryContentBridge(
+        trimmedGoal,
+        input,
+        task,
+        match.score,
+        ctx
+      );
+      if (bridge) {
+        return applyResponseMode(bridge, mode);
+      }
+    }
     const guidance = localDevGuidance();
     return {
       status: "need_input" as const,
       code: MCP_ERROR_CODES.LOCAL_PREVIEW_REQUIRED,
       goal: trimmedGoal,
-      matchedTask: {
-        id: task.id,
-        title: task.title,
-        type: task.type,
-        target: task.target,
-        score: match.score,
-      },
+      matchedTask: matchedMeta,
       message: guidance.message,
       options: guidance.options,
-      hint: "Pass rendered HTML (or text/code) in input — local analysis is free unless enhance=true.",
+      hint: "Pass rendered HTML (or text/code) from the workspace — local analysis is free unless enhance=true. Do not ask for a public URL unless the user asked to analyze a live link.",
       nextActions: [
-        "Re-call solve_task with input.html from the page source",
-        "Or pass input.text / input.code",
+        "Read page HTML or source from the repo and re-call solve_task with input.html / input.text / input.code",
         "Set input.enhance=true only if you want billed text APIs",
+        "Pass input.url only if the user explicitly asked to fetch a live/preview site",
       ],
       exampleInput: {
         html: "<!doctype html><html><head><title>…</title></head><body>…</body></html>",
@@ -217,33 +255,35 @@ export async function solveTask(
 
   if (!normalized.ok) {
     const missing = normalized.missing;
-    const exampleInput: Record<string, string> = {};
-    for (const field of missing) {
-      if (field === "url") exampleInput.url = "https://example.com";
-      else if (field === "html") exampleInput.html = "<html>…</html>";
-      else if (field === "text") exampleInput.text = "Paste copy here";
-      else exampleInput[field] = `value for ${field}`;
+    if (!live && missing.includes("url")) {
+      return payloadNeedInput({
+        goal: trimmedGoal,
+        matchedTask: matchedMeta,
+        fetchOnly: true,
+      });
     }
-    return {
-      status: "need_input" as const,
-      code: MCP_ERROR_CODES.NEED_INPUT,
+    if (
+      missing.includes("text") &&
+      !live &&
+      !hasContent
+    ) {
+      return payloadNeedInput({
+        goal: trimmedGoal,
+        matchedTask: matchedMeta,
+      });
+    }
+    if (missing.includes("url") && live) {
+      return urlNeedInput({
+        goal: trimmedGoal,
+        matchedTask: matchedMeta,
+        missing,
+      });
+    }
+    return payloadNeedInput({
       goal: trimmedGoal,
-      matchedTask: {
-        id: task.id,
-        title: task.title,
-        type: task.type,
-        target: task.target,
-        score: match.score,
-      },
-      missing,
-      message: `Provide required input fields: ${missing.join(", ")}`,
-      hint: `Matched "${task.title}" — re-call solve_task with input.${missing[0]} set.`,
-      nextActions: [
-        `Re-call solve_task(goal, { ${missing.map((m) => `${m}: …`).join(", ")} })`,
-        "Extract a URL from the user message when possible",
-      ],
-      exampleInput,
-    };
+      matchedTask: matchedMeta,
+      fetchOnly: missing.includes("url"),
+    });
   }
 
   if (task.type === "workflow") {

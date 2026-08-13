@@ -4,6 +4,7 @@ import {
   fuzzyTokenMatch,
   tokenizeForFuzzy,
 } from "../search/fuzzy-search";
+import { applyPayloadAliases, explicitLiveUrlIntent, payloadFirstIntent } from "./payload-intent";
 
 export interface TaskMatch {
   task: McpTaskDef;
@@ -191,6 +192,24 @@ export function scoreTask(goal: string, task: McpTaskDef): number {
     score += 1;
   }
 
+  // Payload-first: without a live URL, prefer local/PR tasks over fetch jobs.
+  // Only boost local tasks that already matched keywords (avoid joke goals).
+  const live = explicitLiveUrlIntent(goal);
+  const wantsPayload = payloadFirstIntent(goal);
+  const requiresUrl = Boolean(task.requiredInput?.includes("url"));
+  if (!live) {
+    if (requiresUrl) {
+      score = Math.max(0, score - 8);
+    }
+    if (
+      wantsPayload &&
+      score > 0 &&
+      (task.type === "local" || task.id === "pr-code-gate")
+    ) {
+      score += 10;
+    }
+  }
+
   // Multi-URL goals boost regression/diff style tasks
   const urls = extractUrlsFromText(goal);
   if (urls.length >= 2) {
@@ -309,6 +328,8 @@ export function normalizeTaskInput(
     Object.assign(data, nested);
     delete data.input;
   }
+
+  Object.assign(data, applyPayloadAliases(data));
 
   if (!data.url) {
     const fromGoal = extractUrlFromText(goal);

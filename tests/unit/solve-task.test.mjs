@@ -98,4 +98,33 @@ describe("solve_task matching", () => {
     assert.ok(keywords);
     assert.equal(keywords.task.id, "keyword-opportunity-review");
   });
+
+  it("routes PR/file goals to pr-code-gate without a URL", () => {
+    const match = matchTask("ship this PR before merge", tasks);
+    assert.ok(match);
+    assert.equal(match.task.id, "pr-code-gate");
+    assert.equal(match.task.target, "secrets-hygiene-job");
+  });
+
+  it("keeps ship-gate when the goal includes a live URL", () => {
+    const match = matchTask("ship gate for https://example.com", tasks);
+    assert.ok(match);
+    assert.equal(match.task.id, "ship-gate");
+  });
+
+  it("routes local HTML SEO without a URL", () => {
+    const match = matchTask("audit this html before deploy", tasks);
+    assert.ok(match);
+    assert.equal(match.task.id, "seo-audit-local");
+  });
+
+  it("aliases code/html into text for payload tasks", () => {
+    const fromCode = normalizeTaskInput("scan this env", { code: "API_KEY=secret" }, ["text"]);
+    assert.equal(fromCode.ok, true);
+    if (fromCode.ok) assert.equal(fromCode.data.text, "API_KEY=secret");
+
+    const fromHtml = normalizeTaskInput("check this html", { html: "<html></html>" }, ["text"]);
+    assert.equal(fromHtml.ok, true);
+    if (fromHtml.ok) assert.equal(fromHtml.data.text, "<html></html>");
+  });
 });

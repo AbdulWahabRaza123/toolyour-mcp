@@ -81,18 +81,18 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "solve_task",
-    "Primary entry: plain-language goal → workflow/tool with fuzzy matching + confidence gating. Default responseMode=compact (jobReport without duplicated steps). Use full for raw steps, dataRef to store full payload. Local html/text is free unless input.enhance=true. Ambiguous goals return status suggest.",
+    "Primary entry: plain-language goal → workflow/tool. Prefer workspace payloads (input.text / input.code / input.html / input.json). Pass input.url only when the user asked to analyze a live/preview link, or the job cannot run without a fetch. Default responseMode=compact. Local html/text is free unless input.enhance=true. Ambiguous goals return status suggest.",
     {
       goal: z
         .string()
         .describe(
-          "User intent in plain language, e.g. 'SEO audit for https://example.com'"
+          "User intent in plain language. Prefer file/HTML/text goals; include https:// only for live-link analysis."
         ),
       input: z
         .any()
         .optional()
         .describe(
-          "Optional: url, html, text, code, sourceHint, enhance (true to bill text APIs on local content)"
+          "Prefer text/code/html/json from the workspace. url only for live fetch jobs. enhance=true bills text APIs on local content."
         ),
       responseMode: z
         .enum(["compact", "full", "dataRef"])

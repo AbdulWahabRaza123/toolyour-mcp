@@ -9,7 +9,11 @@ workflowId: ship-gate-job
 
 # Ship Gate Skill
 
-Use when the user wants a **go/no-go deploy gate**.
+Use when the user wants a **go/no-go deploy gate** on a **live or preview URL**.
+
+**Payload first:** if they asked to check a PR, local files, or code **without** a link, use `pr-code-gate` (workspace `input.text` / `input.code`). Do not demand a URL.
+
+**URL only** when they explicitly want a live fetch (preview deploy, staging, Lighthouse, headers on the site).
 
 ## Preferred path
 

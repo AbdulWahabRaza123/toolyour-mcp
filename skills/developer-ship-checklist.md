@@ -9,7 +9,9 @@ workflowId: developer-ship-checklist-job
 
 # Developer Ship Checklist Skill
 
-Use this playbook when the user asks **before deploy**, **ship checklist**, **prod readiness**, or **harden and ship**.
+Use this playbook when the user asks **before deploy**, **ship checklist**, **prod readiness**, or **harden and ship** **and they have a reachable https:// URL**.
+
+**Payload first:** PR / local files / my code without a link → `run_playbook("pr-code-gate", { text })`. Do not invent a URL.
 
 ## Preferred path
 

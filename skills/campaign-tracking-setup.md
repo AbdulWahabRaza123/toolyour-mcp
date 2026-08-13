@@ -9,6 +9,8 @@ workflowId: campaign-tracking-setup-job
 
 # Campaign Tracking Setup
 
+Pass UTM fields from the brief. `baseUrl`/`url` is for **building** query strings, not a live crawl — unless the user asked to audit the deployed landing page (`landing-conversion-check` / `seo-site-audit`).
+
 ## Inputs (required / useful)
 
 | Field | Required | Notes |

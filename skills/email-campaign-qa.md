@@ -9,6 +9,8 @@ workflowId: email-campaign-qa-job
 
 # Email Campaign QA
 
+Pass `subject` / `preheader` / `text` from the workspace. Do not ask for a live URL.
+
 ## Inputs
 
 | Field | Required | Notes |

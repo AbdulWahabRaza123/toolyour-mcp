@@ -7,6 +7,14 @@ import { tryContentBridge } from "./content-bridge";
 import { hasDirectContent, extractContentBundle } from "./content-input";
 import { MCP_ERROR_CODES } from "../contracts";
 import { applyResponseMode, parseResponseMode, type ResponseMode } from "./compact-response";
+import { loadTasks } from "./task-registry";
+import {
+  applyPayloadAliases,
+  hasPayloadInput,
+  hasUrlishInput,
+  payloadNeedInput,
+  urlNeedInput,
+} from "./payload-intent";
 
 export interface RunPlaybookContext {
   apiKey: string;
@@ -111,7 +119,37 @@ export async function runPlaybook(
     };
   }
 
-  const result = await runWorkflow(workflowId, input || {}, {
+  const data = applyPayloadAliases({ ...(input || {}) });
+  const payloadPlaybook =
+    id === "pr-code-gate" || workflowId === "secrets-hygiene-job";
+  if (payloadPlaybook && !hasPayloadInput(data)) {
+    return payloadNeedInput({
+      goal: `run_playbook(${id})`,
+      matchedTask: {
+        id,
+        title: meta.title,
+        type: "workflow",
+        target: workflowId,
+        score: 1,
+      },
+    });
+  }
+
+  if (!payloadPlaybook && playbookRequiresLiveUrl(id, workflowId) && !hasUrlishInput(data)) {
+    return urlNeedInput({
+      goal: `run_playbook(${id})`,
+      matchedTask: {
+        id,
+        title: meta.title,
+        type: "workflow",
+        target: workflowId,
+        score: 1,
+      },
+      missing: ["url"],
+    });
+  }
+
+  const result = await runWorkflow(workflowId, data, {
     apiKey: ctx.apiKey,
     mcpSessionId: ctx.mcpSessionId,
     registry: ctx.registry,
@@ -138,4 +176,15 @@ export async function runPlaybook(
     },
     parseResponseMode(responseMode)
   );
+}
+
+function playbookRequiresLiveUrl(skillId: string, workflowId: string): boolean {
+  const tasks = loadTasks();
+  const bySkill = tasks.find((t) => t.id === skillId);
+  if (bySkill?.requiredInput?.includes("url")) return true;
+  const forWorkflow = tasks.filter(
+    (t) => t.type === "workflow" && t.target === workflowId
+  );
+  if (forWorkflow.length === 0) return false;
+  return forWorkflow.every((t) => t.requiredInput?.includes("url"));
 }

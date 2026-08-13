@@ -48,3 +48,5 @@
 {"goal":"check my headers https://example.com","expectedJobId":"security-headers","category":"messy"}
 {"goal":"why is my link preview broken https://example.com","expectedJobId":"social-preview-audit","category":"messy"}
 {"goal":"is this page seo ready https://example.com","expectedJobId":"seo-audit","category":"messy"}
+{"goal":"ship this PR before merge","expectedJobId":"pr-code-gate","requiredInput":{"text":"API_KEY=example"},"category":"payload"}
+{"goal":"local SEO audit of this HTML","expectedJobId":"seo-audit-local","requiredInput":{"html":"<html></html>"},"category":"payload"}

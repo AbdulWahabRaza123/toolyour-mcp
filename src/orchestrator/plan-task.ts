@@ -10,6 +10,10 @@ import {
 } from "./task-registry";
 import { loadSkills } from "../skills/loader";
 import { enrichAllSkills, skillForWorkflow } from "../skills/enrich";
+import {
+  hasLiveUrlSignal,
+  localEquivalentTaskId,
+} from "./payload-intent";
 
 const CREDITS_PER_STEP = 3;
 const CREDITS_PER_TOOL = 2;
@@ -63,7 +67,7 @@ function playbookHit(goal: string, skill: { id: string; title: string; descripti
  */
 export function planTask(
   goal: string,
-  _input: Record<string, unknown> | undefined,
+  input: Record<string, unknown> | undefined,
   registry: RegistryLoader
 ): PlanTaskResult {
   const trimmedGoal = goal.trim();
@@ -123,7 +127,14 @@ export function planTask(
     };
   }
 
-  const { task } = match;
+  let { task } = match;
+  const live = hasLiveUrlSignal(trimmedGoal, input);
+  if (!live) {
+    const altId = localEquivalentTaskId(task.id);
+    const alt = altId ? tasks.find((t) => t.id === altId) : undefined;
+    if (alt) task = alt;
+  }
+
   let steps: string[] | undefined;
   let estimatedCredits = 0;
 
@@ -135,8 +146,13 @@ export function planTask(
     estimatedCredits = estimateCredits("tool", 1);
   }
 
+  const payloadNext =
+    "Pass workspace files as input.html / input.text / input.code. Do not ask for a public URL unless the user asked to analyze a live link.";
+
   const playbookSkill =
-    task.type === "workflow" ? skillForWorkflow(task.target, skills) : undefined;
+    task.type === "workflow"
+      ? skillForWorkflow(task.target, skills, task.id)
+      : undefined;
 
   if (playbookSkill) {
     return {
@@ -158,7 +174,9 @@ export function planTask(
         .filter((a) => a.id !== playbookSkill.id && a.id !== task.target)
         .slice(0, 4),
       toolHints,
-      next: `Call run_playbook("${playbookSkill.id}", input) — ~${estimatedCredits} credits estimated. After fixes: verify_task with baseline jobReport.`,
+      next: live
+        ? `Call run_playbook("${playbookSkill.id}", input) with a reachable https:// URL — ~${estimatedCredits} credits estimated. After fixes: verify_task with baseline jobReport.`
+        : `Call run_playbook("${playbookSkill.id}", input) with workspace file contents — ~${estimatedCredits} credits estimated. ${payloadNext} After fixes: verify_task with baseline jobReport.`,
     };
   }
 
@@ -170,20 +188,24 @@ export function planTask(
     confidence: match.score >= 8 ? "high" : "medium",
     recommended: {
       kind: task.type,
-      id: task.type === "workflow" ? task.target : task.target,
+      id: task.type === "workflow" ? task.target : task.id,
       title: task.title,
       score: match.score,
       requiredInput: task.requiredInput,
       steps,
       workflowId: task.type === "workflow" ? task.target : undefined,
     },
-    alternatives: alternatives.filter((a) => a.id !== task.target).slice(0, 4),
+    alternatives: alternatives.filter((a) => a.id !== task.target && a.id !== task.id).slice(0, 4),
     toolHints,
     next:
       task.type === "local"
-        ? "Call solve_task with input.html / input.text (enhance defaults false; set enhance:true to bill text APIs)."
-        : task.type === "workflow"
-          ? `Call run_workflow("${task.target}", input) or list_skills for a matching playbook — ~${estimatedCredits} credits estimated.`
-          : `Call solve_task(goal) or invoke_tool — ~${estimatedCredits} credits estimated.`,
+        ? `Call solve_task with input.html / input.text / input.code (enhance defaults false; set enhance:true to bill text APIs). ${payloadNext}`
+        : live
+          ? task.type === "workflow"
+            ? `Call run_workflow("${task.target}", input) or list_skills for a matching playbook — ~${estimatedCredits} credits estimated.`
+            : `Call solve_task(goal) with input.url or invoke_tool — ~${estimatedCredits} credits estimated.`
+          : task.type === "workflow"
+            ? `Call run_workflow("${task.target}", input) with workspace payload (input.text / input.code / input.html) — ~${estimatedCredits} credits estimated. ${payloadNext}`
+            : `Call solve_task with workspace payload (input.text / input.code / input.html) or invoke_tool — ~${estimatedCredits} credits estimated. ${payloadNext}`,
   };
 }

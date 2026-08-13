@@ -9,7 +9,9 @@ workflowId: full-seo-audit
 
 # SEO Site Audit Skill
 
-Full page SEO + page speed audit for a public URL.
+Full page SEO + page speed audit for a **public URL**.
+
+**Payload first:** if they have page HTML in the repo (not a live link), use `run_playbook("content-ship", { html })` or `solve_task` with `input.html` (`seo-audit-local`) — free unless `enhance:true`. Do not ask for a URL unless they asked to crawl a live site.
 
 ## Preferred path
 

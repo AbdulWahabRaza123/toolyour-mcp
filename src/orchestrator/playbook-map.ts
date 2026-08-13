@@ -15,6 +15,7 @@ export const SKILL_WORKFLOW_MAP: Record<string, string> = {
   "web-security-audit": "full-security-audit",
   "dns-email-security": "email-auth-security-job",
   "secrets-and-auth-hygiene": "secrets-hygiene-job",
+  "pr-code-gate": "secrets-hygiene-job",
   "auth-token-hygiene": "auth-token-hygiene-job",
   "frontend-supply-chain": "frontend-supply-chain-job",
   "seo-deploy-regression": "seo-deploy-regression-job",

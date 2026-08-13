@@ -9,7 +9,7 @@ workflowId: content-ship-local
 
 # Content Ship Local Skill
 
-Use when the user has **unpublished HTML** or pasted copy and wants a ship checklist.
+Use when the user has **unpublished HTML** or pasted copy and wants a ship checklist. **Files/HTML first** — do not ask for a public URL.
 
 ## Preferred path
 
