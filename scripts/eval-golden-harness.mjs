@@ -178,6 +178,11 @@ if (computeVerifyGate(afterFail) !== "fail" || fixes[0]?.actions?.[0] !== "Add C
 } else {
   ok("buildRemainingFixes uses finding.howToFix");
 }
+if (fixes[0]?.patchType !== "http-header" || !fixes[0]?.acceptance) {
+  bad("buildRemainingFixes missing patchType/acceptance");
+} else {
+  ok("buildRemainingFixes includes patchType + acceptance");
+}
 
 if (failed) {
   console.error(`\nFAILED ${failed}`);

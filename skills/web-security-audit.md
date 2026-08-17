@@ -22,12 +22,12 @@ Use this playbook when the user wants a **web / HTTPS security posture check** f
    - SPF/DKIM/DMARC → `run_playbook("dns-email-security")` / `email-auth-security-job`
    - Frontend assets focus → `run_playbook("frontend-supply-chain")`
 3. Mixed HTTP assets → SEO **mixed content** tool (or frontend-supply-chain playbook).
-4. Summarize **severity**, **top findings**, and **fix priorities** from `jobReport`.
-5. Do not claim the site is “fully secure” from headers/TLS alone.
+4. Read **`loop.remainingFixes`** (patchType + acceptance). Apply in the host repo, then `verify_task` until `loop.gate` is pass.
+5. Do not `invoke_tool` for the same job. Do not claim the site is “fully secure” from headers/TLS alone.
 
 ## Fallback invoke
 
-`discover_tools` → `get_tool_schema` → `invoke_tool` for individual Phase 1–3 security tools.
+Only for a **one-off** operationId the playbook does not cover: `discover_tools` → `get_tool_schema` → `invoke_tool`. Not the default path.
 
 ## Output format
 

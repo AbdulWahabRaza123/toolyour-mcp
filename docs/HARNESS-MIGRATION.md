@@ -57,7 +57,7 @@ Later we will prove (not assume) this with a **test agent** that only uses ToolY
 | GitHub Action example | Done | `examples/github-actions/ship-gate.yml` + `scripts/ci-ship-gate.mjs` |
 | SDK helpers | Done | `@toolyour/sdk/mcp` → `verifyUntilPass`, `planAndSolve`, `extractJobReport` (0.1.2+) |
 | Eval matrix live runs (opt-in) | Optional | `smoke:live:agent` / staging with API key |
-| Fix-pack richness | Ongoing | Prefer ≥1 actionable `howToFix` on high findings |
+| Fix-pack richness | Shipped | `loop.remainingFixes` on first run; `patchType` + `acceptance`; `verify_task` attaches `loop` |
 
 ### Phase C — External proof agent (your planned test)
 

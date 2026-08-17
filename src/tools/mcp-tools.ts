@@ -11,10 +11,7 @@ import { invokeOperation, solveTask } from "../orchestrator/solve-task";
 import { planTask } from "../orchestrator/plan-task";
 import { runPlaybook } from "../orchestrator/run-playbook";
 import { executeVerifyTask } from "../orchestrator/verify-task";
-import {
-  applyResponseMode,
-  parseResponseMode,
-} from "../orchestrator/compact-response";
+import { parseResponseMode, shapeAgentResult } from "../orchestrator/harness-loop";
 import { payloadStore } from "../payloads/store";
 import { acceptAsyncJob, wantsAsync } from "../runs/async-job";
 import { runStore } from "../runs/store";
@@ -56,15 +53,21 @@ function textResult(payload: unknown, isError = false): ToolResult {
 }
 
 export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
-  const server = new McpServer({
-    name: constants.serverName,
-    version: constants.serverVersion,
-  });
+  const server = new McpServer(
+    {
+      name: constants.serverName,
+      version: constants.serverVersion,
+    },
+    {
+      instructions:
+        "ToolYour is a remote MCP harness. First call plan_task. Only enter plan → run → verify when loop.initiate is true (MCP tools can close the job). If loop.initiate is false, stop — do not call verify_task. Host agents keep editor, git, and terminal. invoke_tool is one-off only. Do not claim this server replaces Cursor or Claude.",
+    }
+  );
 
   registerTool(
     server,
     "plan_task",
-    "Free planning pass: ranked workflow/tool/playbook plan + estimated credits. Does not execute or bill. Typical flow: plan_task → solve_task / run_playbook.",
+    "Free planning pass: ranked plan + estimated credits. Does not execute. Read loop.initiate — only start run/verify if true. Out-of-scope and one-shot jobs set loop.initiate false.",
     {
       goal: z
         .string()
@@ -81,7 +84,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "solve_task",
-    "Primary entry: plain-language goal → workflow/tool. Prefer workspace payloads (input.text / input.code / input.html / input.json). Pass input.url only when the user asked to analyze a live/preview link, or the job cannot run without a fetch. Default responseMode=compact. Local html/text is free unless input.enhance=true. Ambiguous goals return status suggest.",
+    "Run a job from a plain-language goal. Returns loop.initiate — if false, MCP cannot close this with verify_task (out of scope or one-shot). If true, apply remainingFixes then verify_task.",
     {
       goal: z
         .string()
@@ -131,7 +134,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "run_playbook",
-    "Run a skill's backing workflow (or local content ship) in one call. Bills like run_workflow. Prefer over load_skill → manual steps.",
+    "Run a skill playbook (ship-gate, SEO audit, security audit, …) in one call. Returns loop.remainingFixes + loop.gate. After host-repo fixes, verify_task with this result as baseline. Prefer over load_skill or invoke_tool.",
     {
       skillId: z.string().describe("Skill id from list_skills"),
       input: z.any().optional(),
@@ -172,7 +175,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "verify_task",
-    "Re-run a goal and return deltas vs a baseline jobReport (prior solve_task, verify.after, or get_run payload). Includes remainingFixes, nextActions, and gate (pass|fail). Bills like solve_task. Use after applying fixes. Optional async:true → poll get_run.",
+    "Close the loop only when the prior result has loop.initiate true. Re-run vs baseline; read loop.gate and loop.remainingFixes. If loop.initiate is false, stop.",
     {
       goal: z.string(),
       input: z.any().optional(),
@@ -217,7 +220,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "discover_tools",
-    "Search 230+ API-backed tools by keyword or intent. Returns compact cards (not full schemas). Use specific queries (e.g. 'docx pdf', 'headline rewrite', 'webp convert'). Call list_categories first to narrow by family, then discover_tools(query, category). Free — not billed. Typical flow: discover_tools → get_tool_schema → invoke_tool.",
+    "Advanced catalog search (API-backed tools only). Prefer plan_task → run_playbook / solve_task for ship, SEO, and security jobs. Use this only when you need a specific operationId.",
     {
       query: z
         .string()
@@ -257,7 +260,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "get_tool_schema",
-    "Get JSON schema for one API-backed tool by operationId.",
+    "Advanced: JSON schema for one operationId before invoke_tool. Skip this for ship/SEO/security jobs — use run_playbook or solve_task.",
     {
       operationId: z.string(),
     },
@@ -283,7 +286,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "invoke_tool",
-    "Invoke an API-backed ToolYour tool. Large outputs return downloadUrl.",
+    "Advanced: run one API-backed tool by operationId. Prefer run_playbook or solve_task for jobs. After a jobReport, apply loop.remainingFixes then verify_task — do not re-invoke the same tool.",
     {
       operationId: z.string(),
       input: z.any().optional(),
@@ -300,8 +303,8 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
               message: "Tool not available for API / MCP",
               hint: "Only hasApi tools are exposed. Call discover_tools for an API-backed alternative.",
               nextActions: [
-                "discover_tools(query) → get_tool_schema → invoke_tool",
-                "Or solve_task with a plain-language goal",
+                "solve_task or run_playbook for the job",
+                "discover_tools → get_tool_schema → invoke_tool only for a one-off operationId",
               ],
               retryable: false,
             },
@@ -343,7 +346,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "list_skills",
-    "List curated ToolYour agent skills (playbooks). Each entry includes workflowId and runnable. Prefer run_playbook(skillId) over load_skill + manual steps. fix-verify-* skills re-run audits — use verify_task for deltas.",
+    "List skill playbooks. Prefer run_playbook(skillId) immediately. Primary jobs: ship-gate, seo-site-audit, web-security-audit. After a run, verify_task — do not invoke_tool.",
     { category: z.string().optional() },
     async (args) => {
       let skills = enrichAllSkills(loadSkills());
@@ -470,7 +473,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "run_workflow",
-    "Run a server-side multi-step workflow (bills per underlying tool call). Prefer solve_task or run_playbook when you have a goal/skillId.",
+    "Run a named multi-step job by workflowId. Prefer run_playbook (skill) or solve_task (goal). Returns loop.remainingFixes; then verify_task.",
     {
       workflowId: z.string(),
       input: z.any().optional(),
@@ -495,7 +498,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
           workflowId,
           transport: "mcp",
         });
-        return applyResponseMode(result, mode);
+        return shapeAgentResult(result, mode);
       };
       if (wantsAsync(args.async)) {
         return textResult(

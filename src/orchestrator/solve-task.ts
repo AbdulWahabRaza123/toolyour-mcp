@@ -20,10 +20,11 @@ import { localDevGuidance } from "./local-dev";
 import { incr } from "../observability/counters";
 import { constants } from "../config";
 import {
-  applyResponseMode,
+  shapeAgentResult,
+  withHarnessLoop,
   parseResponseMode,
   type ResponseMode,
-} from "./compact-response";
+} from "./harness-loop";
 import {
   fetchEquivalentTaskId,
   hasLiveUrlSignal,
@@ -81,10 +82,10 @@ function suggestResponse(
       : [
           "Call list_categories, then discover_tools with a specific keyword (e.g. 'security headers', 'docx pdf')",
           "Rephrase as an SEO, security, document, conversion, or text goal — pass file contents first; include https://… only for live-link analysis",
-          "Do not retry the same vague chat-style goal; ToolYour is not a general assistant",
+          "Do not start the harness loop (loop.initiate is false). ToolYour cannot resolve this goal.",
         ];
 
-  return {
+  return withHarnessLoop({
     status: "suggest" as const,
     code: MCP_ERROR_CODES.AMBIGUOUS_GOAL,
     goal: trimmedGoal,
@@ -108,7 +109,7 @@ function suggestResponse(
       score: s.score,
     })),
     toolSuggestions: tools,
-  };
+  });
 }
 
 export async function solveTask(
@@ -155,7 +156,7 @@ export async function solveTask(
         adapterId: bridge.adapterId,
         transport: "mcp",
       });
-      return applyResponseMode(bridge, mode);
+      return shapeAgentResult(bridge, mode);
     }
   } else if (hasContent) {
     const bridge = await tryContentBridge(
@@ -172,7 +173,7 @@ export async function solveTask(
         adapterId: bridge.adapterId,
         transport: "mcp",
       });
-      return applyResponseMode(bridge, mode);
+      return shapeAgentResult(bridge, mode);
     }
   }
 
@@ -222,7 +223,7 @@ export async function solveTask(
         ctx
       );
       if (bridge) {
-        return applyResponseMode(bridge, mode);
+        return shapeAgentResult(bridge, mode);
       }
     }
     const guidance = localDevGuidance();
@@ -304,7 +305,7 @@ export async function solveTask(
       transport: "mcp",
     });
 
-    return applyResponseMode(
+    return shapeAgentResult(
       {
         status:
           result.status === "completed"
@@ -351,7 +352,7 @@ export async function solveTask(
     transport: "mcp",
   });
 
-  return applyResponseMode(
+  return shapeAgentResult(
     {
       status: invoked.isError ? ("partial" as const) : ("completed" as const),
       goal: trimmedGoal,

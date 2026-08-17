@@ -18,45 +18,27 @@ const META_TOOLS = [
   {
     name: "plan_task",
     description:
-      "Free planning pass: ranked workflow/tool/playbook plan + estimated credits. Does not execute.",
+      "Free planning pass: ranked playbook/workflow plan + estimated credits. Does not execute. Next: run_playbook or solve_task, then verify_task.",
   },
   {
     name: "solve_task",
     description:
-      "Primary entry: plain-language goal; fuzzy matching + confidence gating. Default compact jobReport. Ambiguous goals return status suggest.",
+      "Run a job from a plain-language goal. Returns jobReport plus loop.remainingFixes and loop.gate. Then verify_task with this result as baseline.",
   },
   {
     name: "run_playbook",
     description:
-      "Execute a skill's mapped workflow (or local content ship) in one call.",
+      "Execute a skill playbook (ship-gate, SEO, security). Returns loop.remainingFixes; then verify_task.",
   },
   {
     name: "verify_task",
     description:
-      "Re-run a goal and return score/finding deltas vs baseline. Supports async:true; poll get_run.",
+      "Close the loop: re-run vs baseline. Read loop.gate and loop.remainingFixes (patchType + acceptance). Optional async:true; poll get_run.",
   },
   {
-    name: "discover_tools",
+    name: "list_skills",
     description:
-      "Search API-backed tools by keyword. Free catalog browse. Typical flow: discover_tools → get_tool_schema → invoke_tool.",
-  },
-  {
-    name: "list_categories",
-    description: "List tool category families to narrow discover_tools.",
-  },
-  {
-    name: "get_tool_schema",
-    description: "Fetch input schema for an operationId before invoke_tool.",
-  },
-  {
-    name: "invoke_tool",
-    description:
-      "Execute an API-backed tool by operationId. Bills the same monthly quota as REST.",
-  },
-  {
-    name: "fetch_payload",
-    description:
-      "Fetch full truncated payload by dataRefId (free in-process TTL store).",
+      "List playbooks. Prefer run_playbook immediately for ship-gate, seo-site-audit, web-security-audit.",
   },
   {
     name: "get_run",
@@ -64,16 +46,35 @@ const META_TOOLS = [
       "Poll async solve_task/run_playbook/run_workflow/verify_task by runId. Read resultStatus — run status completed only means finished.",
   },
   {
-    name: "list_skills",
-    description: "List agent skill playbooks available on this server.",
-  },
-  {
     name: "load_skill",
     description: "Load a skill playbook by id (prefer run_playbook to execute).",
   },
   {
     name: "run_workflow",
-    description: "Run a named multi-step MCP job/workflow by id.",
+    description: "Run a named multi-step MCP job/workflow by id. Prefer run_playbook or solve_task.",
+  },
+  {
+    name: "discover_tools",
+    description:
+      "Advanced catalog search. Prefer plan_task → run_playbook / solve_task for jobs. Use only for a specific operationId.",
+  },
+  {
+    name: "list_categories",
+    description: "List tool category families to narrow discover_tools.",
+  },
+  {
+    name: "get_tool_schema",
+    description: "Fetch input schema for an operationId before invoke_tool (advanced).",
+  },
+  {
+    name: "invoke_tool",
+    description:
+      "Advanced: execute one API-backed tool by operationId. Not the default path for ship/SEO/security jobs.",
+  },
+  {
+    name: "fetch_payload",
+    description:
+      "Fetch full truncated payload by dataRefId (free in-process TTL store).",
   },
 ] as const;
 
@@ -89,7 +90,7 @@ export function buildServerCard() {
       version: constants.serverVersion,
     },
     description:
-      "Remote MCP server for SEO, documents, conversion, text, and related API-backed tools. Same X-Api-Key and monthly quota as the ToolYour REST API.",
+      "Remote MCP harness for AI agents: plan → run playbook/solve → verify until pass. Ship-gate, SEO audits, and security audits on the same X-Api-Key and monthly credits as REST.",
     homepage: MCP_SETUP_URL,
     websiteUrl: MCP_SITE_URL,
     documentation: MCP_DOCS_URL,
@@ -103,12 +104,17 @@ export function buildServerCard() {
         type: "sse",
         endpoint: MCP_PUBLIC_ENDPOINT,
         messagesPath: "/mcp/messages",
-        note: "Legacy SSE — widely supported (Cursor, etc.)",
+        note: "GET /mcp — SSE for Cursor and similar clients",
+      },
+      {
+        type: "streamable-http",
+        endpoint: MCP_PUBLIC_ENDPOINT,
+        note: "POST /mcp — Streamable HTTP initialize (Smithery and MCP spec clients). GET /mcp remains SSE.",
       },
       {
         type: "streamable-http",
         endpoint: `${MCP_PUBLIC_ENDPOINT}/http`,
-        note: "MCP Streamable HTTP — free SDK transport; use when the client supports it",
+        note: "Explicit Streamable HTTP alias (GET/POST/DELETE /mcp/http)",
       },
     ],
     capabilities: {
@@ -128,9 +134,10 @@ export function buildServerCard() {
     },
     tools: [...META_TOOLS],
     notes: [
-      "Catalog tools (converters, SEO, documents, etc.) are dynamic — use discover_tools; only hasApi tools are exposed.",
-      "Discovery meta-tools are free; tool/workflow execution shares the REST monthly quota.",
-      "solve_task is the primary entry with fuzzy matching and confidence gating; ambiguous goals return ranked suggestions. Use plan_task (free) before execute; run_playbook for skills; verify_task for deltas. Default solve_task responses are compact.",
+      "Canonical loop: plan_task → run_playbook or solve_task → apply loop.remainingFixes in the host repo → verify_task until loop.gate is pass.",
+      "invoke_tool is advanced (one-off operationId). Do not use it as the default path for ship-gate, SEO, or security jobs.",
+      "Catalog tools are dynamic — only hasApi tools are exposed. Discovery meta-tools are free; execution shares the REST monthly credit quota.",
+      "solve_task / run_playbook responses include loop.remainingFixes (patchType + acceptance) even on the first run.",
       "Large responses may include dataRefId — use fetch_payload (free in-process TTL store, no paid blob).",
       "Optional async:true on solve_task / run_playbook / run_workflow / verify_task returns runId; always poll get_run and read resultStatus (suggest|need_input|verified|error|…). REDIS_URL enables cross-replica. Dashboard mcp.job.finished webhook is optional best-effort and never required for correctness.",
     ],
@@ -145,7 +152,7 @@ export function buildManifest() {
     name: constants.serverName,
     title: "ToolYour MCP Server",
     description:
-      "Remote MCP for API-backed ToolYour tools. Auth via X-Api-Key (same key/quota as REST).",
+      "Remote MCP harness: plan → run → verify until pass. Same X-Api-Key and monthly credits as REST.",
     endpoints: {
       // Current production transport (SSEServerTransport)
       sse: MCP_PUBLIC_ENDPOINT,

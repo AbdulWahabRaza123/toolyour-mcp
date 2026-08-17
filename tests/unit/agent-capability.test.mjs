@@ -1,6 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { applyResponseMode } from "../../dist/orchestrator/compact-response.js";
+import { shapeAgentResult } from "../../dist/orchestrator/harness-loop.js";
 import { planTask } from "../../dist/orchestrator/plan-task.js";
 import { diffJobReports, extractJobReport } from "../../dist/orchestrator/verify-task.js";
 import { RegistryLoader } from "../../dist/registry/loader.js";
@@ -40,6 +41,51 @@ describe("compact response mode", () => {
       present: true,
     });
   });
+
+  it("shapeAgentResult attaches loop.remainingFixes and fail gate", () => {
+    const full = {
+      status: "completed",
+      execution: {
+        status: "completed",
+        workflowId: "security-headers-job",
+        jobReport: {
+          schemaVersion: "toolyour.jobReport@1",
+          jobId: "security-headers-job",
+          workflowId: "security-headers-job",
+          summary: ["ok"],
+          scores: { overall: { label: "s", value: 32, status: "poor" } },
+          findings: [
+            {
+              severity: "high",
+              title: "CSP",
+              whyItMatters: "x",
+              howToFix: ["Add CSP"],
+              workstream: "headers",
+            },
+          ],
+          prioritizedActions: [],
+          toolsUsed: ["securityHeadersAnalyzer"],
+          steps: { headers: { raw: true } },
+        },
+      },
+    };
+    const shaped = shapeAgentResult(full, "compact");
+    assert.equal(shaped.loop.initiate, true);
+    assert.equal(shaped.loop.phase, "run");
+    assert.equal(shaped.loop.gate, "fail");
+    assert.equal(shaped.loop.remainingFixes[0].patchType, "http-header");
+    assert.match(String(shaped.loop.next), /verify_task/);
+    assert.match(String(shaped.loop.next), /Do not invoke_tool/);
+  });
+
+  it("does not initiate loop without a closable jobReport", () => {
+    const shaped = shapeAgentResult(
+      { status: "completed", workflowId: "document-convert-pipeline", result: { ok: true } },
+      "compact"
+    );
+    assert.equal(shaped.loop.initiate, false);
+    assert.match(String(shaped.loop.next), /one-shot|Do not start verify_task/i);
+  });
 });
 
 describe("plan_task", () => {
@@ -51,6 +97,17 @@ describe("plan_task", () => {
     assert.equal(plan.free, true);
     assert.ok(plan.recommended || plan.alternatives.length > 0);
     assert.ok(plan.estimatedCredits >= 0);
+    assert.equal(plan.loop.initiate, true);
+    assert.equal(plan.loop.inScope, true);
+  });
+
+  it("does not initiate verify loop for one-shot converters", () => {
+    const registry = new RegistryLoader(createLogger("error"));
+    registry.reload(true);
+    const plan = planTask("convert docx to pdf", {}, registry);
+    assert.equal(plan.loop.initiate, false);
+    assert.equal(plan.loop.inScope, true);
+    assert.equal(/verify_task only if/i.test(String(plan.next)), false);
   });
 
   it("does not invent tools for out-of-catalog jokes", () => {
@@ -59,6 +116,8 @@ describe("plan_task", () => {
     const plan = planTask("tell me a joke", {}, registry);
     assert.equal(plan.confidence, "none");
     assert.equal(plan.toolHints.length, 0);
+    assert.equal(plan.loop.initiate, false);
+    assert.equal(plan.loop.inScope, false);
   });
 
   it("asks for workspace files on PR goals, not a URL", () => {
@@ -68,6 +127,7 @@ describe("plan_task", () => {
     assert.ok(plan.recommended || plan.alternatives.length > 0);
     assert.match(String(plan.next), /workspace|input\.(text|html|code)/i);
     assert.equal(/extract a url/i.test(String(plan.next)), false);
+    assert.equal(/invoke_tool/i.test(String(plan.next)), false);
   });
 });
 
@@ -84,6 +144,7 @@ describe("suggest hygiene", () => {
     assert.equal(result.status, "suggest");
     assert.equal(result.toolSuggestions.length, 0);
     assert.equal(result.taskSuggestions.length, 0);
+    assert.equal(result.loop?.initiate, false);
   });
 });
 
@@ -138,6 +199,8 @@ describe("verify delta", () => {
     assert.equal(delta.gate, "fail");
     assert.ok(delta.remainingFixes.length >= 1);
     assert.equal(delta.remainingFixes[0].actions[0], "Add CSP");
+    assert.equal(delta.remainingFixes[0].patchType, "http-header");
+    assert.ok(String(delta.remainingFixes[0].acceptance).includes("Missing CSP"));
     assert.ok(delta.nextActions.length >= 1);
   });
 

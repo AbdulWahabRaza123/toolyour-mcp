@@ -6,7 +6,7 @@ import { resolveSkillWorkflowId } from "../skills/enrich";
 import { tryContentBridge } from "./content-bridge";
 import { hasDirectContent, extractContentBundle } from "./content-input";
 import { MCP_ERROR_CODES } from "../contracts";
-import { applyResponseMode, parseResponseMode, type ResponseMode } from "./compact-response";
+import { shapeAgentResult, parseResponseMode, type ResponseMode } from "./harness-loop";
 import { loadTasks } from "./task-registry";
 import {
   applyPayloadAliases,
@@ -96,7 +96,7 @@ export async function runPlaybook(
         },
       };
     }
-    return applyResponseMode(
+    return shapeAgentResult(
       {
         status: bridge.status,
         skillId: id,
@@ -115,7 +115,7 @@ export async function runPlaybook(
       skill: meta,
       playbook: content,
       message:
-        "This skill has no mapped workflow. Follow the playbook steps with discover_tools / invoke_tool, or call solve_task with a matching goal.",
+        "This skill has no mapped workflow. Call solve_task with a matching goal, or list_skills for a runnable playbook. Do not start with invoke_tool.",
     };
   }
 
@@ -166,7 +166,7 @@ export async function runPlaybook(
     transport: "mcp",
   });
 
-  return applyResponseMode(
+  return shapeAgentResult(
     {
       status: result.status === "completed" ? "completed" : "partial",
       skillId: id,

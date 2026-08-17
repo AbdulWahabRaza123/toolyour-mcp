@@ -14,6 +14,7 @@ import {
   hasLiveUrlSignal,
   localEquivalentTaskId,
 } from "./payload-intent";
+import { decidePlanLoop, type LoopEligibility } from "./loop-scope";
 
 const CREDITS_PER_STEP = 3;
 const CREDITS_PER_TOOL = 2;
@@ -45,6 +46,7 @@ export interface PlanTaskResult {
     category: string;
   }>;
   next: string;
+  loop: LoopEligibility;
 }
 
 function estimateCredits(kind: string, stepCount: number): number {
@@ -111,19 +113,24 @@ export function planTask(
 
   if (!match || !confident) {
     const topPlaybook = alternatives.find((a) => a.kind === "playbook");
+    const confidence = match ? "low" : "none";
+    const loop = decidePlanLoop({ confidence });
     return {
       status: "plan",
       goal: trimmedGoal,
       free: true,
       estimatedCredits: 0,
-      confidence: match ? "low" : "none",
+      confidence,
       alternatives: alternatives.slice(0, 8),
       toolHints,
-      next: topPlaybook
-        ? `Call run_playbook("${topPlaybook.id}", input) or clarify the goal for solve_task.`
-        : alternatives.length || toolHints.length
-          ? "Clarify the goal or call solve_task / run_playbook / discover_tools with a more specific phrase."
-          : "Out of catalog. ToolYour MCP covers SEO, security, documents, conversion, and text — not general chat.",
+      loop,
+      next: loop.inScope
+        ? "Clarify the goal before running a playbook. Do not start verify_task yet."
+        : topPlaybook
+          ? `Possible playbook "${topPlaybook.id}" — confirm the goal maps to a ToolYour job before running it. Do not start verify_task yet.`
+          : alternatives.length || toolHints.length
+            ? "Clarify the goal. Do not start the harness loop until a closable MCP job matches."
+            : loop.reason,
     };
   }
 
@@ -155,12 +162,21 @@ export function planTask(
       : undefined;
 
   if (playbookSkill) {
+    const confidence = match.score >= 8 ? "high" : "medium";
+    const loop = decidePlanLoop({
+      confidence,
+      recommendedKind: "playbook",
+      workflowId: task.target,
+    });
+    const runLine = live
+      ? `Call run_playbook("${playbookSkill.id}", input) with a reachable https:// URL — ~${estimatedCredits} credits estimated.`
+      : `Call run_playbook("${playbookSkill.id}", input) with workspace file contents — ~${estimatedCredits} credits estimated. ${payloadNext}`;
     return {
       status: "plan",
       goal: trimmedGoal,
       free: true,
       estimatedCredits,
-      confidence: match.score >= 8 ? "high" : "medium",
+      confidence,
       recommended: {
         kind: "playbook",
         id: playbookSkill.id,
@@ -174,18 +190,36 @@ export function planTask(
         .filter((a) => a.id !== playbookSkill.id && a.id !== task.target)
         .slice(0, 4),
       toolHints,
-      next: live
-        ? `Call run_playbook("${playbookSkill.id}", input) with a reachable https:// URL — ~${estimatedCredits} credits estimated. After fixes: verify_task with baseline jobReport.`
-        : `Call run_playbook("${playbookSkill.id}", input) with workspace file contents — ~${estimatedCredits} credits estimated. ${payloadNext} After fixes: verify_task with baseline jobReport.`,
+      loop,
+      next: loop.initiate
+        ? `${runLine} After the run, call verify_task only if that result has loop.initiate true.`
+        : `${runLine} ${loop.reason}`,
     };
   }
+
+  const confidence = match.score >= 8 ? "high" : "medium";
+  const loop = decidePlanLoop({
+    confidence,
+    recommendedKind: task.type,
+    workflowId: task.type === "workflow" ? task.target : undefined,
+  });
+  const runLine =
+    task.type === "local"
+      ? `Call solve_task with input.html / input.text / input.code (enhance defaults false; set enhance:true to bill text APIs). ${payloadNext}`
+      : live
+        ? task.type === "workflow"
+          ? `Call run_workflow("${task.target}", input) or list_skills for a matching playbook — ~${estimatedCredits} credits estimated.`
+          : `Call solve_task(goal) with input.url — ~${estimatedCredits} credits estimated.`
+        : task.type === "workflow"
+          ? `Call run_workflow("${task.target}", input) with workspace payload (input.text / input.code / input.html) — ~${estimatedCredits} credits estimated. ${payloadNext}`
+          : `Call solve_task with workspace payload (input.text / input.code / input.html) — ~${estimatedCredits} credits estimated. ${payloadNext}`;
 
   return {
     status: "plan",
     goal: trimmedGoal,
     free: true,
     estimatedCredits,
-    confidence: match.score >= 8 ? "high" : "medium",
+    confidence,
     recommended: {
       kind: task.type,
       id: task.type === "workflow" ? task.target : task.id,
@@ -197,15 +231,9 @@ export function planTask(
     },
     alternatives: alternatives.filter((a) => a.id !== task.target && a.id !== task.id).slice(0, 4),
     toolHints,
-    next:
-      task.type === "local"
-        ? `Call solve_task with input.html / input.text / input.code (enhance defaults false; set enhance:true to bill text APIs). ${payloadNext}`
-        : live
-          ? task.type === "workflow"
-            ? `Call run_workflow("${task.target}", input) or list_skills for a matching playbook — ~${estimatedCredits} credits estimated.`
-            : `Call solve_task(goal) with input.url or invoke_tool — ~${estimatedCredits} credits estimated.`
-          : task.type === "workflow"
-            ? `Call run_workflow("${task.target}", input) with workspace payload (input.text / input.code / input.html) — ~${estimatedCredits} credits estimated. ${payloadNext}`
-            : `Call solve_task with workspace payload (input.text / input.code / input.html) or invoke_tool — ~${estimatedCredits} credits estimated. ${payloadNext}`,
+    loop,
+    next: loop.initiate
+      ? `${runLine} After the run, call verify_task only if that result has loop.initiate true. Do not start with invoke_tool.`
+      : `${runLine} ${loop.reason}`,
   };
 }

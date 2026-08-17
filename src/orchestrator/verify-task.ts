@@ -1,34 +1,32 @@
-import type {
-  JobFinding,
-  JobMetricStatus,
-  JobReport,
-  PrioritizedAction,
-} from "../jobs/types";
+import type { JobFinding, JobMetricStatus, JobReport } from "../jobs/types";
 import type { SolveTaskContext } from "./solve-task";
 import { solveTask } from "./solve-task";
+import { type ResponseMode } from "./compact-response";
+import { shapeAgentResult, withHarnessLoop } from "./harness-loop";
 import {
-  applyResponseMode,
-  type ResponseMode,
-} from "./compact-response";
+  buildNextActions,
+  buildRemainingFixes,
+  computeVerifyGate,
+  extractJobReport,
+  sortFindings,
+  type RemainingFix,
+  type VerifyGate,
+  type VerifyNextAction,
+} from "./job-report";
 
-export type VerifyGate = "pass" | "fail" | "unknown";
-
-export interface RemainingFix {
-  rank: number;
-  workstream: string;
-  severity?: JobFinding["severity"];
-  title: string;
-  actions: string[];
-  expectedImpact?: PrioritizedAction["expectedImpact"];
-  source: "finding" | "prioritizedAction";
-}
-
-export interface VerifyNextAction {
-  id: string;
-  label: string;
-  workstream?: string;
-  severity?: JobFinding["severity"];
-}
+export type {
+  RemainingFix,
+  RemainingFixPatchType,
+  VerifyGate,
+  VerifyNextAction,
+} from "./job-report";
+export {
+  buildNextActions,
+  buildRemainingFixes,
+  computeVerifyGate,
+  extractJobReport,
+  inferPatchType,
+} from "./job-report";
 
 export interface VerifyDelta {
   status: "improved" | "regressed" | "unchanged" | "unknown";
@@ -59,73 +57,8 @@ const STATUS_RANK: Record<JobMetricStatus, number> = {
   unknown: 0,
 };
 
-const SEVERITY_RANK: Record<string, number> = { high: 0, medium: 1, low: 2 };
-
 function findingKey(f: JobFinding): string {
   return `${f.workstream || ""}|${f.title}`.toLowerCase();
-}
-
-function sortFindings(findings: JobFinding[]): JobFinding[] {
-  return [...findings].sort(
-    (a, b) =>
-      (SEVERITY_RANK[a.severity] ?? 9) - (SEVERITY_RANK[b.severity] ?? 9)
-  );
-}
-
-/**
- * Build remainingFixes from the fresh jobReport (findings + prioritizedActions).
- */
-export function buildRemainingFixes(after: JobReport | null): RemainingFix[] {
-  if (!after) return [];
-  const fixes: RemainingFix[] = [];
-  let rank = 1;
-
-  for (const f of sortFindings(after.findings || [])) {
-    const actions = (f.howToFix || []).map((s) => String(s).trim()).filter(Boolean);
-    if (!actions.length && f.severity === "low") continue;
-    fixes.push({
-      rank: rank++,
-      workstream: f.workstream || f.metric || "general",
-      severity: f.severity,
-      title: f.title,
-      actions: actions.length ? actions : ["Investigate and remediate this finding, then re-run verify_task."],
-      source: "finding",
-    });
-  }
-
-  const covered = new Set(fixes.map((x) => x.title.toLowerCase()));
-  for (const a of after.prioritizedActions || []) {
-    const key = String(a.action || "").toLowerCase();
-    if (!key || covered.has(key)) continue;
-    if (fixes.some((f) => f.actions.some((x) => x.toLowerCase() === key))) continue;
-    fixes.push({
-      rank: rank++,
-      workstream: a.workstream || "general",
-      title: a.action,
-      actions: [a.action],
-      expectedImpact: a.expectedImpact,
-      source: "prioritizedAction",
-    });
-  }
-
-  return fixes.slice(0, 12);
-}
-
-export function buildNextActions(fixes: RemainingFix[]): VerifyNextAction[] {
-  return fixes.slice(0, 5).map((f, i) => ({
-    id: `fix_${i + 1}`,
-    label: f.actions[0] || f.title,
-    workstream: f.workstream,
-    severity: f.severity,
-  }));
-}
-
-export function computeVerifyGate(after: JobReport | null): VerifyGate {
-  if (!after) return "unknown";
-  const high = (after.findings || []).some((f) => f.severity === "high");
-  const poor = Object.values(after.scores || {}).some((s) => s.status === "poor");
-  if (high || poor) return "fail";
-  return "pass";
 }
 
 function enrichDelta(
@@ -141,7 +74,7 @@ function enrichDelta(
     summary.push("Gate: pass — no high-severity findings or poor scores on the fresh run.");
   } else if (gate === "fail") {
     summary.push(
-      `Gate: fail — ${remainingFixes.length} remaining fix(es); apply delta.nextActions then verify_task again.`
+      `Gate: fail — ${remainingFixes.length} remaining fix(es); apply loop.remainingFixes (or delta.nextActions) then verify_task again.`
     );
   }
   return {
@@ -152,38 +85,6 @@ function enrichDelta(
     gate,
     summary,
   };
-}
-
-/**
- * Peel common agent envelopes to a JobReport.
- */
-export function extractJobReport(payload: unknown): JobReport | null {
-  if (!payload || typeof payload !== "object") return null;
-  const root = payload as Record<string, unknown>;
-  if (root.schemaVersion === "toolyour.jobReport@1") {
-    return root as unknown as JobReport;
-  }
-  if (root.jobReport && typeof root.jobReport === "object") {
-    return root.jobReport as JobReport;
-  }
-  if (
-    root.execution &&
-    typeof root.execution === "object" &&
-    (root.execution as Record<string, unknown>).jobReport
-  ) {
-    return (root.execution as Record<string, unknown>).jobReport as JobReport;
-  }
-  // verify_task prior response: { status, delta, after }
-  if (root.after !== undefined) {
-    const nested = extractJobReport(root.after);
-    if (nested) return nested;
-  }
-  // get_run / poll envelope: { runId, result: solve_task payload }
-  if (root.result !== undefined) {
-    const nested = extractJobReport(root.result);
-    if (nested) return nested;
-  }
-  return null;
 }
 
 /**
@@ -317,31 +218,24 @@ export async function executeVerifyTask(
   const fresh = await solveTask(goal, input, ctx, "full");
   const after = extractJobReport(fresh);
   const delta = diffJobReports(before, after);
-  const compactFresh = applyResponseMode(fresh, mode);
+  const compactFresh = shapeAgentResult(fresh, mode, "run");
   const freshStatus =
     fresh && typeof fresh === "object"
       ? String((fresh as { status?: string }).status || "")
       : "";
 
-  if (
-    freshStatus === "error" ||
-    freshStatus === "partial" ||
-    freshStatus === "suggest" ||
-    freshStatus === "need_input" ||
-    freshStatus === "need_workflow"
-  ) {
-    return {
-      status: freshStatus,
-      goal,
-      delta,
-      after: compactFresh,
-    };
-  }
-
-  return {
-    status: "verified",
+  const payload: VerifyTaskResult = {
+    status:
+      freshStatus === "error" ||
+      freshStatus === "partial" ||
+      freshStatus === "suggest" ||
+      freshStatus === "need_input" ||
+      freshStatus === "need_workflow"
+        ? freshStatus
+        : "verified",
     goal,
     delta,
     after: compactFresh,
   };
+  return withHarnessLoop(payload, "verify");
 }

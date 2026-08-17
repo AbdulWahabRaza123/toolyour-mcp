@@ -17,8 +17,8 @@ Full page SEO + page speed audit for a **public URL**.
 
 1. `plan_task("seo audit https://example.com")` (free)
 2. `run_playbook("seo-site-audit", { url: "https://…" })` → `full-seo-audit`
-3. Read `jobReport.prioritizedActions` and workstreams — summarize for the user
-4. After fixes: `verify_task(goal, { url }, baselineJobReport)`
+3. Read `loop.remainingFixes` (and `jobReport.prioritizedActions`) — apply in the repo
+4. `verify_task(goal, { url }, baseline)` until `loop.gate` is pass. Do not `invoke_tool` for the same job.
 
 ## Related playbooks (same URL)
 
