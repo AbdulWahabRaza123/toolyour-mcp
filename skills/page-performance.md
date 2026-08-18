@@ -15,5 +15,6 @@ For **Core Web Vitals / performance** requests:
 2. Read `jobReport.scores` for **LCP**, **TTFB**, **INP** (TBT proxy), and **CLS**.
 3. Use `jobReport.prioritizedActions` for ranked fixes — prefer actions with `workstream: "assets"` when present (compress images, defer scripts, CLS dimensions).
 4. Read `jobReport.workstreams.assets.assetOptimizer` for concrete URLs (`compressImages`, `deferScripts`, `fixDimensions`, `preloadHints`). Cite `limitations` when explaining proxy vs field data.
-5. Fallback: `discover_tools("page speed")` → `get_tool_schema` → `invoke_tool` with URL.
-6. Do not paste raw HTML — summarize findings for the user.
+5. To **convert those images to WebP**, use `run_playbook("frontend-webp", { url })` — do not invent a new converter.
+6. Fallback: `discover_tools("page speed")` → `get_tool_schema` → `invoke_tool` with URL.
+7. Do not paste raw HTML — summarize findings for the user.

@@ -21,7 +21,8 @@ How AI agents (Cursor, Claude Desktop, custom clients) communicate with ToolYour
          ▼
   ┌──────────────┐     /mcp          ┌─────────────────────────────────┐
   │ nginx gateway│ ────────────────► │ toolyour-mcp :3090                │
-  │ :8888 local  │                   │  SSE /mcp  ·  POST /mcp/messages │
+  │ :8888 local  │                   │  GET /mcp SSE · POST /mcp HTTP   │
+  │ api.toolyour │ ◄── gateway ────  │  POST /mcp/http · /mcp/messages  │
   │ api.toolyour │ ◄── gateway ────  │  solve_task · registry · breaker │
   └──────┬───────┘                   └───────────┬─────────────────────┘
          │                                       │

@@ -23,7 +23,7 @@ export function registerHealthRoutes(
       gatewayConcurrency: gatewaySemaphore.stats(),
       counters: getCounters(),
       payloadStore: payloadStore.stats(),
-      transports: ["sse:/mcp", "http:/mcp/http"],
+      transports: ["sse:GET /mcp", "http:POST /mcp", "http:/mcp/http"],
     });
   });
 

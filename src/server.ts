@@ -26,10 +26,17 @@ void runStore.start(logger);
 
 const app = express();
 // SSE POST /mcp/messages reads the raw stream — skip JSON there.
-// Streamable HTTP needs a parsed body on /mcp/http.
+// GET /mcp is SSE (no JSON body). POST/DELETE /mcp and /mcp/http are Streamable HTTP.
 app.use((req, res, next) => {
   if (req.path === "/mcp/messages") return next();
-  if (req.path.startsWith("/mcp") && req.path !== "/mcp/http") return next();
+  if (req.path === "/mcp" && req.method === "GET") return next();
+  if (
+    req.path.startsWith("/mcp") &&
+    req.path !== "/mcp/http" &&
+    req.path !== "/mcp"
+  ) {
+    return next();
+  }
   express.json({ limit: "4mb" })(req, res, next);
 });
 
@@ -164,8 +171,8 @@ app.post("/mcp/messages", async (req, res) => {
 });
 
 /**
- * Streamable HTTP transport (free, SDK-native). Use when clients support MCP Streamable HTTP.
- * Endpoint: https://api.toolyour.com/mcp/http
+ * Streamable HTTP (SDK-native). POST initialize on /mcp (directories like Smithery)
+ * or the explicit alias /mcp/http. GET /mcp stays SSE for Cursor.
  */
 async function handleStreamableHttp(
   req: express.Request,
@@ -233,10 +240,16 @@ async function handleStreamableHttp(
 
   res.status(400).json({
     error:
-      "Unknown or missing MCP session. Initialize with POST /mcp/http (Streamable HTTP).",
+      "Unknown or missing MCP session. Initialize with POST /mcp or POST /mcp/http (Streamable HTTP).",
   });
 }
 
+app.post("/mcp", (req, res) => {
+  void handleStreamableHttp(req, res);
+});
+app.delete("/mcp", (req, res) => {
+  void handleStreamableHttp(req, res);
+});
 app.post("/mcp/http", (req, res) => {
   void handleStreamableHttp(req, res);
 });
@@ -299,6 +312,6 @@ app.get("/mcp/runs/:id", async (req, res) => {
 app.listen(env.port, () => {
   logger.info("toolyour-mcp listening", {
     port: env.port,
-    transports: ["sse:/mcp", "http:/mcp/http"],
+    transports: ["sse:GET /mcp", "http:POST /mcp", "http:/mcp/http"],
   });
 });

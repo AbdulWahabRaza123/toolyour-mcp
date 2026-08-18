@@ -63,5 +63,6 @@ Shipped synthesizer workflows (return `toolyour.jobReport@1` when matched):
 | `content-quality-audit-job` | Content + keyword signals |
 | `keyword-opportunity-review-job` | Keyword gaps + opportunities |
 | `document-convert-pipeline` | DOCX → PDF |
+| `frontend-webp-job` | Page images → WebP zip + img/srcset remainingFixes |
 
 Registry: `registry/workflows.json`, `registry/tasks.json`. Roadmap: [`docs/MCP-JOBS-ROADMAP.md`](docs/MCP-JOBS-ROADMAP.md).

@@ -34,6 +34,7 @@ import {
   synthesizeDevFormatTransform,
   synthesizeDevJsonPipeline,
 } from "./developer-jobs";
+import { synthesizeFrontendWebp } from "./frontend-webp";
 
 const SYNTHESIZERS: Record<string, (params: SynthesizeJobParams) => JobReport> = {
   "full-seo-audit": synthesizeFullSeoAudit,
@@ -63,6 +64,7 @@ const SYNTHESIZERS: Record<string, (params: SynthesizeJobParams) => JobReport> =
   "dev-json-pipeline": synthesizeDevJsonPipeline,
   "dev-auth-debug": synthesizeDevAuthDebug,
   "dev-format-transform": synthesizeDevFormatTransform,
+  "frontend-webp": synthesizeFrontendWebp,
 };
 
 export function synthesizeJobReport(params: SynthesizeJobParams): JobReport | null {

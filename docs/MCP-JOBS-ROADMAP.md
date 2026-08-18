@@ -336,6 +336,15 @@ Files: `seo-apis.service.ts`, `internal-linking.zod.ts`
 | P3 | `keyword-opportunity-review` | rankCheckerKeywords + content | Synthesis only |
 | P3 | `local-page-seo` | existing local bridge | Polish |
 | Done | `document-convert-pipeline` | exists | No |
+| Done | `frontend-webp-job` | pageSpeed + convertToWebp | Pack/extract helpers (`folderToZip`, `zipExtract`); staging upload later |
+
+### Staging upload (later — do not ship yet)
+
+MCP cannot send local disk bytes. Converters already accept **file upload or `urls[]`**. The missing primitive is:
+
+`POST /mcp/staging` (or REST `/api/v1/uploads/staging`) → store bytes on R2 → return a fetchable URL (same 1h TTL as temp outputs).
+
+Then every converter keeps **one codebase**: agents upload once, pass that URL as `urls`. Host zip/unzip stays local; remote `folderToZip` / `zipExtract` are for URL lists, not the agent filesystem.
 
 ### Local / MCP-only jobs (no URL)
 

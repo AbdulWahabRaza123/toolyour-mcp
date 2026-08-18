@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { invalidateApiKeyCache, validateApiKey } from "../auth/session";
 import { invokeGatewayRoute } from "../gateway/client";
-import { buildGatewayInvokePayload } from "../gateway/request";
+import { buildGatewayInvokePayload, normalizeStepInput } from "../gateway/request";
 import { shapeResponseForLlm } from "../summarize/registry";
 import { MCP_ERROR_CODES, type McpToolRoute } from "../contracts";
 import type { Logger } from "../observability/logger";
@@ -26,11 +26,12 @@ export async function invokeOperation(
   requestId?: string
 ) {
   const reqId = requestId || randomUUID();
+  const normalized = normalizeStepInput(operationId, input);
 
   if (ctx.registry) {
     const schema = ctx.registry.getSchema(operationId);
     if (schema) {
-      const validation = validateInputAgainstSchema(schema, input);
+      const validation = validateInputAgainstSchema(schema, normalized);
       if (!validation.ok) {
         return {
           requestId: reqId,
@@ -63,7 +64,7 @@ export async function invokeOperation(
     ctx.logger
   );
 
-  const payload = buildGatewayInvokePayload(route, input);
+  const payload = buildGatewayInvokePayload(route, normalized);
 
   const res = await invokeGatewayRoute(route, {
     apiKey: ctx.apiKey,

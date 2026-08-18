@@ -1,6 +1,6 @@
 {
-  "operationId": "convertToJpg",
-  "gatewayPath": "/api/v1/convertors/to-jpg",
+  "operationId": "zipExtract",
+  "gatewayPath": "/api/v1/convertors/zip-extract",
   "method": "POST",
   "request": {
     "type": "object",
@@ -20,23 +20,23 @@
             },
             "description": "HTTPS URLs as a JSON array (MCP multipart may send this as a JSON string)"
           },
-          "image": {
+          "file": {
             "type": "string",
             "format": "binary",
-            "description": "Image, ZIP, or RAR to convert to JPG"
+            "description": "ZIP file to extract, or pass a ZIP URL in urls"
           }
         }
       },
       {
         "type": "object",
         "required": [
-          "image"
+          "file"
         ],
         "properties": {
-          "image": {
+          "file": {
             "type": "string",
             "format": "binary",
-            "description": "Image, ZIP, or RAR to convert to JPG"
+            "description": "ZIP file to extract, or pass a ZIP URL in urls"
           },
           "urls": {
             "type": "array",
@@ -52,5 +52,5 @@
     "description": "Upload a file or pass urls (JSON array of HTTPS URLs)."
   },
   "response": null,
-  "responseHint": "Returns ToolFileResponse with downloadUrl"
+  "responseHint": "Returns Node API envelope JSON"
 }

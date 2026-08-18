@@ -66,9 +66,11 @@ const REQUIRED_OVERRIDES = {
   caseConverter: ["text"],
   docx_to_pdf: ["file"],
   pdf_to_docx: ["file"],
-  convertToJpg: ["file"],
-  convertToPng: ["file"],
-  convertToWebp: ["file"],
+  convertToJpg: ["image"],
+  convertToPng: ["image"],
+  convertToWebp: ["urls"],
+  folderToZip: ["urls"],
+  zipExtract: ["file"],
 };
 
 /** Skip auto-required (discovery / no-input / ambiguous tools). */

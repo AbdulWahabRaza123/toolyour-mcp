@@ -1,6 +1,6 @@
 {
-  "operationId": "convertToJpg",
-  "gatewayPath": "/api/v1/convertors/to-jpg",
+  "operationId": "folderToZip",
+  "gatewayPath": "/api/v1/convertors/folder-to-zip",
   "method": "POST",
   "request": {
     "type": "object",
@@ -20,23 +20,23 @@
             },
             "description": "HTTPS URLs as a JSON array (MCP multipart may send this as a JSON string)"
           },
-          "image": {
+          "files": {
             "type": "string",
             "format": "binary",
-            "description": "Image, ZIP, or RAR to convert to JPG"
+            "description": "Files to pack into a ZIP (repeat the files field, max 50)"
           }
         }
       },
       {
         "type": "object",
         "required": [
-          "image"
+          "files"
         ],
         "properties": {
-          "image": {
+          "files": {
             "type": "string",
             "format": "binary",
-            "description": "Image, ZIP, or RAR to convert to JPG"
+            "description": "Files to pack into a ZIP (repeat the files field, max 50)"
           },
           "urls": {
             "type": "array",

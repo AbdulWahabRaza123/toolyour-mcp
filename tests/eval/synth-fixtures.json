@@ -360,5 +360,55 @@
         }
       }
     }
+  },
+  "frontend-webp": {
+    "input": { "url": "https://example.com" },
+    "steps": [
+      { "id": "speed", "operationId": "pageSpeedAnalyzer" },
+      { "id": "convert", "operationId": "convertToWebp" }
+    ],
+    "stepResults": {
+      "speed": {
+        "status": 200,
+        "operationId": "pageSpeedAnalyzer",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "page-speed-analyzer",
+          "url": "https://example.com",
+          "data": { "url": "https://example.com" },
+          "report": {
+            "summary": { "totalScore": 58, "grade": "D", "topPriorities": ["Convert hero image"] },
+            "evidence": {
+              "assetOptimizer": {
+                "compressImages": [
+                  {
+                    "src": "https://example.com/hero.jpg",
+                    "bytes": 450000,
+                    "reason": "Likely LCP candidate"
+                  }
+                ],
+                "deferScripts": [],
+                "fixDimensions": [],
+                "preloadHints": []
+              }
+            },
+            "findings": []
+          }
+        }
+      },
+      "convert": {
+        "status": 200,
+        "operationId": "convertToWebp",
+        "data": {
+          "status": true,
+          "code": 200,
+          "message": "Conversion successful",
+          "result": {
+            "downloadUrl": "https://example.com/tmp/converted_urls_webp.zip",
+            "fileName": "converted_urls_webp.zip"
+          }
+        }
+      }
+    }
   }
 }

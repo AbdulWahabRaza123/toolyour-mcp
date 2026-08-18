@@ -21,7 +21,18 @@ describe("MCP discovery documents", () => {
     assert.ok(card.tools.some((t) => t.name === "run_playbook"));
     assert.ok(card.tools.some((t) => t.name === "verify_task"));
     assert.ok(Array.isArray(card.transports));
-    assert.ok(card.transports.some((t) => t.type === "streamable-http"));
+    assert.ok(
+      card.transports.some(
+        (t) => t.type === "streamable-http" && t.endpoint === MCP_PUBLIC_ENDPOINT
+      )
+    );
+    assert.ok(
+      card.transports.some(
+        (t) =>
+          t.type === "streamable-http" &&
+          t.endpoint === `${MCP_PUBLIC_ENDPOINT}/http`
+      )
+    );
   });
 
   it("manifest lists sse and api_key auth", () => {

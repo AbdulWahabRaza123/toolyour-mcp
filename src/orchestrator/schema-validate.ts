@@ -140,7 +140,17 @@ function checkType(expected: string, value: unknown): boolean {
     case "boolean":
       return typeof value === "boolean";
     case "array":
-      return Array.isArray(value);
+      if (Array.isArray(value)) return true;
+      if (typeof value === "string") {
+        const trimmed = value.trim();
+        if (!trimmed.startsWith("[")) return false;
+        try {
+          return Array.isArray(JSON.parse(trimmed));
+        } catch {
+          return false;
+        }
+      }
+      return false;
     case "object":
       return !!value && typeof value === "object" && !Array.isArray(value);
     default:

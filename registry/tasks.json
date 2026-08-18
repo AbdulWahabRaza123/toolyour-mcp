@@ -124,6 +124,38 @@
       "requiredInput": ["file"]
     },
     {
+      "id": "frontend-webp",
+      "title": "Convert frontend images to WebP",
+      "description": "Find compressible page images, convert them to WebP, and list img/srcset replacements.",
+      "keywords": [
+        "convert images to webp",
+        "frontend webp",
+        "convert png to webp",
+        "convert jpeg to webp",
+        "webp for seo",
+        "optimize images webp",
+        "frontend assets webp",
+        "convert assets to webp",
+        "serve webp"
+      ],
+      "type": "workflow",
+      "target": "frontend-webp-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "fix-verify-frontend-webp",
+      "title": "Fix-verify frontend WebP",
+      "description": "Re-run WebP conversion after img/srcset replacements.",
+      "keywords": [
+        "fix verify frontend webp",
+        "verify webp after fix",
+        "recheck webp images"
+      ],
+      "type": "workflow",
+      "target": "frontend-webp-job",
+      "requiredInput": ["url"]
+    },
+    {
       "id": "seo-analyze",
       "title": "Analyze URL SEO",
       "description": "Single-page on-page SEO analysis.",

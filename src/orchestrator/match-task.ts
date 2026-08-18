@@ -18,7 +18,8 @@ const URL_RE =
 const SYNONYM_MAP: Record<string, string[]> = {
   optimisation: ["optimization"],
   optimize: ["optimisation", "optimization"],
-  jpeg: ["jpg"],
+  webp: ["image to webp", "frontend webp", "convert png to webp"],
+  "frontend assets": ["webp", "compress images"],
   jpg: ["jpeg"],
   pagespeed: ["page speed", "page-speed"],
   "page-speed": ["pagespeed", "page speed"],

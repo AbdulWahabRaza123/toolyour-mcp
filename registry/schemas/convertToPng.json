@@ -4,17 +4,52 @@
   "method": "POST",
   "request": {
     "type": "object",
-    "required": [
-      "image"
-    ],
-    "properties": {
-      "image": {
-        "type": "string",
-        "format": "binary",
-        "description": "Input file to convert or process"
+    "additionalProperties": true,
+    "oneOf": [
+      {
+        "type": "object",
+        "required": [
+          "urls"
+        ],
+        "properties": {
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            },
+            "description": "HTTPS URLs as a JSON array (MCP multipart may send this as a JSON string)"
+          },
+          "image": {
+            "type": "string",
+            "format": "binary",
+            "description": "Image, ZIP, or RAR to convert to PNG"
+          }
+        }
+      },
+      {
+        "type": "object",
+        "required": [
+          "image"
+        ],
+        "properties": {
+          "image": {
+            "type": "string",
+            "format": "binary",
+            "description": "Image, ZIP, or RAR to convert to PNG"
+          },
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            },
+            "description": "HTTPS URLs as a JSON array (MCP multipart may send this as a JSON string)"
+          }
+        }
       }
-    },
-    "additionalProperties": true
+    ],
+    "description": "Upload a file or pass urls (JSON array of HTTPS URLs)."
   },
   "response": null,
   "responseHint": "Returns ToolFileResponse with downloadUrl"

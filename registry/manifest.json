@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-08-12T18:05:27.271Z",
+  "generatedAt": "2026-08-18T15:01:29.043Z",
   "stats": {
-    "totalOpenApiRoutes": 342,
-    "hasApiIncluded": 339,
+    "totalOpenApiRoutes": 344,
+    "hasApiIncluded": 341,
     "excluded": 3
   },
   "categories": [
@@ -160,6 +160,22 @@
       "name": "Convert JSON to CSV",
       "category": "Convertors",
       "description": "Convert JSON to CSV",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "folderToZip",
+      "name": "Pack files or URLs into a ZIP",
+      "category": "Convertors",
+      "description": "Pack files or URLs into a ZIP",
+      "inputShape": "multipart",
+      "backend": "node"
+    },
+    {
+      "operationId": "zipExtract",
+      "name": "Extract a ZIP into downloadable files",
+      "category": "Convertors",
+      "description": "Extract a ZIP into downloadable files",
       "inputShape": "multipart",
       "backend": "node"
     },
@@ -3011,6 +3027,38 @@
       "responseHint": "Returns ToolFileResponse with downloadUrl",
       "validatePaths": [
         "convertors/json-2-csv"
+      ]
+    },
+    "folderToZip": {
+      "operationId": "folderToZip",
+      "method": "POST",
+      "gatewayPath": "/api/v1/convertors/folder-to-zip",
+      "category": "Convertors",
+      "name": "Pack files or URLs into a ZIP",
+      "description": "Pack files or URLs into a ZIP",
+      "backend": "node",
+      "multipart": true,
+      "fileField": "files",
+      "jsonBody": false,
+      "responseHint": "Returns ToolFileResponse with downloadUrl",
+      "validatePaths": [
+        "convertors/folder-to-zip"
+      ]
+    },
+    "zipExtract": {
+      "operationId": "zipExtract",
+      "method": "POST",
+      "gatewayPath": "/api/v1/convertors/zip-extract",
+      "category": "Convertors",
+      "name": "Extract a ZIP into downloadable files",
+      "description": "Extract a ZIP into downloadable files",
+      "backend": "node",
+      "multipart": true,
+      "fileField": "file",
+      "jsonBody": false,
+      "responseHint": "Returns Node API envelope JSON",
+      "validatePaths": [
+        "convertors/zip-extract"
       ]
     },
     "docx_to_pdf": {

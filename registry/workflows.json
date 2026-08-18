@@ -324,6 +324,16 @@
         { "id": "format", "operationId": "jsonFormatter", "continueOnError": true },
         { "id": "xml", "operationId": "xmlFormatter", "continueOnError": true }
       ]
+    },
+    {
+      "id": "frontend-webp-job",
+      "title": "Frontend WebP Conversion",
+      "description": "Find compressible images on a URL, convert them to WebP, return img/srcset remainingFixes.",
+      "synthesizer": "frontend-webp",
+      "steps": [
+        { "id": "speed", "operationId": "pageSpeedAnalyzer" },
+        { "id": "convert", "operationId": "convertToWebp", "continueOnError": true }
+      ]
     }
   ]
 }

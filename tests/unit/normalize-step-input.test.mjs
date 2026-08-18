@@ -28,4 +28,21 @@ describe("normalizeStepInput", () => {
     });
     assert.equal(out.text, "eyJhbGciOiJub25lIn0.e30.");
   });
+
+  it("pulls compressImages srcs into urls for convertToWebp", async () => {
+    const { normalizeStepInput } = await import("../../dist/gateway/request.js");
+    const out = normalizeStepInput("convertToWebp", {
+      status: 200,
+      data: {
+        report: {
+          evidence: {
+            assetOptimizer: {
+              compressImages: [{ src: "https://example.com/hero.jpg" }],
+            },
+          },
+        },
+      },
+    });
+    assert.deepEqual(out.urls, ["https://example.com/hero.jpg"]);
+  });
 });
