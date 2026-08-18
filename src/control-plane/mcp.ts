@@ -13,7 +13,9 @@ import {
   hashRunnerNonce,
   leakSecretKeys,
   nonceAccepted,
+  submitHmacHex,
   tokenAccepted,
+  tokensEqual,
   writeRunnerNonce,
 } from "./secrets";
 import { jobStore } from "./store";
@@ -337,7 +339,7 @@ async function handleSubmit(args: Record<string, unknown>, ctx: ControlPlaneCtx)
   if (!tokenAccepted(token, expectedRunnerToken())) {
     return err(
       "runner_required",
-      "check_submit is host-runner only. Run scripts/control-plane-host.mjs; do not invent pass/fail."
+      "check_submit is host-runner only. Run toolyour-check-run or scripts/control-plane-host.mjs; do not invent pass/fail."
     );
   }
 
@@ -353,7 +355,7 @@ async function handleSubmit(args: Record<string, unknown>, ctx: ControlPlaneCtx)
   if (!nonceAccepted(nonce, job.runnerNonceHash)) {
     return err(
       "runner_required",
-      "check_submit needs the host-only job nonce. Run scripts/control-plane-host.mjs."
+      "check_submit needs the host-only job nonce. Run toolyour-check-run or scripts/control-plane-host.mjs."
     );
   }
 
@@ -375,6 +377,25 @@ async function handleSubmit(args: Record<string, unknown>, ctx: ControlPlaneCtx)
     typeof args.treeHash === "string" && args.treeHash.trim()
       ? args.treeHash.trim()
       : undefined;
+
+  const presentedHmac = String(args.submitHmac || "").trim();
+  const requireHmac = ["true", "1"].includes(
+    String(process.env.CONTROL_PLANE_REQUIRE_HMAC || "")
+      .trim()
+      .toLowerCase()
+  );
+  if (requireHmac && !presentedHmac) {
+    return err(
+      "runner_required",
+      "check_submit HMAC required. Run toolyour-check-run."
+    );
+  }
+  if (presentedHmac) {
+    const expected = submitHmacHex(token, jobId, nonce, treeHash || "", results);
+    if (!tokensEqual(presentedHmac, expected)) {
+      return err("runner_required", "check_submit HMAC mismatch");
+    }
+  }
 
   const decided = decide(job, results, gitSha, treeHash);
   if (!decided.ok) {
@@ -471,11 +492,12 @@ export function registerControlPlaneTools(
   registerTool(
     server,
     "check_submit",
-    "EXPERIMENT: host runner only. Agents must run control-plane-host.mjs instead of inventing results. No job_complete.",
+    "EXPERIMENT: host runner only. Agents must run toolyour-check-run or control-plane-host.mjs instead of inventing results. No job_complete.",
     {
       jobId: z.string(),
       runnerToken: z.string().optional(),
       runnerNonce: z.string().optional(),
+      submitHmac: z.string().optional(),
       gitSha: z.string().optional(),
       treeHash: z.string().optional(),
       results: z.array(checkResultSchema),

@@ -92,7 +92,7 @@ Implementation note (2026-08-18, local only): `CONTROL_PLANE_ADDITIVE=true` regi
 
 ## 5. Signed host CLI (`@toolyour/sdk`)
 
-Publish a bin, e.g. `toolyour-check-run --job <id> --cwd <repo>`.
+Publish a bin, e.g. `toolyour-check-run --job <id> --cwd <repo>` (source in `@toolyour/sdk`; not an npm release until you tag).
 
 1. `job_status` over MCP (same URL/key as the agent).
 2. Execute **only** `Check.command` strings frozen on the job (allowlist at `job_start`).

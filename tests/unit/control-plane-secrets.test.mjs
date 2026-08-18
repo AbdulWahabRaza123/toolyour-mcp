@@ -13,6 +13,7 @@ import {
   tokensEqual,
   writeRunnerNonce,
   readRunnerNonce,
+  submitHmacHex,
 } from "../../dist/control-plane/secrets.js";
 
 describe("control-plane secrets", () => {
@@ -51,6 +52,24 @@ describe("control-plane secrets", () => {
       else process.env.CONTROL_PLANE_SECRETS_DIR = prev;
       fs.rmSync(dir, { recursive: true, force: true });
     }
+  });
+
+  it("submitHmacHex changes when results change", () => {
+    const token = "abcdefghijklmnop";
+    const nonce = generateRunnerNonce();
+    const row = {
+      checkId: "chk_test",
+      status: "fail",
+      exitCode: 1,
+      fingerprint: "abc",
+    };
+    const a = submitHmacHex(token, "job-1", nonce, "tree", [row]);
+    const b = submitHmacHex(token, "job-1", nonce, "tree", [
+      { ...row, fingerprint: "def" },
+    ]);
+    assert.equal(a.length, 64);
+    assert.notEqual(a, b);
+    assert.equal(submitHmacHex(token, "job-1", nonce, "tree", [row]), a);
   });
 
   it("detects leaked secret keys in payloads", () => {

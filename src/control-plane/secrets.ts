@@ -1,4 +1,4 @@
-import { createHash, randomBytes, timingSafeEqual } from "crypto";
+import { createHash, createHmac, randomBytes, timingSafeEqual } from "crypto";
 import fs from "fs";
 import os from "os";
 import path from "path";
@@ -71,6 +71,29 @@ export function tokenAccepted(presented: string, expected: string): boolean {
 export function nonceAccepted(presented: string, nonceHash: string | undefined): boolean {
   if (!presented || !nonceHash || !HEX32.test(presented)) return false;
   return tokensEqual(hashRunnerNonce(presented), nonceHash);
+}
+
+/** HMAC over jobId + treeHash + result identities. Keep in sync with @toolyour/sdk check-run. */
+export function submitHmacHex(
+  runnerToken: string,
+  jobId: string,
+  nonce: string,
+  treeHash: string,
+  results: Array<{ checkId: string; status: string; exitCode: number; fingerprint: string }>
+): string {
+  const body = JSON.stringify({
+    jobId,
+    treeHash,
+    results: results.map((r) => ({
+      checkId: r.checkId,
+      status: r.status,
+      exitCode: r.exitCode,
+      fingerprint: r.fingerprint,
+    })),
+  });
+  return createHmac("sha256", runnerToken)
+    .update(`${nonce}\n${body}`, "utf8")
+    .digest("hex");
 }
 
 const SECRET_KEYS = ["runnerNonce", "runnerNonceHash", "startToken", "runnerToken"];
