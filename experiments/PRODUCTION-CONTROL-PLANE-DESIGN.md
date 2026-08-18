@@ -86,7 +86,7 @@ api.toolyour.com/mcp     ← existing nginx path; no new public URL required for
 
 Opt-in: SaaS plan or key metadata `controlPlane: true`. Unset → these four tools are **absent**, catalog unchanged. This is the opposite of `CONTROL_PLANE_EXPERIMENT=true` (which must never ship).
 
-Implementation bug to fix when coding: `createToolYourMcpServer` currently `return`s early when the experiment flag is on. Production registration is **catalog first, then optional job tools**.
+Implementation note (2026-08-18, local only): `CONTROL_PLANE_ADDITIVE=true` registers catalog first, then job tools. `CONTROL_PLANE_EXPERIMENT=true` still isolates (hides catalog). Additive default is off. Never set either flag on `api.toolyour.com`.
 
 ---
 

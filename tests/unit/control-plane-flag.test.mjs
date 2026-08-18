@@ -6,6 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createToolYourMcpServer } from "../../dist/tools/mcp-tools.js";
 import {
+  CONTROL_PLANE_ADDITIVE_INSTRUCTIONS,
   CONTROL_PLANE_EXPERIMENT_INSTRUCTIONS,
   CONTROL_PLANE_TOOLS,
   DEFAULT_MCP_INSTRUCTIONS,
@@ -47,15 +48,19 @@ function makeServer() {
 }
 
 describe("control-plane MCP flag", { concurrency: 1 }, () => {
-  const prev = process.env.CONTROL_PLANE_EXPERIMENT;
+  const prevExperiment = process.env.CONTROL_PLANE_EXPERIMENT;
+  const prevAdditive = process.env.CONTROL_PLANE_ADDITIVE;
 
   after(() => {
-    if (prev === undefined) delete process.env.CONTROL_PLANE_EXPERIMENT;
-    else process.env.CONTROL_PLANE_EXPERIMENT = prev;
+    if (prevExperiment === undefined) delete process.env.CONTROL_PLANE_EXPERIMENT;
+    else process.env.CONTROL_PLANE_EXPERIMENT = prevExperiment;
+    if (prevAdditive === undefined) delete process.env.CONTROL_PLANE_ADDITIVE;
+    else process.env.CONTROL_PLANE_ADDITIVE = prevAdditive;
   });
 
   it("flag off: 13 core tools, no job_* tools", () => {
     delete process.env.CONTROL_PLANE_EXPERIMENT;
+    delete process.env.CONTROL_PLANE_ADDITIVE;
     const n = names(makeServer());
     assert.deepEqual(n, CORE_TOOLS.slice().sort());
     for (const t of CONTROL_PLANE_TOOLS) {
@@ -66,25 +71,54 @@ describe("control-plane MCP flag", { concurrency: 1 }, () => {
 
   it("flag on: isolated control-plane tools only (no catalog harness)", () => {
     process.env.CONTROL_PLANE_EXPERIMENT = "true";
+    delete process.env.CONTROL_PLANE_ADDITIVE;
     const n = names(makeServer());
     assert.deepEqual(n, [...CONTROL_PLANE_TOOLS].slice().sort());
     for (const t of CORE_TOOLS) assert.equal(n.includes(t), false, t);
     assert.equal(n.length, 4);
   });
 
+  it("additive: catalog stays and job_* are added", () => {
+    delete process.env.CONTROL_PLANE_EXPERIMENT;
+    process.env.CONTROL_PLANE_ADDITIVE = "true";
+    const n = names(makeServer());
+    for (const t of CORE_TOOLS) assert.equal(n.includes(t), true, t);
+    for (const t of CONTROL_PLANE_TOOLS) assert.equal(n.includes(t), true, t);
+    assert.equal(n.length, CORE_TOOLS.length + CONTROL_PLANE_TOOLS.length);
+  });
+
+  it("experiment flag wins over additive (isolation preserved)", () => {
+    process.env.CONTROL_PLANE_EXPERIMENT = "true";
+    process.env.CONTROL_PLANE_ADDITIVE = "true";
+    const n = names(makeServer());
+    assert.deepEqual(n, [...CONTROL_PLANE_TOOLS].slice().sort());
+    assert.equal(n.includes("plan_task"), false);
+  });
+
   it("flag off instructions still tell agents to call plan_task first", () => {
     delete process.env.CONTROL_PLANE_EXPERIMENT;
+    delete process.env.CONTROL_PLANE_ADDITIVE;
     assert.equal(resolveMcpInstructions(), DEFAULT_MCP_INSTRUCTIONS);
     assert.match(resolveMcpInstructions(), /First call plan_task/);
   });
 
   it("flag on instructions forbid plan_task for coding jobs", () => {
     process.env.CONTROL_PLANE_EXPERIMENT = "true";
+    delete process.env.CONTROL_PLANE_ADDITIVE;
     assert.equal(resolveMcpInstructions(), CONTROL_PLANE_EXPERIMENT_INSTRUCTIONS);
     assert.match(resolveMcpInstructions(), /EXPERIMENT MODE/);
     assert.match(resolveMcpInstructions(), /Do not call job_start/);
     assert.match(resolveMcpInstructions(), /node run-checks\.mjs/);
     assert.doesNotMatch(resolveMcpInstructions(), /First call plan_task/);
+  });
+
+  it("additive instructions keep plan_task and forbid invented check_submit", () => {
+    delete process.env.CONTROL_PLANE_EXPERIMENT;
+    process.env.CONTROL_PLANE_ADDITIVE = "true";
+    assert.equal(resolveMcpInstructions(), CONTROL_PLANE_ADDITIVE_INSTRUCTIONS);
+    assert.match(resolveMcpInstructions(), /First call plan_task/);
+    assert.match(resolveMcpInstructions(), /do not replace plan_task/);
+    assert.match(resolveMcpInstructions(), /Do not invent check_submit/);
   });
 });
 

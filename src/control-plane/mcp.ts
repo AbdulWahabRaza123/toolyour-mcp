@@ -91,10 +91,23 @@ export function isControlPlaneExperimentEnabled(): boolean {
   return v === "true" || v === "1";
 }
 
+/** Local preview of production registration: catalog first, then job tools. Ignored when the experiment flag is on. Never set in production until the design is reviewed. */
+export function isControlPlaneAdditiveEnabled(): boolean {
+  if (isControlPlaneExperimentEnabled()) return false;
+  const v = String(process.env.CONTROL_PLANE_ADDITIVE || "").trim().toLowerCase();
+  return v === "true" || v === "1";
+}
+
+export const CONTROL_PLANE_ADDITIVE_INSTRUCTIONS =
+  `${DEFAULT_MCP_INSTRUCTIONS} Job tools (job_status, check_submit) are additive and do not replace plan_task. Do not invent check_submit results. There is no job_complete. Host runner: node scripts/control-plane-host.mjs --job <id> --cwd <repo>.`;
+
 export function resolveMcpInstructions(
-  experiment = isControlPlaneExperimentEnabled()
+  experiment = isControlPlaneExperimentEnabled(),
+  additive = isControlPlaneAdditiveEnabled()
 ): string {
-  return experiment ? CONTROL_PLANE_EXPERIMENT_INSTRUCTIONS : DEFAULT_MCP_INSTRUCTIONS;
+  if (experiment) return CONTROL_PLANE_EXPERIMENT_INSTRUCTIONS;
+  if (additive) return CONTROL_PLANE_ADDITIVE_INSTRUCTIONS;
+  return DEFAULT_MCP_INSTRUCTIONS;
 }
 
 type RegisterTool = (

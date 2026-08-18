@@ -19,6 +19,7 @@ import { serializeRunPoll } from "../runs/serialize";
 import { validateApiKey } from "../auth/session";
 import type { Logger } from "../observability/logger";
 import {
+  isControlPlaneAdditiveEnabled,
   isControlPlaneExperimentEnabled,
   registerControlPlaneTools,
   resolveMcpInstructions,
@@ -526,6 +527,10 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
       );
     }
   );
+
+  if (isControlPlaneAdditiveEnabled()) {
+    registerControlPlaneTools(server, registerTool, ctx);
+  }
 
   return server;
 }
