@@ -1,0 +1,33 @@
+{
+  "id": "task-3",
+  "title": "Enforce bearer auth",
+  "goal": "Enforce bearer-token auth. Requests without Authorization must be 401. Authorization Bearer test must be 200 with {\"ok\":true}.",
+  "acceptance": [
+    {
+      "id": "ac_401",
+      "statement": "Unauthenticated request is HTTP 401",
+      "requiredCheckIds": ["chk_test", "chk_test_inventory"]
+    },
+    {
+      "id": "ac_200",
+      "statement": "Authorization Bearer test is HTTP 200 with { ok: true }",
+      "requiredCheckIds": ["chk_test", "chk_test_inventory"]
+    }
+  ],
+  "checks": [
+    {
+      "id": "chk_test",
+      "kind": "test",
+      "command": "node --test tests/auth.test.js",
+      "blocking": true
+    },
+    {
+      "id": "chk_test_inventory",
+      "kind": "test",
+      "command": "node ../../scripts/assert-frozen-file.mjs tests/auth.test.js --sha256 a67076b40541ecce094ab7ade5dafdbec7d9521ca8ed2d37cf3ef7548037a584",
+      "blocking": true
+    }
+  ],
+  "maxIterations": 8,
+  "repeatFailN": 3
+}

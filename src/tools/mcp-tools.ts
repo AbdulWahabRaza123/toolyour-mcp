@@ -18,6 +18,11 @@ import { runStore } from "../runs/store";
 import { serializeRunPoll } from "../runs/serialize";
 import { validateApiKey } from "../auth/session";
 import type { Logger } from "../observability/logger";
+import {
+  isControlPlaneExperimentEnabled,
+  registerControlPlaneTools,
+  resolveMcpInstructions,
+} from "../control-plane/mcp";
 
 export interface McpServerContext {
   apiKey: string;
@@ -59,10 +64,14 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
       version: constants.serverVersion,
     },
     {
-      instructions:
-        "ToolYour is a remote MCP harness. First call plan_task. Only enter plan → run → verify when loop.initiate is true (MCP tools can close the job). If loop.initiate is false, stop — do not call verify_task. Host agents keep editor, git, and terminal. invoke_tool is one-off only. Do not claim this server replaces Cursor or Claude.",
+      instructions: resolveMcpInstructions(),
     }
   );
+
+  if (isControlPlaneExperimentEnabled()) {
+    registerControlPlaneTools(server, registerTool, ctx);
+    return server;
+  }
 
   registerTool(
     server,

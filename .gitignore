@@ -2,3 +2,6 @@ node_modules/
 dist/
 .env
 *.log
+.data/
+experiments/control-plane-fixture/DECISION.json
+experiments/control-plane-operator/patches/
