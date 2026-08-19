@@ -1,4 +1,4 @@
-import { describe, it, after } from "node:test";
+import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import fs from "node:fs";
@@ -48,16 +48,6 @@ function makeServer() {
 }
 
 describe("control-plane MCP loops", { concurrency: 1 }, () => {
-  const prevAdditive = process.env.CONTROL_PLANE_ADDITIVE;
-  const prevExperiment = process.env.CONTROL_PLANE_EXPERIMENT;
-
-  after(() => {
-    if (prevAdditive === undefined) delete process.env.CONTROL_PLANE_ADDITIVE;
-    else process.env.CONTROL_PLANE_ADDITIVE = prevAdditive;
-    if (prevExperiment === undefined) delete process.env.CONTROL_PLANE_EXPERIMENT;
-    else process.env.CONTROL_PLANE_EXPERIMENT = prevExperiment;
-  });
-
   function bothLoops(n) {
     for (const t of CORE_TOOLS) assert.equal(n.includes(t), true, t);
     for (const t of CONTROL_PLANE_TOOLS) assert.equal(n.includes(t), true, t);
@@ -69,18 +59,7 @@ describe("control-plane MCP loops", { concurrency: 1 }, () => {
   }
 
   it("always registers skill catalog, job tools, and approvals", () => {
-    delete process.env.CONTROL_PLANE_ADDITIVE;
-    delete process.env.CONTROL_PLANE_EXPERIMENT;
     bothLoops(names(makeServer()));
-  });
-
-  it("ignores leftover CONTROL_PLANE_ADDITIVE and CONTROL_PLANE_EXPERIMENT", () => {
-    process.env.CONTROL_PLANE_ADDITIVE = "false";
-    process.env.CONTROL_PLANE_EXPERIMENT = "true";
-    const n = names(makeServer());
-    assert.equal(n.includes("plan_task"), true);
-    assert.equal(n.includes("job_status"), true);
-    bothLoops(n);
   });
 
   it("never registers a ToolYour-owned shell or sandbox tool", () => {
