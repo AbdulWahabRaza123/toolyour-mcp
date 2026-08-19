@@ -57,6 +57,8 @@ HIGH/CRITICAL **declared** actions also block `verified` (rule R9) until `job_ap
 
 Optional frozen check kind `playwright`: the host CLI runs `npx playwright test …` from `job_status` (120s default). MCP never launches Chromium. Template id `host-playwright` is not in the task-1…task-5 eval.
 
+Default MCP: skill loop and completion loop are always registered. There is no env flag to hide either loop.
+
 Phase 5 (ToolYour-owned sandbox / `execution.run`): **NO-GO**. Host Playwright MCP and GitHub MCP stay complementary. See [`experiments/SANDBOX-NOGO.md`](../experiments/SANDBOX-NOGO.md).
 
 ## GitHub Actions example (ship-gate URL jobs)

@@ -5,7 +5,7 @@
  *   npm run build
  *   node scripts/eval-control-plane.mjs
  *
- * Spawns local MCP with CONTROL_PLANE_EXPERIMENT=true.
+ * Spawns a local MCP with both loops registered (catalog + job tools).
  * Does not read MCP_URL (stale shells broke eval). Override only with
  * --mcp-url or CONTROL_PLANE_EVAL_MCP_URL.
  */
@@ -216,7 +216,6 @@ async function main() {
       cwd: root,
       env: {
         ...process.env,
-        CONTROL_PLANE_EXPERIMENT: "true",
         PORT: String(port),
         CONTROL_PLANE_DATA_DIR: dataDir,
         CONTROL_PLANE_SECRETS_DIR: secretsDir,

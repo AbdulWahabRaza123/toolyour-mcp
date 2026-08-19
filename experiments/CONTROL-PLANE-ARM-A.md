@@ -8,8 +8,7 @@ This arm exists so Arm B is not confused with “the agent ran the tests itself.
 
 ## Experimenter setup
 
-- Do **not** set `CONTROL_PLANE_EXPERIMENT=true` for this Cursor/Claude session.
-- Do **not** connect to the experimental MCP, or connect only to a flag-off MCP (13 tools, no `job_*`).
+- Do **not** call `job_start` / `job_status` / `check_submit` in this session (skill loop only). Job tools may still be registered.
 - Do **not** open `experiments/control-plane-operator/` (known-good patches).
 - Reset `experiments/control-plane-fixture` before each task:
 

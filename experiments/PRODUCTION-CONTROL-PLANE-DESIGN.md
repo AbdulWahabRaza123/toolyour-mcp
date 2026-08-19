@@ -6,7 +6,7 @@
 **Audit:** [`AUTONOMOUS-EXECUTION-AUDIT.md`](../../docs/AUTONOMOUS-EXECUTION-AUDIT.md) §5 / §15 / §16 — MODIFY (B).  
 **Experiment code:** `toolyour-mcp` branch `experiment/control-plane-mvp` (local only).
 
-This document is the protocol step-5 deliverable. It is **not** permission to set `CONTROL_PLANE_EXPERIMENT=true` on Railway or `api.toolyour.com`.
+This document is the protocol step-5 deliverable. Catalog tools stay registered. There is no `CONTROL_PLANE_EXPERIMENT` isolation flag.
 
 ---
 
@@ -86,9 +86,9 @@ api.toolyour.com/mcp     ← existing nginx path; no new public URL required for
 | `job_declare_action` | Host / agent | Additive only. Declare one HIGH/CRITICAL action with a bounded `resourceGlob`. |
 | `job_approve` | Human | Additive only. One `actionId` per call + `CONTROL_PLANE_APPROVE_TOKEN`. CRITICAL needs `breakGlass`. No approve-all. |
 
-Opt-in: SaaS `ApiKey.controlPlane: true`. When `CONTROL_PLANE_JOBS_BACKEND=saas`, unset keys get `unauthorized` on all four tools (fail closed). File store / experiment dummy key skip validate-key. Tools may still be **registered** on an additive process; access is per-key. This is the opposite of `CONTROL_PLANE_EXPERIMENT=true` (which must never ship).
+Opt-in: SaaS `ApiKey.controlPlane: true`. When `CONTROL_PLANE_JOBS_BACKEND=saas`, unset keys get `unauthorized` on all four tools (fail closed). File store / dummy `ty_experiment` skip validate-key. Job tools are registered next to the catalog; access is per-key.
 
-Implementation note (2026-08-18, local only): `CONTROL_PLANE_ADDITIVE=true` registers catalog first, then job tools. `CONTROL_PLANE_EXPERIMENT=true` still isolates (hides catalog). Additive default is off. Never set either flag on `api.toolyour.com`.
+Implementation note (2026-08-19): both loops are always registered. Loop toggle env flags were removed.
 
 ---
 
@@ -113,7 +113,7 @@ CI: GitHub Action wraps `toolyour-check-run --require-verified` and fails unless
 
 **Store:** SaaS Mongo collection `ControlPlaneJob` (full Job JSON in `payload` + TTL on `expiresAt`). MCP talks to `GET/PUT /internal/control-plane/jobs/:id` when `CONTROL_PLANE_JOBS_BACKEND=saas`. Default remains local `.data/control-plane/jobs.json` so the experiment eval does not need Mongo. MCP process stays thin. TTL = experiment `JOB_TTL_MS` (7d), not the 1h `runStore`.
 
-`validate-key` returns `controlPlane` from `ApiKey.controlPlane` (default false). When `CONTROL_PLANE_JOBS_BACKEND=saas`, every `job_*` / `check_submit` call requires `controlPlane === true`. File store and `CONTROL_PLANE_EXPERIMENT` skip the check (dummy `ty_experiment`). Do not set the saas backend on api.toolyour.com until keys are opted in.
+`validate-key` returns `controlPlane` from `ApiKey.controlPlane` (default false). When `CONTROL_PLANE_JOBS_BACKEND=saas`, every `job_*` / `check_submit` call requires `controlPlane === true`. File store skips the check (dummy `ty_experiment`). Do not set the saas backend on api.toolyour.com until keys are opted in.
 
 **States (MVP subset of the audit machine):**
 
@@ -211,8 +211,7 @@ Do **not** update brand to “replaces Cursor.” Non-goal `replacing-cursor-cla
 
 ## 12. Explicit non-goals
 
-- `CONTROL_PLANE_EXPERIMENT=true` on production
-- Replacing catalog tools when job tools are enabled
+- Replacing catalog tools when job tools are enabled (removed isolation flag)
 - Mongo / nginx / validate-key **production** wiring (`CONTROL_PLANE_JOBS_BACKEND=saas` on api.toolyour.com, new nginx `job_*` paths)
 - Enabling `CONTROL_PLANE_JOBS_BACKEND=saas` without SaaS `controlPlane` key opt-in in production
 - ToolYour-owned Firecracker/Docker customer runtime or MCP `execution.run` / general shell tools (Phase 5 **NO-GO**)

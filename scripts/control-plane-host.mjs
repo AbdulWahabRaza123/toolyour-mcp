@@ -3,7 +3,6 @@
  * Host check runner for the control-plane experiment.
  * Executes ONLY frozen Check.command strings from job_status, then check_submit.
  *
- *   CONTROL_PLANE_EXPERIMENT=true
  *   MCP_API_KEY=ty_experiment
  *   node scripts/control-plane-host.mjs --job <id> --cwd experiments/control-plane-fixture
  */

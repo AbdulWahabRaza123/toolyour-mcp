@@ -20,8 +20,6 @@ import { validateApiKey } from "../auth/session";
 import type { Logger } from "../observability/logger";
 import {
   FORBIDDEN_EXECUTION_TOOLS,
-  isControlPlaneAdditiveEnabled,
-  isControlPlaneExperimentEnabled,
   registerControlPlaneTools,
   resolveMcpInstructions,
 } from "../control-plane/mcp";
@@ -82,16 +80,10 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
     }
   );
 
-  if (isControlPlaneExperimentEnabled()) {
-    registerControlPlaneTools(server, registerTool, ctx);
-    assertNoForbiddenExecutionTools(server);
-    return server;
-  }
-
   registerTool(
     server,
     "plan_task",
-    "Free planning pass: ranked plan + estimated credits. Does not execute. Read loop.initiate — only start run/verify if true. Out-of-scope and one-shot jobs set loop.initiate false.",
+    "Skill-loop planner (SEO, security, ship-gate, catalog). Free: ranked plan + estimated credits. Do not use when the user already has a control-plane jobId — call job_status instead. Read loop.initiate — only start run/verify if true. Out-of-scope and one-shot jobs set loop.initiate false.",
     {
       goal: z
         .string()
@@ -542,9 +534,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
     }
   );
 
-  if (isControlPlaneAdditiveEnabled()) {
-    registerControlPlaneTools(server, registerTool, ctx, { approvals: true });
-  }
+  registerControlPlaneTools(server, registerTool, ctx, { approvals: true });
 
   assertNoForbiddenExecutionTools(server);
   return server;

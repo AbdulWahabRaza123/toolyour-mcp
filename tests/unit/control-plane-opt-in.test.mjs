@@ -9,14 +9,11 @@ import {
 const logger = { warn() {}, info() {}, error() {}, debug() {} };
 
 describe("control-plane key opt-in", { concurrency: 1 }, () => {
-  const prevExperiment = process.env.CONTROL_PLANE_EXPERIMENT;
   const prevBackend = process.env.CONTROL_PLANE_JOBS_BACKEND;
   const prevFetch = globalThis.fetch;
 
   after(() => {
     globalThis.fetch = prevFetch;
-    if (prevExperiment === undefined) delete process.env.CONTROL_PLANE_EXPERIMENT;
-    else process.env.CONTROL_PLANE_EXPERIMENT = prevExperiment;
     if (prevBackend === undefined) delete process.env.CONTROL_PLANE_JOBS_BACKEND;
     else process.env.CONTROL_PLANE_JOBS_BACKEND = prevBackend;
     clearSessionCache();
@@ -24,7 +21,6 @@ describe("control-plane key opt-in", { concurrency: 1 }, () => {
 
   beforeEach(() => {
     clearSessionCache();
-    delete process.env.CONTROL_PLANE_EXPERIMENT;
     delete process.env.CONTROL_PLANE_JOBS_BACKEND;
     globalThis.fetch = prevFetch;
   });
@@ -38,10 +34,9 @@ describe("control-plane key opt-in", { concurrency: 1 }, () => {
     assert.equal(requiresControlPlaneOptIn(), true);
   });
 
-  it("experiment flag skips opt-in even if saas backend is set", () => {
-    process.env.CONTROL_PLANE_EXPERIMENT = "true";
+  it("saas backend always requires opt-in", () => {
     process.env.CONTROL_PLANE_JOBS_BACKEND = "saas";
-    assert.equal(requiresControlPlaneOptIn(), false);
+    assert.equal(requiresControlPlaneOptIn(), true);
   });
 
   it("file backend allows access without calling validate-key", async () => {

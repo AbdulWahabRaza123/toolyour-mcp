@@ -12,7 +12,6 @@ const runner = randomBytes(24).toString("hex");
 const secrets = path.join(os.tmpdir(), "toolyour-control-plane");
 
 const lines = [
-  `$env:CONTROL_PLANE_EXPERIMENT="true"`,
   `$env:MCP_API_KEY="ty_experiment"`,
   `$env:CONTROL_PLANE_START_TOKEN="${start}"`,
   `$env:CONTROL_PLANE_RUNNER_TOKEN="${runner}"`,

@@ -50,7 +50,7 @@ export const CONTROL_PLANE_TOOLS = [
   "job_cancel",
 ] as const;
 
-/** Additive-only. Not registered in CONTROL_PLANE_EXPERIMENT isolation. */
+/** Always registered with the skill catalog. */
 export const CONTROL_PLANE_APPROVAL_TOOLS = [
   "job_declare_action",
   "job_approve",
@@ -104,32 +104,12 @@ export const ALLOWED_COMMANDS = new Set([
 ]);
 
 export const DEFAULT_MCP_INSTRUCTIONS =
-  "ToolYour is a remote MCP harness. First call plan_task. Only enter plan → run → verify when loop.initiate is true (MCP tools can close the job). If loop.initiate is false, stop — do not call verify_task. Host agents keep editor, git, and terminal. invoke_tool is one-off only. Do not claim this server replaces Cursor or Claude.";
+  "ToolYour has two loops. Pick exactly one per user goal — never both. " +
+  "Skill loop (SEO, security, ship-gate, converters, catalog): First call plan_task. If loop.initiate is false, stop; do not call verify_task. Then solve_task or run_playbook, then verify_task. " +
+  "Completion loop (frozen coding jobId): call job_status only; edit on the host; run toolyour-check-run or control-plane-host.mjs. Do not invent check_submit. Do not call plan_task, solve_task, or verify_task for that jobId. Do not call job_start unless the user asked to start a frozen task. " +
+  "Host keeps editor, git, and terminal. This server does not replace Cursor.";
 
-export const CONTROL_PLANE_EXPERIMENT_INSTRUCTIONS =
-  "EXPERIMENT MODE: Isolated control-plane MCP. You already have a jobId. Call job_status, edit experiments/control-plane-fixture/lib only, then from that folder run: node run-checks.mjs --job <id>. Do not call job_start. Do not invent check_submit results. There is no job_complete. Stop when state is verified or escalated. Host agents keep editor, git, and terminal.";
-
-export function isControlPlaneExperimentEnabled(): boolean {
-  const v = String(process.env.CONTROL_PLANE_EXPERIMENT || "").trim().toLowerCase();
-  return v === "true" || v === "1";
-}
-
-/** Local preview of production registration: catalog first, then job tools. Ignored when the experiment flag is on. Never set in production until the design is reviewed. */
-export function isControlPlaneAdditiveEnabled(): boolean {
-  if (isControlPlaneExperimentEnabled()) return false;
-  const v = String(process.env.CONTROL_PLANE_ADDITIVE || "").trim().toLowerCase();
-  return v === "true" || v === "1";
-}
-
-export const CONTROL_PLANE_ADDITIVE_INSTRUCTIONS =
-  `${DEFAULT_MCP_INSTRUCTIONS} Job tools (job_status, check_submit) are additive and do not replace plan_task. Do not invent check_submit results. There is no job_complete. Host runner: node scripts/control-plane-host.mjs --job <id> --cwd <repo> (or toolyour-check-run). Optional kind playwright is host-run only — ToolYour does not launch a browser. HIGH/CRITICAL host-declared actions need job_approve per actionId (no approve-all). ToolYour cannot see undeclared shell commands.`;
-
-export function resolveMcpInstructions(
-  experiment = isControlPlaneExperimentEnabled(),
-  additive = isControlPlaneAdditiveEnabled()
-): string {
-  if (experiment) return CONTROL_PLANE_EXPERIMENT_INSTRUCTIONS;
-  if (additive) return CONTROL_PLANE_ADDITIVE_INSTRUCTIONS;
+export function resolveMcpInstructions(): string {
   return DEFAULT_MCP_INSTRUCTIONS;
 }
 
@@ -635,7 +615,7 @@ export function registerControlPlaneTools(
   registerTool(
     server,
     "job_start",
-    "EXPERIMENT: experimenter-only. Starts a frozen task (task-1 … task-5, or optional host-playwright). Agents already have a jobId — call job_status instead.",
+    "Completion-loop: start a frozen task (task-1 … task-5, or optional host-playwright). Do not use for SEO, URLs, or ship-gate — those use plan_task. Agents that already have a jobId must call job_status instead.",
     {
       taskId: z.enum(STARTABLE_TASK_IDS),
       startToken: z.string().optional(),
@@ -646,7 +626,7 @@ export function registerControlPlaneTools(
   registerTool(
     server,
     "job_status",
-    "EXPERIMENT: read job state, frozen checks, next_action, and lastDecision.",
+    "Completion-loop status for an existing jobId (state, frozen checks, next_action). Do not use for catalog/SEO goals — those use plan_task.",
     { jobId: z.string() },
     async (args) => handleStatus(args, ctx)
   );
@@ -654,7 +634,7 @@ export function registerControlPlaneTools(
   registerTool(
     server,
     "check_submit",
-    "EXPERIMENT: host runner only. Agents must run toolyour-check-run or control-plane-host.mjs instead of inventing results. No job_complete.",
+    "Completion-loop: host runner only. Run toolyour-check-run or control-plane-host.mjs. Do not invent results. Do not use for skill-loop verify_task jobs. No job_complete.",
     {
       jobId: z.string(),
       runnerToken: z.string().optional(),
@@ -670,7 +650,7 @@ export function registerControlPlaneTools(
   registerTool(
     server,
     "job_cancel",
-    "EXPERIMENT: cancel an open control-plane job.",
+    "Completion-loop: cancel an open frozen job. Does not cancel skill-loop runs (use the run lifecycle for those).",
     { jobId: z.string() },
     async (args) => handleCancel(args, ctx)
   );

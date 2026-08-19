@@ -2,7 +2,6 @@
 /**
  * Start a frozen control-plane job from experiments/jobs/task-N.json
  *
- *   $env:CONTROL_PLANE_EXPERIMENT="true"
  *   node scripts/control-plane-start-job.mjs --task 1
  */
 import fs from "node:fs";

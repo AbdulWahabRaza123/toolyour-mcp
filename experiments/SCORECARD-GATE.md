@@ -12,7 +12,7 @@
 | Decision | Meaning |
 |---|---|
 | GO | Design durable jobs, real API keys, signed host CLI, `hasApi` catalog jobs. Still no ToolYour-owned sandbox. Audit stays MODIFY (B). |
-| NO-GO | Do not set `CONTROL_PLANE_EXPERIMENT` on `api.toolyour.com`. Do not deploy `experiment/control-plane-mvp`. Do not replace the 13 catalog tools. |
+| NO-GO | Do not hide catalog tools. Do not deploy an isolated job-only MCP as `api.toolyour.com`. Isolation flag `CONTROL_PLANE_EXPERIMENT` was **removed** (2026-08-19); both loops are default. |
 
 Stop-if conditions did **not** fire.
 
@@ -58,7 +58,7 @@ The design is drafted: [`PRODUCTION-CONTROL-PLANE-DESIGN.md`](./PRODUCTION-CONTR
 - Brand / `llms.txt` “replaces Cursor”
 - Committing this branch as production MCP
 - Putting `node --test` inside `toolyour-mcp`
-- `CONTROL_PLANE_EXPERIMENT=true` on Railway / `api.toolyour.com`
+- Hiding catalog tools / shipping a job-only MCP on Railway / `api.toolyour.com`
 
 ## Protocol status (2026-08-18)
 

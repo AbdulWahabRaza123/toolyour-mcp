@@ -6,19 +6,11 @@ export type ControlPlaneAccess =
   | { ok: true }
   | { ok: false; code: "unauthorized"; message: string };
 
-function experimentEnabled(): boolean {
-  const v = String(process.env.CONTROL_PLANE_EXPERIMENT || "")
-    .trim()
-    .toLowerCase();
-  return v === "true" || v === "1";
-}
-
 /**
- * Production-shaped path: durable Mongo jobs + real ty_ keys.
- * File store and CONTROL_PLANE_EXPERIMENT skip validate-key (dummy ty_experiment).
+ * Durable Mongo jobs + real ty_ keys require ApiKey.controlPlane.
+ * File store skips validate-key (local fixture / ty_experiment).
  */
 export function requiresControlPlaneOptIn(): boolean {
-  if (experimentEnabled()) return false;
   return useSaasJobsBackend();
 }
 
