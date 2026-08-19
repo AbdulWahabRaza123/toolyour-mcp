@@ -1,0 +1,22 @@
+{
+  "id": "host-playwright",
+  "title": "Optional host Playwright smoke",
+  "goal": "Run the frozen Playwright smoke spec on the host. ToolYour does not launch a browser or execute Playwright.",
+  "acceptance": [
+    {
+      "id": "ac_e2e",
+      "statement": "Host Playwright smoke spec exits 0",
+      "requiredCheckIds": ["chk_playwright"]
+    }
+  ],
+  "checks": [
+    {
+      "id": "chk_playwright",
+      "kind": "playwright",
+      "command": "npx playwright test e2e/smoke.spec.ts",
+      "blocking": true
+    }
+  ],
+  "maxIterations": 8,
+  "repeatFailN": 3
+}

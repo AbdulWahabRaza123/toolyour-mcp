@@ -1,0 +1,28 @@
+{
+  "id": "task-4",
+  "title": "Parser tests plus inventory",
+  "goal": "Make all parser tests pass. Do not delete, empty, or rewrite tests/parser.test.js.",
+  "acceptance": [
+    {
+      "id": "ac_parser",
+      "statement": "parsePair handles key:value, values containing colons, and empty input; tests/parser.test.js still has the frozen assertions",
+      "requiredCheckIds": ["chk_test", "chk_test_inventory"]
+    }
+  ],
+  "checks": [
+    {
+      "id": "chk_test",
+      "kind": "test",
+      "command": "node --test tests/parser.test.js",
+      "blocking": true
+    },
+    {
+      "id": "chk_test_inventory",
+      "kind": "test",
+      "command": "node ../../scripts/assert-frozen-file.mjs tests/parser.test.js --sha256 3babf837d45354f410482c981e0bea827e2b25a11f836e9464eedc86201aa528",
+      "blocking": true
+    }
+  ],
+  "maxIterations": 8,
+  "repeatFailN": 3
+}

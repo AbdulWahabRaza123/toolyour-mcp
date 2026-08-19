@@ -18,6 +18,11 @@ import { runStore } from "../runs/store";
 import { serializeRunPoll } from "../runs/serialize";
 import { validateApiKey } from "../auth/session";
 import type { Logger } from "../observability/logger";
+import {
+  FORBIDDEN_EXECUTION_TOOLS,
+  registerControlPlaneTools,
+  resolveMcpInstructions,
+} from "../control-plane/mcp";
 
 export interface McpServerContext {
   apiKey: string;
@@ -52,6 +57,18 @@ function textResult(payload: unknown, isError = false): ToolResult {
   };
 }
 
+function assertNoForbiddenExecutionTools(server: McpServer): void {
+  const names = Object.keys(
+    (server as unknown as { _registeredTools?: Record<string, unknown> })
+      ._registeredTools || {}
+  );
+  for (const name of FORBIDDEN_EXECUTION_TOOLS) {
+    if (names.includes(name)) {
+      throw new Error(`Forbidden execution tool registered: ${name}`);
+    }
+  }
+}
+
 export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   const server = new McpServer(
     {
@@ -59,15 +76,14 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
       version: constants.serverVersion,
     },
     {
-      instructions:
-        "ToolYour is a remote MCP harness. First call plan_task. Only enter plan → run → verify when loop.initiate is true (MCP tools can close the job). If loop.initiate is false, stop — do not call verify_task. Host agents keep editor, git, and terminal. invoke_tool is one-off only. Do not claim this server replaces Cursor or Claude.",
+      instructions: resolveMcpInstructions(),
     }
   );
 
   registerTool(
     server,
     "plan_task",
-    "Free planning pass: ranked plan + estimated credits. Does not execute. Read loop.initiate — only start run/verify if true. Out-of-scope and one-shot jobs set loop.initiate false.",
+    "Skill-loop planner (SEO, security, ship-gate, catalog). Free: ranked plan + estimated credits. Do not use when the user already has a control-plane jobId — call job_status instead. Read loop.initiate — only start run/verify if true. Out-of-scope and one-shot jobs set loop.initiate false.",
     {
       goal: z
         .string()
@@ -518,5 +534,8 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
     }
   );
 
+  registerControlPlaneTools(server, registerTool, ctx, { approvals: true });
+
+  assertNoForbiddenExecutionTools(server);
   return server;
 }

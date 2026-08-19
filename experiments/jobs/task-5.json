@@ -1,0 +1,38 @@
+{
+  "id": "task-5",
+  "title": "Discount rules",
+  "goal": "Implement discountAmount so the discount tests pass: 10% over $100, none at or below $100, none for negative prices.",
+  "acceptance": [
+    {
+      "id": "ac_over_100",
+      "statement": "discountAmount(150)===15",
+      "requiredCheckIds": ["chk_test", "chk_test_inventory"]
+    },
+    {
+      "id": "ac_at_or_below_100",
+      "statement": "discountAmount(100)===0 and discountAmount(99)===0",
+      "requiredCheckIds": ["chk_test", "chk_test_inventory"]
+    },
+    {
+      "id": "ac_negative",
+      "statement": "discountAmount(-10)===0",
+      "requiredCheckIds": ["chk_test", "chk_test_inventory"]
+    }
+  ],
+  "checks": [
+    {
+      "id": "chk_test",
+      "kind": "test",
+      "command": "node --test tests/discount.test.js",
+      "blocking": true
+    },
+    {
+      "id": "chk_test_inventory",
+      "kind": "test",
+      "command": "node ../../scripts/assert-frozen-file.mjs tests/discount.test.js --sha256 b0ecbfb941ca206c305730cde36f85dba2558952cead6a14954290199f402fc3",
+      "blocking": true
+    }
+  ],
+  "maxIterations": 8,
+  "repeatFailN": 3
+}

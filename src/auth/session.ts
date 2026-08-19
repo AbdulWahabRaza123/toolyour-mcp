@@ -7,6 +7,8 @@ export interface SessionData {
   userId: string;
   apiKeyId: string;
   cachedAt: number;
+  /** From SaaS ApiKey.controlPlane — required for job_* when jobs backend is saas. */
+  controlPlane: boolean;
 }
 
 const cache = new Map<string, SessionData>();
@@ -45,6 +47,7 @@ export async function validateApiKey(
     sessionToken?: string;
     userId?: string;
     apiKeyId?: string;
+    controlPlane?: boolean;
   };
 
   if (!res.ok || !body.allowed || !body.sessionToken) {
@@ -60,6 +63,7 @@ export async function validateApiKey(
     userId: body.userId || "",
     apiKeyId: body.apiKeyId || "",
     cachedAt: Date.now(),
+    controlPlane: body.controlPlane === true,
   };
   cache.set(key, session);
   return session;

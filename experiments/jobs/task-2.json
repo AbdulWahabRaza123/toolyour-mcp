@@ -1,0 +1,28 @@
+{
+  "id": "task-2",
+  "title": "Implement GET /health",
+  "goal": "Implement GET /health so the health tests pass. Response must be HTTP 200 with JSON body {\"ok\":true}.",
+  "acceptance": [
+    {
+      "id": "ac_health",
+      "statement": "GET /health returns status 200 and JSON { ok: true }",
+      "requiredCheckIds": ["chk_test", "chk_test_inventory"]
+    }
+  ],
+  "checks": [
+    {
+      "id": "chk_test",
+      "kind": "test",
+      "command": "node --test tests/health.test.js",
+      "blocking": true
+    },
+    {
+      "id": "chk_test_inventory",
+      "kind": "test",
+      "command": "node ../../scripts/assert-frozen-file.mjs tests/health.test.js --sha256 0b57cb5e7d1ef5e573e1675f9877de8acd8decf4f3f3bb00a6f85b37782fa615",
+      "blocking": true
+    }
+  ],
+  "maxIterations": 8,
+  "repeatFailN": 3
+}

@@ -41,7 +41,27 @@ TOOLYOUR_API_KEY=ty_... SHIP_URL=https://preview.example.com \
 - Exit `0` with `SKIP` if no API key (optional local).  
 - `REQUIRE_PASS=false` prints the report without failing the job.
 
-## GitHub Actions example
+## Control-plane merge gate (coding jobs)
+
+This is **not** ship-gate. Frozen host checks + `decide()`: fail CI unless `job.state === verified`. Agent “I’m done” is not a pass.
+
+```bash
+npx toolyour-check-run --job <jobId> --cwd . --require-verified
+```
+
+Writes `DECISION.json` and `EVIDENCE.json`. Copy [`examples/github-actions/control-plane-merge-gate.yml`](../examples/github-actions/control-plane-merge-gate.yml) into an app repo. Leave `pull_request` commented until you have a job id; do not add it as a required check on this MCP package.
+
+Composite action (after the SDK is on the default branch): `toolyour-sdk/.github/actions/control-plane-merge-gate`.
+
+HIGH/CRITICAL **declared** actions also block `verified` (rule R9) until `job_approve` for that `actionId`. This is contractual — undeclared terminal commands are out of contract. Dashboard ApprovalBatch is not shipped.
+
+Optional frozen check kind `playwright`: the host CLI runs `npx playwright test …` from `job_status` (120s default). MCP never launches Chromium. Template id `host-playwright` is not in the task-1…task-5 eval.
+
+Default MCP: skill loop and completion loop are always registered. There is no env flag to hide either loop.
+
+Phase 5 (ToolYour-owned sandbox / `execution.run`): **NO-GO**. Host Playwright MCP and GitHub MCP stay complementary. See [`experiments/SANDBOX-NOGO.md`](../experiments/SANDBOX-NOGO.md).
+
+## GitHub Actions example (ship-gate URL jobs)
 
 Copy [`examples/github-actions/ship-gate.yml`](../examples/github-actions/ship-gate.yml) into your app repo. Wire `secrets.TOOLYOUR_API_KEY` and a preview `SHIP_URL`.
 
