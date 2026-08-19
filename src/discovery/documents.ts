@@ -18,7 +18,7 @@ const META_TOOLS = [
   {
     name: "plan_task",
     description:
-      "Skill-loop planner. Free: ranked playbook/workflow plan + estimated credits. Do not use when the user already has a control-plane jobId — call job_status. Next: run_playbook or solve_task, then verify_task.",
+      "Free planning pass: ranked playbook/workflow plan + estimated credits. Does not execute. Next: run_playbook or solve_task, then verify_task.",
   },
   {
     name: "solve_task",
@@ -75,35 +75,6 @@ const META_TOOLS = [
     name: "fetch_payload",
     description:
       "Fetch full truncated payload by dataRefId (free in-process TTL store).",
-  },
-  {
-    name: "job_start",
-    description:
-      "Completion-loop: start a frozen task (task-1 … task-5). Do not use for SEO, URLs, or ship-gate.",
-  },
-  {
-    name: "job_status",
-    description:
-      "Completion-loop status for an existing jobId. Do not mix with plan_task on the same jobId.",
-  },
-  {
-    name: "check_submit",
-    description:
-      "Completion-loop: host runner only (toolyour-check-run). Do not invent results.",
-  },
-  {
-    name: "job_cancel",
-    description: "Completion-loop: cancel an open frozen job.",
-  },
-  {
-    name: "job_declare_action",
-    description:
-      "Declare a HIGH or CRITICAL host action for a frozen job. Not an approve-all.",
-  },
-  {
-    name: "job_approve",
-    description:
-      "Human-only scoped approval for one declared actionId. No approve-all.",
   },
 ] as const;
 
@@ -163,7 +134,7 @@ export function buildServerCard() {
     },
     tools: [...META_TOOLS],
     notes: [
-      "Two loops — pick exactly one per goal. Skill loop: plan_task → run_playbook or solve_task → apply loop.remainingFixes → verify_task. Completion loop: job_status → host toolyour-check-run; do not invent check_submit.",
+      "Canonical loop: plan_task → run_playbook or solve_task → apply loop.remainingFixes in the host repo → verify_task until loop.gate is pass.",
       "invoke_tool is advanced (one-off operationId). Do not use it as the default path for ship-gate, SEO, or security jobs.",
       "Catalog tools are dynamic — only hasApi tools are exposed. Discovery meta-tools are free; execution shares the REST monthly credit quota.",
       "solve_task / run_playbook responses include loop.remainingFixes (patchType + acceptance) even on the first run.",
