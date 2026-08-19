@@ -7,12 +7,28 @@ import {
 import { MCP_ERROR_CODES } from "../../dist/contracts/errors.js";
 
 describe("agent error shapes", () => {
-  it("maps 429 to quota_exceeded with hint", () => {
+  it("maps 429 monthly quota to quota_exceeded with hint", () => {
     const err = normalizeHttpError(429, { reason: "Monthly quota exceeded" }, "");
     assert.equal(err.code, MCP_ERROR_CODES.QUOTA_EXCEEDED);
     assert.equal(err.retryable, true);
     assert.ok(err.hint);
     assert.ok(Array.isArray(err.nextActions) && err.nextActions.length > 0);
+  });
+
+  it("maps 429 rate_limit to rate_limited with retryAfterMs", () => {
+    const err = normalizeHttpError(
+      429,
+      {
+        message: "Rate limit exceeded. Try again in 48 seconds.",
+        type: "rate_limit",
+        retryAfter: 48,
+      },
+      ""
+    );
+    assert.equal(err.code, MCP_ERROR_CODES.RATE_LIMITED);
+    assert.equal(err.retryable, true);
+    assert.equal(err.retryAfterMs, 48000);
+    assert.match(String(err.hint), /burst/i);
   });
 
   it("maps 403 allowlist to tool_not_allowed", () => {

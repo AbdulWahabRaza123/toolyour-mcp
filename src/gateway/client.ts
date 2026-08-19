@@ -43,6 +43,49 @@ function isTransientStatus(status: number): boolean {
   return status === 502 || status === 503 || status === 504;
 }
 
+/** One wait+retry on Free burst 429. Not an env flag. */
+const RATE_LIMIT_RETRIES = 1;
+const RATE_LIMIT_WAIT_CAP_MS = 60_000;
+
+function quotaKind(data: unknown): string {
+  if (!data || typeof data !== "object") return "";
+  const o = data as Record<string, unknown>;
+  const nested =
+    o.error && typeof o.error === "object"
+      ? (o.error as Record<string, unknown>)
+      : null;
+  return String(o.type || nested?.type || "").toLowerCase();
+}
+
+function isRetryableRateLimit(status: number, data: unknown, text: string): boolean {
+  if (status !== 429) return false;
+  if (quotaKind(data) === "monthly_quota") return false;
+  if (quotaKind(data) === "rate_limit") return true;
+  return /rate limit|try again in \d+ seconds/i.test(`${text} ${JSON.stringify(data)}`);
+}
+
+function rateLimitWaitMs(
+  headers: Headers,
+  data: unknown
+): number {
+  const h = headers.get("retry-after");
+  if (h && /^\d+$/.test(h.trim())) {
+    return Math.min(RATE_LIMIT_WAIT_CAP_MS, Number(h.trim()) * 1000);
+  }
+  if (data && typeof data === "object") {
+    const o = data as Record<string, unknown>;
+    const nested =
+      o.error && typeof o.error === "object"
+        ? (o.error as Record<string, unknown>)
+        : null;
+    const n = o.retryAfter ?? nested?.retryAfter;
+    if (typeof n === "number" && Number.isFinite(n) && n > 0) {
+      return Math.min(RATE_LIMIT_WAIT_CAP_MS, Math.floor(n) * 1000);
+    }
+  }
+  return 1000;
+}
+
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -110,8 +153,9 @@ async function invokeGatewayRouteUnlocked(
 
   const maxAttempts = 1 + Math.max(0, constants.gatewayRetryCount);
   let lastError: unknown;
+  let rateLimitRetries = 0;
 
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+  for (let attempt = 1; attempt <= maxAttempts + RATE_LIMIT_RETRIES; attempt++) {
     const controller = new AbortController();
     const timer = setTimeout(
       () => controller.abort(),
@@ -135,6 +179,19 @@ async function invokeGatewayRouteUnlocked(
         } catch {
           data = text;
         }
+      }
+
+      if (isRetryableRateLimit(res.status, data, text) && rateLimitRetries < RATE_LIMIT_RETRIES) {
+        rateLimitRetries += 1;
+        const waitMs = rateLimitWaitMs(res.headers, data);
+        incr("gatewayRetries");
+        opts.logger.warn("gateway rate limit, retrying", {
+          status: res.status,
+          waitMs,
+          operationId: opts.operationId,
+        });
+        await sleep(waitMs);
+        continue;
       }
 
       if (isTransientStatus(res.status) && attempt < maxAttempts) {

@@ -8,6 +8,7 @@ export const MCP_ERROR_CODES = {
   NEED_INPUT: "need_input",
   AMBIGUOUS_GOAL: "ambiguous_goal",
   QUOTA_EXCEEDED: "quota_exceeded",
+  RATE_LIMITED: "rate_limited",
   GATEWAY_ERROR: "gateway_error",
   CIRCUIT_OPEN: "circuit_open",
   WORKFLOW_NOT_FOUND: "workflow_not_found",

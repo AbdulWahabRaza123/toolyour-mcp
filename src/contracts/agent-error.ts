@@ -13,6 +13,31 @@ export function agentError(
   return mcpError(code, message, extra);
 }
 
+function quotaType(data: unknown): string {
+  if (!data || typeof data !== "object") return "";
+  const o = data as Record<string, unknown>;
+  const nested =
+    o.error && typeof o.error === "object"
+      ? (o.error as Record<string, unknown>)
+      : null;
+  return String(o.type || nested?.type || "").toLowerCase();
+}
+
+function retryAfterSeconds(data: unknown, message: string): number | undefined {
+  if (data && typeof data === "object") {
+    const o = data as Record<string, unknown>;
+    const nested =
+      o.error && typeof o.error === "object"
+        ? (o.error as Record<string, unknown>)
+        : null;
+    const n = o.retryAfter ?? nested?.retryAfter ?? o.retryAfterSec ?? nested?.retryAfterSec;
+    if (typeof n === "number" && Number.isFinite(n) && n > 0) return Math.floor(n);
+  }
+  const m = /try again in (\d+) seconds/i.exec(message);
+  if (m) return Number(m[1]);
+  return undefined;
+}
+
 function bodyMessage(data: unknown, text: string): string {
   if (data && typeof data === "object") {
     const o = data as Record<string, unknown>;
@@ -70,6 +95,27 @@ export function normalizeHttpError(
   }
 
   if (status === 429 || /quota|rate limit|monthly limit|credits/i.test(lower)) {
+    const kind = quotaType(data);
+    const waitSec = retryAfterSeconds(data, message);
+    if (
+      kind === "rate_limit" ||
+      (!kind && /rate limit|try again in \d+ seconds/i.test(lower))
+    ) {
+      const sec = waitSec || 48;
+      return agentError(
+        MCP_ERROR_CODES.RATE_LIMITED,
+        message || "Rate limit exceeded",
+        {
+          hint: "Per-minute burst limit on Free — wait, then retry the same step. This is not monthly credits.",
+          retryable: true,
+          retryAfterMs: sec * 1000,
+          nextActions: [
+            `Wait ${sec}s then retry the same tool or playbook step`,
+            "Monthly credits are unchanged — this is a per-minute burst cap",
+          ],
+        }
+      );
+    }
     return agentError(
       MCP_ERROR_CODES.QUOTA_EXCEEDED,
       message || "Monthly quota exceeded",
@@ -77,7 +123,7 @@ export function normalizeHttpError(
         hint: "Execution shares REST monthly credits. plan_task, discover_tools, get_run, and suggestions stay free.",
         retryable: true,
         nextActions: [
-          "Wait for quota reset or upgrade the plan in the dashboard",
+          "Wait for the monthly credit reset or upgrade the plan in the dashboard",
           "Use plan_task to estimate cost before re-running",
         ],
       }

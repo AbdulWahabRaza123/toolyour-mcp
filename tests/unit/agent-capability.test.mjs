@@ -78,6 +78,65 @@ describe("compact response mode", () => {
     assert.match(String(shaped.loop.next), /Do not invoke_tool/);
   });
 
+  it("omits passing mixed-content findings from remainingFixes", () => {
+    const full = {
+      status: "completed",
+      execution: {
+        status: "completed",
+        workflowId: "ship-gate-job",
+        jobReport: {
+          schemaVersion: "toolyour.jobReport@1",
+          jobId: "ship-gate-job",
+          workflowId: "ship-gate-job",
+          summary: ["ok"],
+          scores: {
+            overall: { label: "s", value: 85, status: "good" },
+            mixedContent: { label: "Mixed content", value: 100, status: "good" },
+            securityHeaders: {
+              label: "Security headers",
+              value: 70,
+              status: "needs_improvement",
+            },
+          },
+          findings: [
+            {
+              severity: "high",
+              title: "Content-Security-Policy",
+              whyItMatters: "x",
+              howToFix: ["Add a CSP"],
+              workstream: "securityHeaders",
+              evidence: { present: false, severity: "fail" },
+            },
+            {
+              severity: "low",
+              title: "No mixed-content issues in scanned HTML",
+              whyItMatters: "clean",
+              howToFix: ["Re-scan after adding embeds"],
+              workstream: "mixedContent",
+              evidence: {
+                scannedAssetCount: 205,
+                httpsAssetCount: 205,
+              },
+            },
+          ],
+          prioritizedActions: [
+            {
+              rank: 4,
+              workstream: "mixedContent",
+              action: "Re-scan after adding embeds",
+              expectedImpact: "low",
+            },
+          ],
+          toolsUsed: ["mixedContentChecker"],
+          steps: {},
+        },
+      },
+    };
+    const shaped = shapeAgentResult(full, "compact");
+    assert.equal(shaped.loop.remainingFixes.length, 1);
+    assert.equal(shaped.loop.remainingFixes[0].title, "Content-Security-Policy");
+  });
+
   it("does not initiate loop without a closable jobReport", () => {
     const shaped = shapeAgentResult(
       { status: "completed", workflowId: "document-convert-pipeline", result: { ok: true } },

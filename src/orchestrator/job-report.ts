@@ -1,6 +1,7 @@
 import type {
   JobFinding,
   JobReport,
+  JobScore,
   PrioritizedAction,
 } from "../jobs/types";
 
@@ -77,6 +78,30 @@ export function inferPatchType(
   return "investigate";
 }
 
+function findingNeedsHostFix(
+  f: JobFinding,
+  scores: Record<string, JobScore>
+): boolean {
+  const ev = f.evidence || {};
+  const evSev = String(ev.severity || "").toLowerCase();
+  if (evSev === "pass" || evSev === "ok" || evSev === "good") return false;
+
+  const title = String(f.title || "").toLowerCase();
+  if (
+    /^no\s/.test(title) &&
+    /issue|problem|mixed-content|mixed content/.test(title)
+  ) {
+    return false;
+  }
+
+  const ws = f.workstream;
+  if (ws && scores[ws]?.status === "good" && f.severity === "low") {
+    return false;
+  }
+
+  return true;
+}
+
 function acceptanceLine(title: string): string {
   return `After the host applies this fix, verify_task should no longer list "${title}" as a high finding (or the related score should leave poor).`;
 }
@@ -90,6 +115,7 @@ export function buildRemainingFixes(after: JobReport | null): RemainingFix[] {
   let rank = 1;
 
   for (const f of sortFindings(after.findings || [])) {
+    if (!findingNeedsHostFix(f, after.scores || {})) continue;
     const actions = (f.howToFix || [])
       .map((s) => String(s).trim())
       .filter(Boolean);
@@ -120,6 +146,12 @@ export function buildRemainingFixes(after: JobReport | null): RemainingFix[] {
       continue;
     }
     const workstream = a.workstream || "general";
+    if (
+      after.scores?.[workstream]?.status === "good" &&
+      a.expectedImpact === "low"
+    ) {
+      continue;
+    }
     const title = a.action;
     fixes.push({
       rank: rank++,
