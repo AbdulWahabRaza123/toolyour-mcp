@@ -70,23 +70,23 @@ export const FORBIDDEN_EXECUTION_TOOLS = [
 export const FROZEN_TEST_INVENTORY = [
   {
     rel: "tests/add.test.js",
-    sha256: "089c0ba98471e2e2ef5871c491952eeaec20f8e4c28d4e77d86e90af557d26bf",
+    sha256: "c7b9284a8eae26b4e032cbd5691afb4106e947a826857beeb2af948fc43ec165",
   },
   {
     rel: "tests/health.test.js",
-    sha256: "0b57cb5e7d1ef5e573e1675f9877de8acd8decf4f3f3bb00a6f85b37782fa615",
+    sha256: "1bce215ac54183c53783a08f4ff34a0521a750941fa51235385bd8ea5a1faac8",
   },
   {
     rel: "tests/auth.test.js",
-    sha256: "a67076b40541ecce094ab7ade5dafdbec7d9521ca8ed2d37cf3ef7548037a584",
+    sha256: "ea5ae5e55c57600a8290af5498d68a05583331062509039d58a3b43485146da3",
   },
   {
     rel: "tests/parser.test.js",
-    sha256: "3babf837d45354f410482c981e0bea827e2b25a11f836e9464eedc86201aa528",
+    sha256: "d4ee42787a42f1a35ad334ad795f590acb9c80c18c360e21d15e0241bbf90fab",
   },
   {
     rel: "tests/discount.test.js",
-    sha256: "b0ecbfb941ca206c305730cde36f85dba2558952cead6a14954290199f402fc3",
+    sha256: "8bb52ab9479e0a91275720c18b63fe2d8dda52e9c00b0ed54c5503e7a9f28646",
   },
 ] as const;
 

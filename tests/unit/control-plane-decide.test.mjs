@@ -312,7 +312,7 @@ describe("decide()", () => {
         {
           id: "chk_test_inventory",
           kind: "test",
-          command: "node ../../scripts/assert-frozen-file.mjs tests/parser.test.js --sha256 3babf837d45354f410482c981e0bea827e2b25a11f836e9464eedc86201aa528",
+          command: "node ../../scripts/assert-frozen-file.mjs tests/parser.test.js --sha256 d4ee42787a42f1a35ad334ad795f590acb9c80c18c360e21d15e0241bbf90fab",
           blocking: true,
         },
       ],

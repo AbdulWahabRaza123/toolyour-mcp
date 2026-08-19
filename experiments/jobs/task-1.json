@@ -19,7 +19,7 @@
     {
       "id": "chk_test_inventory",
       "kind": "test",
-      "command": "node ../../scripts/assert-frozen-file.mjs tests/add.test.js --sha256 089c0ba98471e2e2ef5871c491952eeaec20f8e4c28d4e77d86e90af557d26bf",
+      "command": "node ../../scripts/assert-frozen-file.mjs tests/add.test.js --sha256 c7b9284a8eae26b4e032cbd5691afb4106e947a826857beeb2af948fc43ec165",
       "blocking": true
     }
   ],

@@ -1,0 +1,2 @@
+# GitHub Actions checks out LF. Frozen SHA-256 inventory must match that.
+experiments/control-plane-fixture/** text eol=lf

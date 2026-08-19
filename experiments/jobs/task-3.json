@@ -24,7 +24,7 @@
     {
       "id": "chk_test_inventory",
       "kind": "test",
-      "command": "node ../../scripts/assert-frozen-file.mjs tests/auth.test.js --sha256 a67076b40541ecce094ab7ade5dafdbec7d9521ca8ed2d37cf3ef7548037a584",
+      "command": "node ../../scripts/assert-frozen-file.mjs tests/auth.test.js --sha256 ea5ae5e55c57600a8290af5498d68a05583331062509039d58a3b43485146da3",
       "blocking": true
     }
   ],

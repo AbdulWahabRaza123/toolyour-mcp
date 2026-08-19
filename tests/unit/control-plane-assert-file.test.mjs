@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const script = path.join(root, "scripts", "assert-frozen-file.mjs");
 const fixture = path.join(root, "experiments", "control-plane-fixture");
-const parserHash = "3babf837d45354f410482c981e0bea827e2b25a11f836e9464eedc86201aa528";
+const parserHash = "d4ee42787a42f1a35ad334ad795f590acb9c80c18c360e21d15e0241bbf90fab";
 
 function run(args, cwd = fixture) {
   return spawnSync(process.execPath, [script, ...args], { cwd, encoding: "utf8" });
