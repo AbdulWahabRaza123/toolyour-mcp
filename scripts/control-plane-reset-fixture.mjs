@@ -28,5 +28,7 @@ copyDir(path.join(baselines, "tests"), path.join(fixture, "tests"));
 
 const decision = path.join(fixture, "DECISION.json");
 if (fs.existsSync(decision)) fs.unlinkSync(decision);
+const evidence = path.join(fixture, "EVIDENCE.json");
+if (fs.existsSync(evidence)) fs.unlinkSync(evidence);
 
 console.log("fixture reset to planted baseline");

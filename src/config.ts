@@ -64,6 +64,9 @@ export function getEnv() {
     mcpJobWebhookConfigUrl:
       process.env.SAAS_MCP_JOB_WEBHOOK_URL ||
       `${saasInternalBase}/mcp-job-webhook`,
+    controlPlaneJobsUrl:
+      process.env.CONTROL_PLANE_JOBS_URL?.replace(/\/$/, "") ||
+      `${saasInternalBase}/control-plane/jobs`,
     internalSecret: process.env.SAAS_INTERNAL_SECRET || "",
     registryPath:
       process.env.REGISTRY_PATH ||

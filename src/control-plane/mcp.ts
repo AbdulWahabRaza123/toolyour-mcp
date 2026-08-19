@@ -7,6 +7,7 @@ import type { Logger } from "../observability/logger";
 import { cancelledDecision, decide } from "./decide";
 import { hashCanonical, ownerKeyFromApiKey } from "./hash";
 import {
+  expectedApproveToken,
   expectedRunnerToken,
   expectedStartToken,
   generateRunnerNonce,
@@ -18,11 +19,14 @@ import {
   tokensEqual,
   writeRunnerNonce,
 } from "./secrets";
-import { jobStore } from "./store";
+import { approvalBatch, parseApproval, parseDeclaredAction } from "./approvals";
+import { ensureControlPlaneAccess } from "./opt-in";
+import { jobStore, JobStoreError } from "./store";
 import {
   DEFAULT_MAX_ITERATIONS,
   DEFAULT_REPEAT_FAIL_N,
-  FROZEN_TASK_IDS,
+  CHECK_KINDS,
+  STARTABLE_TASK_IDS,
   JOB_TTL_MS,
   type Check,
   type CheckKind,
@@ -32,6 +36,7 @@ import {
   type NextAction,
   type ProjectSpec,
 } from "./types";
+import { isAllowedCheckCommand } from "./host-checks";
 
 export interface ControlPlaneCtx {
   apiKey: string;
@@ -43,6 +48,22 @@ export const CONTROL_PLANE_TOOLS = [
   "job_status",
   "check_submit",
   "job_cancel",
+] as const;
+
+/** Additive-only. Not registered in CONTROL_PLANE_EXPERIMENT isolation. */
+export const CONTROL_PLANE_APPROVAL_TOOLS = [
+  "job_declare_action",
+  "job_approve",
+] as const;
+
+/** Never register these. Host owns the shell; ToolYour is not an execution sandbox. */
+export const FORBIDDEN_EXECUTION_TOOLS = [
+  "execution.run",
+  "execution_run",
+  "run_shell",
+  "shell_exec",
+  "sandbox_exec",
+  "sandbox_run",
 ] as const;
 
 /** SHA-256 of fixture test files as committed. Existence-only checks are not enough. */
@@ -101,7 +122,7 @@ export function isControlPlaneAdditiveEnabled(): boolean {
 }
 
 export const CONTROL_PLANE_ADDITIVE_INSTRUCTIONS =
-  `${DEFAULT_MCP_INSTRUCTIONS} Job tools (job_status, check_submit) are additive and do not replace plan_task. Do not invent check_submit results. There is no job_complete. Host runner: node scripts/control-plane-host.mjs --job <id> --cwd <repo>.`;
+  `${DEFAULT_MCP_INSTRUCTIONS} Job tools (job_status, check_submit) are additive and do not replace plan_task. Do not invent check_submit results. There is no job_complete. Host runner: node scripts/control-plane-host.mjs --job <id> --cwd <repo> (or toolyour-check-run). Optional kind playwright is host-run only — ToolYour does not launch a browser. HIGH/CRITICAL host-declared actions need job_approve per actionId (no approve-all). ToolYour cannot see undeclared shell commands.`;
 
 export function resolveMcpInstructions(
   experiment = isControlPlaneExperimentEnabled(),
@@ -134,6 +155,19 @@ function err(code: string, message: string) {
   return textResult({ error: { code, message } }, true);
 }
 
+function storeErr(e: unknown) {
+  if (e instanceof JobStoreError && e.code === "job_not_found") {
+    return err("job_not_found", "Job not found or expired");
+  }
+  return err("store_unavailable", "Job store unavailable");
+}
+
+async function denyIfNotOptedIn(ctx: ControlPlaneCtx) {
+  const access = await ensureControlPlaneAccess(ctx.apiKey, ctx.logger);
+  if (!access.ok) return err(access.code, access.message);
+  return null;
+}
+
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
 }
@@ -161,7 +195,7 @@ function parseChecks(raw: unknown): Check[] | string {
   if (!Array.isArray(raw) || raw.length < 1) return "at least one check is required";
   const out: Check[] = [];
   const ids = new Set<string>();
-  const kinds = new Set<CheckKind>(["test", "lint", "typecheck"]);
+  const kinds = new Set<CheckKind>(CHECK_KINDS);
   for (const item of raw) {
     const row = asRecord(item);
     const id = String(row.id || "").trim();
@@ -171,7 +205,7 @@ function parseChecks(raw: unknown): Check[] | string {
     if (!id || !command) return "each check needs id and command";
     if (ids.has(id)) return `duplicate check id: ${id}`;
     if (!kinds.has(kind)) return `invalid check kind: ${kind}`;
-    if (!ALLOWED_COMMANDS.has(command)) {
+    if (!isAllowedCheckCommand(command, kind, ALLOWED_COMMANDS)) {
       return `command not in experiment allowlist: ${command}`;
     }
     ids.add(id);
@@ -198,6 +232,7 @@ function runChecksAction(job: Job): NextAction {
 function jobEnvelope(job: Job, extra: Record<string, unknown> = {}) {
   const bootstrap = job.state === "open" && !job.lastDecision;
   const decision = job.lastDecision;
+  const batch = approvalBatch(job);
   const payload = {
     ok: true,
     jobId: job.id,
@@ -215,7 +250,9 @@ function jobEnvelope(job: Job, extra: Record<string, unknown> = {}) {
     next_action: bootstrap ? runChecksAction(job) : decision?.next_action ?? null,
     remaining_requirements:
       decision?.remaining_requirements ?? job.spec.acceptance.map((a) => a.id),
-    requires_human: decision?.requires_human ?? false,
+    requires_human: Boolean(decision?.requires_human || batch),
+    pending_approvals: batch?.actions ?? [],
+    approval_batch: batch,
     ...extra,
   };
   const leaked = leakSecretKeys(payload);
@@ -226,8 +263,8 @@ function jobEnvelope(job: Job, extra: Record<string, unknown> = {}) {
 }
 
 function loadFrozenTask(taskId: string): { goal: string; spec: ProjectSpec } | string {
-  if (!FROZEN_TASK_IDS.includes(taskId as FrozenTaskId)) {
-    return `taskId must be one of ${FROZEN_TASK_IDS.join(", ")}`;
+  if (!STARTABLE_TASK_IDS.includes(taskId as FrozenTaskId)) {
+    return `taskId must be one of ${STARTABLE_TASK_IDS.join(", ")}`;
   }
   const file = path.join(jobsDir(), `${taskId}.json`);
   if (!fs.existsSync(file)) return `frozen job file missing: ${file}`;
@@ -270,6 +307,8 @@ function loadFrozenTask(taskId: string): { goal: string; spec: ProjectSpec } | s
 }
 
 async function handleStart(args: Record<string, unknown>, ctx: ControlPlaneCtx) {
+  const denied = await denyIfNotOptedIn(ctx);
+  if (denied) return denied;
   const startToken = String(args.startToken || "").trim();
   if (!tokenAccepted(startToken, expectedStartToken())) {
     return err(
@@ -301,9 +340,15 @@ async function handleStart(args: Record<string, unknown>, ctx: ControlPlaneCtx) 
     expiresAt: now + JOB_TTL_MS,
     lastDecision: null,
     iterations: [],
+    declaredActions: [],
+    approvals: [],
     runnerNonceHash: hashRunnerNonce(nonce),
   };
-  jobStore.create(job);
+  try {
+    await jobStore.create(job);
+  } catch (e) {
+    return storeErr(e);
+  }
   ctx.logger.info("control-plane job_start", { jobId: job.id, taskId });
   return textResult(jobEnvelope(job));
 }
@@ -334,6 +379,8 @@ function parseResults(raw: unknown): CheckResult[] | string {
 }
 
 async function handleSubmit(args: Record<string, unknown>, ctx: ControlPlaneCtx) {
+  const denied = await denyIfNotOptedIn(ctx);
+  if (denied) return denied;
   const token = String(args.runnerToken || "").trim();
   const nonce = String(args.runnerNonce || "").trim();
   if (!tokenAccepted(token, expectedRunnerToken())) {
@@ -344,7 +391,12 @@ async function handleSubmit(args: Record<string, unknown>, ctx: ControlPlaneCtx)
   }
 
   const jobId = String(args.jobId || "").trim();
-  const job = jobStore.get(jobId);
+  let job;
+  try {
+    job = await jobStore.get(jobId);
+  } catch (e) {
+    return storeErr(e);
+  }
   if (!job) return err("job_not_found", "Job not found or expired");
   if (!jobStore.owns(job, ownerKeyFromApiKey(ctx.apiKey))) {
     return err("unauthorized", "Job not owned by this API key");
@@ -418,7 +470,11 @@ async function handleSubmit(args: Record<string, unknown>, ctx: ControlPlaneCtx)
   if (decision.status === "verified" || decision.status === "escalated") {
     job.state = decision.status;
   }
-  jobStore.update(job);
+  try {
+    await jobStore.update(job);
+  } catch (e) {
+    return storeErr(e);
+  }
   return textResult({
     ...jobEnvelope(job),
     ...decision,
@@ -426,8 +482,15 @@ async function handleSubmit(args: Record<string, unknown>, ctx: ControlPlaneCtx)
 }
 
 async function handleStatus(args: Record<string, unknown>, ctx: ControlPlaneCtx) {
+  const denied = await denyIfNotOptedIn(ctx);
+  if (denied) return denied;
   const jobId = String(args.jobId || "").trim();
-  const job = jobStore.get(jobId);
+  let job;
+  try {
+    job = await jobStore.get(jobId);
+  } catch (e) {
+    return storeErr(e);
+  }
   if (!job) return err("job_not_found", "Job not found or expired");
   if (!jobStore.owns(job, ownerKeyFromApiKey(ctx.apiKey))) {
     return err("unauthorized", "Job not owned by this API key");
@@ -436,8 +499,15 @@ async function handleStatus(args: Record<string, unknown>, ctx: ControlPlaneCtx)
 }
 
 async function handleCancel(args: Record<string, unknown>, ctx: ControlPlaneCtx) {
+  const denied = await denyIfNotOptedIn(ctx);
+  if (denied) return denied;
   const jobId = String(args.jobId || "").trim();
-  const job = jobStore.get(jobId);
+  let job;
+  try {
+    job = await jobStore.get(jobId);
+  } catch (e) {
+    return storeErr(e);
+  }
   if (!job) return err("job_not_found", "Job not found or expired");
   if (!jobStore.owns(job, ownerKeyFromApiKey(ctx.apiKey))) {
     return err("unauthorized", "Job not owned by this API key");
@@ -449,10 +519,101 @@ async function handleCancel(args: Record<string, unknown>, ctx: ControlPlaneCtx)
   job.state = "cancelled";
   job.lastDecision = decision;
   job.updatedAt = Date.now();
-  jobStore.update(job);
+  try {
+    await jobStore.update(job);
+  } catch (e) {
+    return storeErr(e);
+  }
   return textResult({
     ...jobEnvelope(job),
     ...decision,
+  });
+}
+
+async function loadOwnedOpenJob(
+  jobId: string,
+  ctx: ControlPlaneCtx
+): Promise<{ ok: true; job: Job } | { ok: false; error: ReturnType<typeof err> }> {
+  let job;
+  try {
+    job = await jobStore.get(jobId);
+  } catch (e) {
+    return { ok: false, error: storeErr(e) };
+  }
+  if (!job) return { ok: false, error: err("job_not_found", "Job not found or expired") };
+  if (!jobStore.owns(job, ownerKeyFromApiKey(ctx.apiKey))) {
+    return { ok: false, error: err("unauthorized", "Job not owned by this API key") };
+  }
+  if (job.state !== "open") {
+    return { ok: false, error: err("job_terminal", `Job is ${job.state}`) };
+  }
+  return { ok: true, job };
+}
+
+async function handleDeclareAction(args: Record<string, unknown>, ctx: ControlPlaneCtx) {
+  const denied = await denyIfNotOptedIn(ctx);
+  if (denied) return denied;
+  const loaded = await loadOwnedOpenJob(String(args.jobId || "").trim(), ctx);
+  if (!loaded.ok) return loaded.error;
+  const job = loaded.job;
+  const parsed = parseDeclaredAction(args, job);
+  if (typeof parsed === "string") return err("invalid_input", parsed);
+  job.declaredActions = [...(job.declaredActions || []), parsed];
+  job.updatedAt = Date.now();
+  try {
+    await jobStore.update(job);
+  } catch (e) {
+    return storeErr(e);
+  }
+  ctx.logger.info("control-plane job_declare_action", {
+    jobId: job.id,
+    actionId: parsed.id,
+    risk: parsed.risk,
+  });
+  return textResult({
+    ...jobEnvelope(job),
+    declared: {
+      id: parsed.id,
+      actionClass: parsed.actionClass,
+      resourceGlob: parsed.resourceGlob,
+      risk: parsed.risk,
+    },
+  });
+}
+
+async function handleApprove(args: Record<string, unknown>, ctx: ControlPlaneCtx) {
+  const denied = await denyIfNotOptedIn(ctx);
+  if (denied) return denied;
+  const approveToken = String(args.approveToken || "").trim();
+  if (!tokenAccepted(approveToken, expectedApproveToken())) {
+    return err(
+      "approve_required",
+      "job_approve is human-only. Set CONTROL_PLANE_APPROVE_TOKEN and pass approveToken. There is no approve-all."
+    );
+  }
+  const actionId = String(args.actionId || "").trim();
+  if (!actionId) return err("invalid_input", "actionId is required (one action per call)");
+  const loaded = await loadOwnedOpenJob(String(args.jobId || "").trim(), ctx);
+  if (!loaded.ok) return loaded.error;
+  const job = loaded.job;
+  const action = (job.declaredActions || []).find((a) => a.id === actionId);
+  if (!action) return err("invalid_input", "Unknown actionId on this job");
+  if (action.status && action.status !== "pending") {
+    return err("invalid_input", `Action is already ${action.status}`);
+  }
+  const parsed = parseApproval(args, action, ownerKeyFromApiKey(ctx.apiKey).slice(0, 12));
+  if (typeof parsed === "string") return err("invalid_input", parsed);
+  action.status = "approved";
+  job.approvals = [...(job.approvals || []), parsed];
+  job.updatedAt = Date.now();
+  try {
+    await jobStore.update(job);
+  } catch (e) {
+    return storeErr(e);
+  }
+  return textResult({
+    ...jobEnvelope(job),
+    approved: { actionId: action.id, approvalId: parsed.id },
   });
 }
 
@@ -468,14 +629,15 @@ const checkResultSchema = z.object({
 export function registerControlPlaneTools(
   server: McpServer,
   registerTool: RegisterTool,
-  ctx: ControlPlaneCtx
+  ctx: ControlPlaneCtx,
+  opts: { approvals?: boolean } = {}
 ): void {
   registerTool(
     server,
     "job_start",
-    "EXPERIMENT: experimenter-only. Starts a frozen task (task-1 … task-5). Agents already have a jobId — call job_status instead.",
+    "EXPERIMENT: experimenter-only. Starts a frozen task (task-1 … task-5, or optional host-playwright). Agents already have a jobId — call job_status instead.",
     {
-      taskId: z.enum(["task-1", "task-2", "task-3", "task-4", "task-5"]),
+      taskId: z.enum(STARTABLE_TASK_IDS),
       startToken: z.string().optional(),
     },
     async (args) => handleStart(args, ctx)
@@ -511,5 +673,37 @@ export function registerControlPlaneTools(
     "EXPERIMENT: cancel an open control-plane job.",
     { jobId: z.string() },
     async (args) => handleCancel(args, ctx)
+  );
+
+  if (!opts.approvals) return;
+
+  registerTool(
+    server,
+    "job_declare_action",
+    "Declare a HIGH or CRITICAL host action for this job. ToolYour cannot see undeclared shell commands. Not an approve-all.",
+    {
+      jobId: z.string(),
+      actionClass: z.string(),
+      resourceGlob: z.string(),
+      risk: z.enum(["HIGH", "CRITICAL"]),
+      label: z.string().optional(),
+      iterationFrom: z.number().optional(),
+      iterationTo: z.number().optional(),
+    },
+    async (args) => handleDeclareAction(args, ctx)
+  );
+
+  registerTool(
+    server,
+    "job_approve",
+    "Human-only scoped approval for one declared actionId. Requires CONTROL_PLANE_APPROVE_TOKEN. CRITICAL needs breakGlass. No approve-all.",
+    {
+      jobId: z.string(),
+      actionId: z.string(),
+      approveToken: z.string().optional(),
+      breakGlass: z.boolean().optional(),
+      expiresAt: z.number().optional(),
+    },
+    async (args) => handleApprove(args, ctx)
   );
 }

@@ -4,4 +4,5 @@ dist/
 *.log
 .data/
 experiments/control-plane-fixture/DECISION.json
+experiments/control-plane-fixture/EVIDENCE.json
 experiments/control-plane-operator/patches/

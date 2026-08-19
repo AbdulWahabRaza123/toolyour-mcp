@@ -358,4 +358,81 @@ describe("decide()", () => {
     assert.equal(out.decision.status, "escalated");
     assert.equal(out.decision.ruleId, "R8");
   });
+
+  it("HIGH declared action without approval blocks verified (R9)", () => {
+    const j = job({
+      declaredActions: [
+        {
+          id: "act-1",
+          actionClass: "prod_deploy",
+          resourceGlob: "apps/api",
+          risk: "HIGH",
+          label: "prod deploy",
+          status: "pending",
+          createdAt: 1,
+          iterationFrom: 0,
+          iterationTo: 8,
+        },
+      ],
+    });
+    const out = decide(j, [result("chk_test", "pass")]);
+    assert.equal(out.ok, true);
+    assert.equal(out.decision.status, "continue");
+    assert.equal(out.decision.ruleId, "R9");
+    assert.equal(out.decision.requires_human, true);
+    assert.equal(out.decision.next_action.type, "await_approval");
+    assert.equal(out.decision.next_action.targetActionId, "act-1");
+  });
+
+  it("approved HIGH action allows verified (R6)", () => {
+    const j = job({
+      declaredActions: [
+        {
+          id: "act-1",
+          actionClass: "prod_deploy",
+          resourceGlob: "apps/api",
+          risk: "HIGH",
+          label: "prod deploy",
+          status: "approved",
+          createdAt: 1,
+        },
+      ],
+      approvals: [
+        {
+          id: "ap-1",
+          actionId: "act-1",
+          actionClass: "prod_deploy",
+          resourceGlob: "apps/api",
+          actor: "human",
+          createdAt: 1,
+          expiresAt: Date.now() + 60_000,
+        },
+      ],
+    });
+    const out = decide(j, [result("chk_test", "pass")]);
+    assert.equal(out.ok, true);
+    assert.equal(out.decision.status, "verified");
+    assert.equal(out.decision.ruleId, "R6");
+  });
+
+  it("unapproved CRITICAL escalates (R9)", () => {
+    const j = job({
+      declaredActions: [
+        {
+          id: "act-c",
+          actionClass: "drop_table",
+          resourceGlob: "db/prod",
+          risk: "CRITICAL",
+          label: "drop",
+          status: "pending",
+          createdAt: 1,
+        },
+      ],
+    });
+    const out = decide(j, [result("chk_test", "pass")]);
+    assert.equal(out.ok, true);
+    assert.equal(out.decision.status, "escalated");
+    assert.equal(out.decision.ruleId, "R9");
+    assert.equal(out.decision.requires_human, true);
+  });
 });

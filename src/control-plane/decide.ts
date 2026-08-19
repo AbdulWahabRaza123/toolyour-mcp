@@ -8,6 +8,7 @@ import type {
   NextAction,
   RuleId,
 } from "./types";
+import { pendingDeclaredActions } from "./approvals";
 
 function resultMap(results: CheckResult[]): Map<string, CheckResult> {
   return new Map(results.map((r) => [r.checkId, r]));
@@ -80,15 +81,22 @@ function makeDecision(
   reason: string,
   iterationN: number,
   gitSha?: string,
-  treeHash?: string
+  treeHash?: string,
+  opts?: { requires_human?: boolean; next_action?: NextAction | null }
 ): Decision {
   const terminal = status !== "continue";
   return {
     status,
-    next_action: terminal ? null : nextAction(job, submission),
+    next_action:
+      opts && "next_action" in opts
+        ? opts.next_action ?? null
+        : terminal
+          ? null
+          : nextAction(job, submission),
     reason,
     ruleId,
-    requires_human: status === "escalated" || status === "cancelled",
+    requires_human:
+      opts?.requires_human ?? (status === "escalated" || status === "cancelled"),
     remaining_requirements: remainingRequirements(job, submission),
     evidence: evidenceFrom(iterationN, gitSha, submission, treeHash),
   };
@@ -114,6 +122,7 @@ function countFailFingerprint(
  * Pure decision engine. First match wins.
  * R8: same worktree hash while still failing, repeatFailN times (no-progress).
  * R4 is a hard cap: evaluated before R2/R5 so errors/fails at maxIterations escalate.
+ * R9: HIGH/CRITICAL host-declared actions without scoped approval cannot verify.
  */
 export function decide(
   job: Job,
@@ -263,6 +272,50 @@ export function decide(
         iterationN,
         gitSha,
         treeHash
+      ),
+    };
+  }
+
+  const pending = pendingDeclaredActions(job, Date.now(), iterationN);
+  const critical = pending.filter((a) => a.risk === "CRITICAL");
+  const high = pending.filter((a) => a.risk === "HIGH");
+  if (critical.length || high.length) {
+    const ids = pending.map((a) => a.id);
+    const classes = pending.map((a) => a.actionClass).join(", ");
+    const next: NextAction = {
+      type: "await_approval",
+      targetCheckId: ids[0],
+      targetActionId: ids[0],
+      label: `Human approval required for ${classes}. Call job_approve per actionId. There is no approve-all.`,
+    };
+    if (critical.length) {
+      return {
+        ok: true,
+        decision: makeDecision(
+          job,
+          submission,
+          "escalated",
+          "R9",
+          `CRITICAL action(s) declared without break-glass approval: ${classes}.`,
+          iterationN,
+          gitSha,
+          treeHash,
+          { requires_human: true, next_action: next }
+        ),
+      };
+    }
+    return {
+      ok: true,
+      decision: makeDecision(
+        job,
+        submission,
+        "continue",
+        "R9",
+        `HIGH action(s) declared without scoped approval: ${classes}.`,
+        iterationN,
+        gitSha,
+        treeHash,
+        { requires_human: true, next_action: next }
       ),
     };
   }

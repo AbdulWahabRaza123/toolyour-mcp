@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import type { Job } from "./types";
 import { JOB_TTL_MS } from "./types";
+import { JobStoreError, saasJobStore, useSaasJobsBackend } from "./store-saas";
 
 function dataDir(): string {
   return (
@@ -56,27 +57,45 @@ function sweep(map: JobMap, now = Date.now()): JobMap {
   return next;
 }
 
-export const jobStore = {
-  create(job: Job): Job {
+const fileJobStore = {
+  async create(job: Job): Promise<Job> {
     const map = sweep(readAll());
     map[job.id] = job;
     writeAll(map);
     return job;
   },
 
-  get(id: string): Job | null {
+  async get(id: string): Promise<Job | null> {
     const map = sweep(readAll());
     return map[id] || null;
   },
 
-  update(job: Job): Job {
+  async update(job: Job): Promise<Job> {
     const map = sweep(readAll());
     if (!map[job.id]) {
-      throw new Error(`job_not_found:${job.id}`);
+      throw new JobStoreError("job_not_found", `job_not_found:${job.id}`);
     }
     map[job.id] = job;
     writeAll(map);
     return job;
+  },
+};
+
+function backend() {
+  return useSaasJobsBackend() ? saasJobStore : fileJobStore;
+}
+
+export const jobStore = {
+  create(job: Job): Promise<Job> {
+    return backend().create(job);
+  },
+
+  get(id: string): Promise<Job | null> {
+    return backend().get(id);
+  },
+
+  update(job: Job): Promise<Job> {
+    return backend().update(job);
   },
 
   owns(job: Job, ownerKey: string): boolean {
@@ -84,4 +103,6 @@ export const jobStore = {
   },
 };
 
-export { JOB_TTL_MS };
+export { JOB_TTL_MS, useSaasJobsBackend };
+export { saasJobsCollectionUrl } from "./store-saas";
+export { JobStoreError };

@@ -83,8 +83,10 @@ api.toolyour.com/mcp     ← existing nginx path; no new public URL required for
 | `job_status` | Agent | Envelope from the experiment: `state`, `next_action`, `remaining_requirements`, `specHash`, `iteration`. No secrets. |
 | `check_submit` | **CLI only** | Reject if not signed with the per-job nonce + account runner HMAC. Agents must not invent results. |
 | `job_cancel` | Customer / agent | Open jobs only. |
+| `job_declare_action` | Host / agent | Additive only. Declare one HIGH/CRITICAL action with a bounded `resourceGlob`. |
+| `job_approve` | Human | Additive only. One `actionId` per call + `CONTROL_PLANE_APPROVE_TOKEN`. CRITICAL needs `breakGlass`. No approve-all. |
 
-Opt-in: SaaS plan or key metadata `controlPlane: true`. Unset → these four tools are **absent**, catalog unchanged. This is the opposite of `CONTROL_PLANE_EXPERIMENT=true` (which must never ship).
+Opt-in: SaaS `ApiKey.controlPlane: true`. When `CONTROL_PLANE_JOBS_BACKEND=saas`, unset keys get `unauthorized` on all four tools (fail closed). File store / experiment dummy key skip validate-key. Tools may still be **registered** on an additive process; access is per-key. This is the opposite of `CONTROL_PLANE_EXPERIMENT=true` (which must never ship).
 
 Implementation note (2026-08-18, local only): `CONTROL_PLANE_ADDITIVE=true` registers catalog first, then job tools. `CONTROL_PLANE_EXPERIMENT=true` still isolates (hides catalog). Additive default is off. Never set either flag on `api.toolyour.com`.
 
@@ -103,13 +105,15 @@ Nonce lives in OS temp or a secrets dir, never in MCP responses (same as the exp
 
 Do **not** put `node --test` inside `toolyour-mcp`.
 
-CI: GitHub Action wraps the same CLI and fails the merge unless `job.state === verified` (phase 2).
+CI: GitHub Action wraps `toolyour-check-run --require-verified` and fails unless `job.state === verified`. Evidence: `EVIDENCE.json` (`toolyour.controlPlaneEvidence@1`) + `DECISION.json` uploaded as a CI artifact. Example workflow is copy-paste only — not a required check on the MCP package.
 
 ---
 
 ## 6. Durable Job + frozen spec
 
-**Store:** SaaS Mongo collections `ControlPlaneJob`, `ControlPlaneIteration` (names TBD). MCP process is stateless beyond cache. TTL days (reuse experiment `JOB_TTL_MS` = 7d as default), not 1 hour.
+**Store:** SaaS Mongo collection `ControlPlaneJob` (full Job JSON in `payload` + TTL on `expiresAt`). MCP talks to `GET/PUT /internal/control-plane/jobs/:id` when `CONTROL_PLANE_JOBS_BACKEND=saas`. Default remains local `.data/control-plane/jobs.json` so the experiment eval does not need Mongo. MCP process stays thin. TTL = experiment `JOB_TTL_MS` (7d), not the 1h `runStore`.
+
+`validate-key` returns `controlPlane` from `ApiKey.controlPlane` (default false). When `CONTROL_PLANE_JOBS_BACKEND=saas`, every `job_*` / `check_submit` call requires `controlPlane === true`. File store and `CONTROL_PLANE_EXPERIMENT` skip the check (dummy `ty_experiment`). Do not set the saas backend on api.toolyour.com until keys are opted in.
 
 **States (MVP subset of the audit machine):**
 
@@ -125,7 +129,7 @@ Do not ship `discovering` / `spec_review` until host discovery artifacts exist. 
 - Immutable after `job_start`. Amendments require a new job or a future `spec.amend` + human approval (not in MVP).
 - `specHash` on every `job_status`. Mismatch → reject submit.
 
-**Host check kinds (MVP):** `test`, `lint`, `typecheck` — commands from an allowlist (e.g. `node --test …`, `npm test`, `npx tsc --noEmit`). No `bash -c`.
+**Host check kinds (MVP):** `test`, `lint`, `typecheck`, optional `playwright` — commands from an allowlist (e.g. `node --test …`, `npm test`, `npx tsc --noEmit`, `npx playwright test e2e/smoke.spec.ts`). No `bash -c`. Playwright runs **on the host** via `toolyour-check-run`; ToolYour does not launch a browser. Template `host-playwright` is optional and is **not** in the experiment eval.
 
 **Remote check kinds:** existing `hasApi` workflows only (`ship-gate`, SEO, security playbooks). Params freeze URL + (if available) TLS identity at start so stub hosts cannot silently replace the target.
 
@@ -179,11 +183,11 @@ Do not let the agent call `decide()`. Do not add an LLM as completion decider.
 | Phase | What | Exit | Do now? |
 |---|---|---|---|
 | **0** | This design + keep flag off + keep complementary brand | Human review of this doc | **This is the end of the experiment loop** |
-| **1** | Additive tools, Mongo jobs, SDK CLI, host test/lint/tsc, `decide()` | Dogfood on ToolYour PRs | No — blocked on review |
-| **2** | Evidence blobs + GitHub Action merge gate | One design partner | No |
-| **3** | Narrow approvals for HIGH host-declared actions | Approval UX | No |
-| **4** | Optional host Playwright as CheckResult | Only if phase 2 is used | No |
-| **5** | Third-party sandbox | New product go/no-go | **Maybe never** |
+| **1** | Additive tools, Mongo jobs (opt-in backend), SDK CLI, host test/lint/tsc, `decide()` | Dogfood on ToolYour PRs | Local slices only — no prod flag |
+| **2** | Evidence blobs + GitHub Action merge gate | One design partner | Local slices — opt-in example, not a required PR check |
+| **3** | Narrow approvals for HIGH host-declared actions | Approval UX | Local MCP slice — no dashboard, not a kernel |
+| **4** | Optional host Playwright as CheckResult | Only if phase 2 is used | Local slice — host CLI only, no browser in MCP |
+| **5** | Third-party sandbox | Locked **NO-GO** (2026-08-19). Complementary host Playwright / GitHub MCP. See `experiments/SANDBOX-NOGO.md`. Guard: MCP never registers `execution.run` / sandbox tools. | **No** |
 
 Kill-gate before any prod binary with job tools: `npm run build && npm run test:mcp:unit && node scripts/eval-control-plane.mjs` **plus** a test that catalog tools remain registered when job tools are on.
 
@@ -209,8 +213,9 @@ Do **not** update brand to “replaces Cursor.” Non-goal `replacing-cursor-cla
 
 - `CONTROL_PLANE_EXPERIMENT=true` on production
 - Replacing catalog tools when job tools are enabled
-- Mongo / nginx / validate-key wiring **before** this design is reviewed
-- ToolYour-owned Firecracker/Docker customer runtime
+- Mongo / nginx / validate-key **production** wiring (`CONTROL_PLANE_JOBS_BACKEND=saas` on api.toolyour.com, new nginx `job_*` paths)
+- Enabling `CONTROL_PLANE_JOBS_BACKEND=saas` without SaaS `controlPlane` key opt-in in production
+- ToolYour-owned Firecracker/Docker customer runtime or MCP `execution.run` / general shell tools (Phase 5 **NO-GO**)
 - `check_submit` from the agent with invented pass
 - Weakening frozen specs to make tests go green
 - Mass converter strategy change, underscore URL 301s

@@ -28,6 +28,10 @@ export function expectedStartToken(): string {
   return envToken("CONTROL_PLANE_START_TOKEN");
 }
 
+export function expectedApproveToken(): string {
+  return envToken("CONTROL_PLANE_APPROVE_TOKEN");
+}
+
 export function tokensEqual(a: string, b: string): boolean {
   const left = Buffer.from(a);
   const right = Buffer.from(b);
@@ -96,7 +100,13 @@ export function submitHmacHex(
     .digest("hex");
 }
 
-const SECRET_KEYS = ["runnerNonce", "runnerNonceHash", "startToken", "runnerToken"];
+const SECRET_KEYS = [
+  "runnerNonce",
+  "runnerNonceHash",
+  "startToken",
+  "runnerToken",
+  "approveToken",
+];
 
 export function leakSecretKeys(payload: unknown): string[] {
   const raw = JSON.stringify(payload);

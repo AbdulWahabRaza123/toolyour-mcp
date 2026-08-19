@@ -19,6 +19,7 @@ import { serializeRunPoll } from "../runs/serialize";
 import { validateApiKey } from "../auth/session";
 import type { Logger } from "../observability/logger";
 import {
+  FORBIDDEN_EXECUTION_TOOLS,
   isControlPlaneAdditiveEnabled,
   isControlPlaneExperimentEnabled,
   registerControlPlaneTools,
@@ -58,6 +59,18 @@ function textResult(payload: unknown, isError = false): ToolResult {
   };
 }
 
+function assertNoForbiddenExecutionTools(server: McpServer): void {
+  const names = Object.keys(
+    (server as unknown as { _registeredTools?: Record<string, unknown> })
+      ._registeredTools || {}
+  );
+  for (const name of FORBIDDEN_EXECUTION_TOOLS) {
+    if (names.includes(name)) {
+      throw new Error(`Forbidden execution tool registered: ${name}`);
+    }
+  }
+}
+
 export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   const server = new McpServer(
     {
@@ -71,6 +84,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
 
   if (isControlPlaneExperimentEnabled()) {
     registerControlPlaneTools(server, registerTool, ctx);
+    assertNoForbiddenExecutionTools(server);
     return server;
   }
 
@@ -529,8 +543,9 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   );
 
   if (isControlPlaneAdditiveEnabled()) {
-    registerControlPlaneTools(server, registerTool, ctx);
+    registerControlPlaneTools(server, registerTool, ctx, { approvals: true });
   }
 
+  assertNoForbiddenExecutionTools(server);
   return server;
 }

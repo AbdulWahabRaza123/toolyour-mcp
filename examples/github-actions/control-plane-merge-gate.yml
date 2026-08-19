@@ -1,0 +1,55 @@
+# Example: fail the merge unless a ToolYour control-plane job is verified.
+#
+# Copy into your app repo. Leave pull_request commented until you have a job id
+# and runner nonce for that PR. Do not make this a required check without a job.
+#
+# Secrets: TOOLYOUR_API_KEY, CONTROL_PLANE_RUNNER_TOKEN
+# Optional vars: TOOLYOUR_JOB_ID, MCP_URL, CONTROL_PLANE_SECRETS_DIR
+#
+# Completion is job.state === verified from decide(), not agent speech.
+
+name: ToolYour control-plane merge gate (example)
+
+on:
+  workflow_dispatch:
+    inputs:
+      job_id:
+        description: "Control-plane job UUID"
+        required: true
+        type: string
+  # Uncomment when a job id is supplied per PR (var or commit message):
+  # pull_request:
+  #   types: [opened, synchronize, reopened]
+
+jobs:
+  merge-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run host checks (require verified)
+        env:
+          TOOLYOUR_API_KEY: ${{ secrets.TOOLYOUR_API_KEY }}
+          CONTROL_PLANE_RUNNER_TOKEN: ${{ secrets.CONTROL_PLANE_RUNNER_TOKEN }}
+          CONTROL_PLANE_SECRETS_DIR: ${{ vars.CONTROL_PLANE_SECRETS_DIR }}
+          MCP_URL: ${{ vars.MCP_URL || 'https://api.toolyour.com/mcp/http' }}
+        run: |
+          npx --yes toolyour-check-run \
+            --job "${{ inputs.job_id || vars.TOOLYOUR_JOB_ID }}" \
+            --cwd . \
+            --require-verified
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: toolyour-control-plane-evidence
+          if-no-files-found: ignore
+          path: |
+            DECISION.json
+            EVIDENCE.json

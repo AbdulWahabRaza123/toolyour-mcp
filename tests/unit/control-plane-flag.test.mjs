@@ -6,9 +6,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createToolYourMcpServer } from "../../dist/tools/mcp-tools.js";
 import {
+  CONTROL_PLANE_APPROVAL_TOOLS,
   CONTROL_PLANE_ADDITIVE_INSTRUCTIONS,
   CONTROL_PLANE_EXPERIMENT_INSTRUCTIONS,
   CONTROL_PLANE_TOOLS,
+  FORBIDDEN_EXECUTION_TOOLS,
   DEFAULT_MCP_INSTRUCTIONS,
   FROZEN_TEST_INVENTORY,
   resolveMcpInstructions,
@@ -84,7 +86,11 @@ describe("control-plane MCP flag", { concurrency: 1 }, () => {
     const n = names(makeServer());
     for (const t of CORE_TOOLS) assert.equal(n.includes(t), true, t);
     for (const t of CONTROL_PLANE_TOOLS) assert.equal(n.includes(t), true, t);
-    assert.equal(n.length, CORE_TOOLS.length + CONTROL_PLANE_TOOLS.length);
+    for (const t of CONTROL_PLANE_APPROVAL_TOOLS) assert.equal(n.includes(t), true, t);
+    assert.equal(
+      n.length,
+      CORE_TOOLS.length + CONTROL_PLANE_TOOLS.length + CONTROL_PLANE_APPROVAL_TOOLS.length
+    );
   });
 
   it("experiment flag wins over additive (isolation preserved)", () => {
@@ -93,6 +99,19 @@ describe("control-plane MCP flag", { concurrency: 1 }, () => {
     const n = names(makeServer());
     assert.deepEqual(n, [...CONTROL_PLANE_TOOLS].slice().sort());
     assert.equal(n.includes("plan_task"), false);
+  });
+
+  it("never registers a ToolYour-owned shell or sandbox tool", () => {
+    for (const mode of ["off", "experiment", "additive"]) {
+      delete process.env.CONTROL_PLANE_EXPERIMENT;
+      delete process.env.CONTROL_PLANE_ADDITIVE;
+      if (mode === "experiment") process.env.CONTROL_PLANE_EXPERIMENT = "true";
+      if (mode === "additive") process.env.CONTROL_PLANE_ADDITIVE = "true";
+      const n = names(makeServer());
+      for (const t of FORBIDDEN_EXECUTION_TOOLS) {
+        assert.equal(n.includes(t), false, `${mode}:${t}`);
+      }
+    }
   });
 
   it("flag off instructions still tell agents to call plan_task first", () => {
@@ -119,6 +138,7 @@ describe("control-plane MCP flag", { concurrency: 1 }, () => {
     assert.match(resolveMcpInstructions(), /First call plan_task/);
     assert.match(resolveMcpInstructions(), /do not replace plan_task/);
     assert.match(resolveMcpInstructions(), /Do not invent check_submit/);
+    assert.match(resolveMcpInstructions(), /job_approve/);
   });
 });
 
