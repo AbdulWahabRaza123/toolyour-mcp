@@ -6,7 +6,7 @@
 **Audit:** [`AUTONOMOUS-EXECUTION-AUDIT.md`](../../docs/AUTONOMOUS-EXECUTION-AUDIT.md) §5 / §15 / §16 — MODIFY (B).  
 **Experiment code:** `toolyour-mcp` branch `experiment/control-plane-mvp` (local only).
 
-This document is the protocol step-5 deliverable. Catalog tools stay registered. There is no `CONTROL_PLANE_EXPERIMENT` isolation flag.
+This document is the protocol step-5 deliverable. Catalog tools stay registered next to completion-loop job tools.
 
 ---
 
@@ -57,7 +57,7 @@ api.toolyour.com/mcp     ← existing nginx path; no new public URL required for
         │     (unchanged catalog — always registered)
         │
         └─ job_start / job_status / check_submit / job_cancel
-              ADDITIVE, opt-in per key or plan flag — never hide catalog tools
+              always registered; opt-in per key when jobs backend is saas
                     │
                     ├ decide() in toolyour-mcp (reuse R0–R8)
                     ├ Job documents in toolyour-saas Mongo
@@ -88,7 +88,7 @@ api.toolyour.com/mcp     ← existing nginx path; no new public URL required for
 
 Opt-in: SaaS `ApiKey.controlPlane: true`. When `CONTROL_PLANE_JOBS_BACKEND=saas`, unset keys get `unauthorized` on all four tools (fail closed). File store / dummy `ty_experiment` skip validate-key. Job tools are registered next to the catalog; access is per-key.
 
-Implementation note (2026-08-19): both loops are always registered. Loop toggle env flags were removed.
+Implementation note (2026-08-19): both loops are always registered.
 
 ---
 

@@ -12,7 +12,7 @@
 | Decision | Meaning |
 |---|---|
 | GO | Design durable jobs, real API keys, signed host CLI, `hasApi` catalog jobs. Still no ToolYour-owned sandbox. Audit stays MODIFY (B). |
-| NO-GO | Do not hide catalog tools. Do not deploy an isolated job-only MCP as `api.toolyour.com`. Isolation flag `CONTROL_PLANE_EXPERIMENT` was **removed** (2026-08-19); both loops are default. |
+| NO-GO | Do not hide catalog tools. Do not deploy an isolated job-only MCP as `api.toolyour.com`. |
 
 Stop-if conditions did **not** fire.
 
