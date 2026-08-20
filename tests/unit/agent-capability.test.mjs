@@ -78,6 +78,41 @@ describe("compact response mode", () => {
     assert.match(String(shaped.loop.next), /Do not invoke_tool/);
   });
 
+  it("partial run never advertises gate=pass", () => {
+    const full = {
+      status: "partial",
+      skillId: "ship-gate",
+      execution: {
+        status: "partial",
+        workflowId: "ship-gate-job",
+        failedStep: "headers",
+        jobReport: {
+          schemaVersion: "toolyour.jobReport@1",
+          jobId: "ship-gate-job",
+          workflowId: "ship-gate-job",
+          url: "not-a-url",
+          summary: ["Ready for a human smoke test."],
+          scores: {
+            overall: { label: "Ship readiness", value: "—", status: "unknown" },
+            securityHeaders: {
+              label: "Security headers",
+              value: "—",
+              status: "unknown",
+            },
+          },
+          findings: [],
+          prioritizedActions: [],
+          toolsUsed: ["securityHeadersAnalyzer"],
+        },
+      },
+    };
+    const shaped = shapeAgentResult(full, "compact");
+    assert.equal(shaped.loop.gate, "fail");
+    assert.equal(shaped.loop.initiate, false);
+    assert.match(String(shaped.loop.next), /incomplete|re-run|ship-ready/i);
+    assert.doesNotMatch(String(shaped.loop.next), /Gate pass/);
+  });
+
   it("omits passing mixed-content findings from remainingFixes", () => {
     const full = {
       status: "completed",

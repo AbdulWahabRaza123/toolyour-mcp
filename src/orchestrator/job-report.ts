@@ -180,10 +180,16 @@ export function buildNextActions(fixes: RemainingFix[]): VerifyNextAction[] {
 export function computeVerifyGate(after: JobReport | null): VerifyGate {
   if (!after) return "unknown";
   const high = (after.findings || []).some((f) => f.severity === "high");
-  const poor = Object.values(after.scores || {}).some(
-    (s) => s.status === "poor"
-  );
+  const scoreValues = Object.values(after.scores || {});
+  const poor = scoreValues.some((s) => s.status === "poor");
   if (high || poor) return "fail";
+  // Empty/unknown scorecards (typical of failed first step) are not a pass.
+  if (
+    scoreValues.length > 0 &&
+    scoreValues.every((s) => s.status === "unknown")
+  ) {
+    return "unknown";
+  }
   return "pass";
 }
 

@@ -19,6 +19,9 @@ const LOOP_NEED_INPUT =
 const LOOP_GATE_PASS =
   "Gate pass. Stop unless the user asked to re-verify after more changes.";
 
+const LOOP_INCOMPLETE =
+  "Run incomplete (partial or error). Fix the input or URL and re-run — do not treat this as ship-ready.";
+
 export interface LoopEligibility {
   /** Start / continue plan → run → verify until pass. */
   initiate: boolean;
@@ -123,12 +126,18 @@ export function decideRunLoop(opts: {
   remainingFixes: RemainingFix[];
 }): LoopEligibility {
   const status = String(opts.status || "");
-  if (
-    status === "suggest" ||
-    status === "error" ||
-    status === "need_workflow"
-  ) {
+  if (status === "suggest" || status === "need_workflow") {
     return { initiate: false, inScope: false, reason: LOOP_OUT_OF_SCOPE };
+  }
+  if (status === "partial" || status === "error") {
+    return {
+      initiate: false,
+      inScope:
+        opts.hasJobReport ||
+        workflowClosesWithVerify(opts.workflowId) ||
+        Boolean(opts.workflowId),
+      reason: LOOP_INCOMPLETE,
+    };
   }
   if (status === "need_input" || status === "accepted") {
     return {
@@ -175,4 +184,5 @@ export const LOOP_COPY = {
   notRemediable: LOOP_NOT_REMEDIABLE,
   needInput: LOOP_NEED_INPUT,
   gatePass: LOOP_GATE_PASS,
+  incomplete: LOOP_INCOMPLETE,
 } as const;

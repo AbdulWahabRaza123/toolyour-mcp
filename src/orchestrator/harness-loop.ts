@@ -65,6 +65,31 @@ function assembleLoop(
   };
 }
 
+function payloadRunStatus(payload: unknown): string {
+  if (!payload || typeof payload !== "object") return "";
+  const root = payload as Record<string, unknown>;
+  const rootStatus = String(root.status || "");
+  if (rootStatus) return rootStatus;
+  if (root.execution && typeof root.execution === "object") {
+    return String((root.execution as { status?: string }).status || "");
+  }
+  return "";
+}
+
+/**
+ * Incomplete runs must never advertise gate=pass (empty findings look like a clean bill).
+ */
+export function resolveRunGate(
+  payload: unknown,
+  reportGate: VerifyGate
+): VerifyGate {
+  const status = payloadRunStatus(payload);
+  if (status === "partial" || status === "error") {
+    return "fail";
+  }
+  return reportGate;
+}
+
 export function buildHarnessLoopFromReport(
   payload: unknown,
   phase: "run" | "verify"
@@ -72,7 +97,7 @@ export function buildHarnessLoopFromReport(
   const report = extractJobReport(payload);
   const remainingFixes = buildRemainingFixes(report);
   const nextActions = buildNextActions(remainingFixes);
-  const gate = computeVerifyGate(report);
+  const gate = resolveRunGate(payload, computeVerifyGate(report));
   return assembleLoop(payload, phase, remainingFixes, nextActions, gate);
 }
 
