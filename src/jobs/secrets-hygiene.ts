@@ -37,9 +37,7 @@ export function synthesizeSecretsHygiene(params: SynthesizeJobParams): JobReport
     const m = raw as Record<string, unknown>;
     findings.push({
       workstream: "secrets",
-      severity: (String(m.severity ?? "high").toLowerCase() === "medium"
-        ? "medium"
-        : "high") as JobFinding["severity"],
+      severity: "high",
       title: String(m.type ?? m.kind ?? m.title ?? "Possible secret"),
       whyItMatters: String(m.message ?? m.advice ?? "Looks like credential material."),
       howToFix: [
@@ -80,6 +78,7 @@ export function synthesizeSecretsHygiene(params: SynthesizeJobParams): JobReport
     jobId: params.jobId || workflowId,
     workflowId,
     url: undefined,
+    gatePolicy: "secrets",
     summary: [
       textHint
         ? `Scanned pasted text (${Math.min(textHint.length, 80)}… chars) for leaked secrets.`
@@ -95,7 +94,12 @@ export function synthesizeSecretsHygiene(params: SynthesizeJobParams): JobReport
       overall: {
         label: "Secrets hygiene",
         value: matchCount === 0 ? 100 : Math.max(0, 100 - matchCount * 15),
-        status: matchCount === 0 ? "good" : matchCount < 3 ? "needs_improvement" : "poor",
+        status:
+          matchCount === 0
+            ? "good"
+            : matchCount < 3
+              ? "needs_improvement"
+              : "poor",
       },
     },
     findings,
@@ -108,6 +112,7 @@ export function synthesizeSecretsHygiene(params: SynthesizeJobParams): JobReport
     steps: stepResults,
     limitations: [
       "Heuristic pattern matching only — not a breach database or entropy oracle.",
+      "Gate policy (secrets): any secrets/jwt finding fails — rotate and re-verify until clean.",
       "False positives are possible; false negatives are also possible.",
       "Never paste production secrets into public forms when avoidable.",
     ],

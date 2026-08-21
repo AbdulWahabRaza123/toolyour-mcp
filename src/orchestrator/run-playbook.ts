@@ -37,8 +37,14 @@ export async function runPlaybook(
   responseMode: ResponseMode = "compact"
 ) {
   const id = skillId.trim();
+  const skillAliases: Record<string, string> = {
+    "core-web-vitals": "page-performance",
+    "improve-core-web-vitals": "page-performance",
+    cwv: "page-performance",
+  };
+  const resolvedId = skillAliases[id] || id;
   const skills = loadSkills();
-  const meta = skills.find((s) => s.id === id);
+  const meta = skills.find((s) => s.id === resolvedId);
   if (!meta) {
     return {
       status: "error" as const,
@@ -49,7 +55,7 @@ export async function runPlaybook(
     };
   }
 
-  const content = loadSkillContent(id);
+  const content = loadSkillContent(resolvedId);
   const workflowId = resolveSkillWorkflowId(meta);
 
   // Local content ship — no public URL required
@@ -103,9 +109,10 @@ export async function runPlaybook(
     return shapeAgentResult(
       {
         status: bridge.status,
-        skillId: id,
+        skillId: resolvedId,
         playbook: content,
         mode: "content-bridge",
+        jobReport: bridge.jobReport,
         execution: bridge.execution,
       },
       responseMode

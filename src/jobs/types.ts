@@ -1,8 +1,8 @@
 export type JobSeverity = "low" | "medium" | "high";
 export type JobMetricStatus = "good" | "needs_improvement" | "poor" | "unknown";
 export type JobImpact = "high" | "medium" | "low";
-/** default = high findings / poor scores; ship = also fail critical NI/unknown. */
-export type GatePolicy = "default" | "ship";
+/** default = high findings / poor scores; ship = also fail critical NI/unknown; secrets = any secret/jwt finding fails. */
+export type GatePolicy = "default" | "ship" | "secrets";
 
 export interface JobScore {
   label: string;

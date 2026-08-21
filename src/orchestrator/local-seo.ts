@@ -203,3 +203,81 @@ export function analyzeLocalHtml(
     nextSteps,
   };
 }
+
+/**
+ * Turn local HTML SEO into a closable jobReport (verify_task / remainingFixes).
+ * No workflowId — decideRunLoop treats remediable reports without a workflow as closable.
+ */
+export function localSeoToJobReport(
+  report: LocalSeoReport,
+  opts?: { jobId?: string; goal?: string }
+): import("../jobs/types").JobReport {
+  const findings = report.issues
+    .filter((i) => i.severity !== "info")
+    .map((i) => ({
+      workstream: i.category || "technicalSeo",
+      severity: (i.severity === "critical"
+        ? "high"
+        : "medium") as import("../jobs/types").JobSeverity,
+      title: i.message,
+      whyItMatters: i.message,
+      howToFix: [
+        i.severity === "critical"
+          ? `Fix in local HTML/templates: ${i.message}`
+          : `Improve in local HTML/templates: ${i.message}`,
+      ],
+    }));
+
+  const score = report.summary.score;
+  // Any critical/warning finding must fail the gate so verify_task can close the loop.
+  const status =
+    findings.length === 0
+      ? "good"
+      : report.summary.criticalCount > 0 || score < 60
+        ? "poor"
+        : "needs_improvement";
+  const gateStatus = findings.length > 0 && status === "needs_improvement" ? "poor" : status;
+
+  return {
+    schemaVersion: "toolyour.jobReport@1",
+    jobId: opts?.jobId || "local-html-seo",
+    workflowId: "",
+    summary: [
+      opts?.goal
+        ? `Local HTML SEO review for: ${opts.goal}`
+        : "Local HTML SEO review (no public URL).",
+      report.summary.criticalCount
+        ? `${report.summary.criticalCount} critical issue(s) — fix before deploy.`
+        : findings.length
+          ? `${findings.length} issue(s) remain in local HTML.`
+          : "No critical/warning issues in this local pass.",
+      report.nextSteps[0] || "Re-run solve_task with updated input.html after edits.",
+    ],
+    scores: {
+      overall: {
+        label: "Local on-page SEO",
+        value: score,
+        status: gateStatus,
+      },
+      technicalSeo: {
+        label: "On-page SEO",
+        value: score,
+        status: gateStatus,
+      },
+    },
+    findings,
+    prioritizedActions: findings.slice(0, 8).map((f, i) => ({
+      rank: i + 1,
+      workstream: f.workstream || "technicalSeo",
+      action: f.howToFix[0] || f.title,
+      expectedImpact: f.severity === "high" ? ("high" as const) : ("medium" as const),
+      effort: "medium" as const,
+    })),
+    toolsUsed: [],
+    steps: { local: report },
+    limitations: [
+      "Local HTML audit only — not a live crawl, CrUX, or Lighthouse lab run.",
+      "Pass updated input.html and verify_task with this result as baseline until gate pass.",
+    ],
+  };
+}

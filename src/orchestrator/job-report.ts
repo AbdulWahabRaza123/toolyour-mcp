@@ -6,8 +6,6 @@ import type {
 } from "../jobs/types";
 import { stampFindingIds } from "../jobs/utils";
 
-export type VerifyGate = "pass" | "fail" | "unknown";
-
 /** Ship-gate critical workstreams — NI/unknown here fails the gate (speed proxy excluded). */
 export const SHIP_CRITICAL_SCORE_KEYS = [
   "tls",
@@ -15,6 +13,17 @@ export const SHIP_CRITICAL_SCORE_KEYS = [
   "httpStatus",
   "mixedContent",
 ] as const;
+
+/** Detail metrics — unknown alone must not fail default audits. */
+const OPTIONAL_METRIC_SCORE_KEYS = new Set([
+  "LCP",
+  "CLS",
+  "INP",
+  "TTFB",
+  "FCP",
+]);
+
+export type VerifyGate = "pass" | "fail" | "unknown";
 
 /** Where the host agent should apply the fix (it owns editor/git). */
 export type RemainingFixPatchType =
@@ -209,6 +218,24 @@ export function computeVerifyGate(after: JobReport | null): VerifyGate {
     scoreValues.every((s) => s.status === "unknown")
   ) {
     return "unknown";
+  }
+
+  // Primary workstream scores (not LCP/CLS/…) must be known to pass.
+  const primaryUnknown = Object.entries(after.scores || {}).some(([key, s]) => {
+    if (key === "overall") return false;
+    if (OPTIONAL_METRIC_SCORE_KEYS.has(key)) return false;
+    return s.status === "unknown";
+  });
+  if (primaryUnknown) return "fail";
+
+  // Secrets hygiene: any open secret/jwt finding or NI overall fails.
+  if (after.gatePolicy === "secrets") {
+    const openSecret = (after.findings || []).some(
+      (f) => f.workstream === "secrets" || f.workstream === "jwt"
+    );
+    if (openSecret) return "fail";
+    const overall = after.scores?.overall?.status;
+    if (overall === "needs_improvement" || overall === "poor") return "fail";
   }
 
   // Ship policy: critical deploy signals must be good (not NI/unknown).

@@ -17,7 +17,9 @@ import {
   localDevGuidance,
   resolveUrlFromGoalAndInput,
 } from "./local-dev";
-import { analyzeLocalHtml } from "./local-seo";
+import { analyzeLocalHtml, localSeoToJobReport } from "./local-seo";
+import type { JobReport } from "../jobs/types";
+import { finalizeJobReport } from "../jobs/utils";
 import {
   extractHeadlineTextFromHtml,
   extractLinksFromHtml,
@@ -45,6 +47,7 @@ export interface ContentBridgeResult {
   options?: Array<{ mode: string; description: string }>;
   hint?: Record<string, string>;
   missing?: string[];
+  jobReport?: JobReport;
   execution: {
     mode: "content-bridge";
     billed: boolean;
@@ -55,6 +58,7 @@ export interface ContentBridgeResult {
       httpStatus: number;
     }>;
     note?: string;
+    jobReport?: JobReport;
   };
 }
 
@@ -242,16 +246,34 @@ export async function tryContentBridge(
   const local = runLocalHandlers(adapter, bundle, url);
   const backend = await runTextPipeline(adapter, bundle, input, ctx, ctx.registry);
 
+  const seoLocal = local.find(
+    (item) =>
+      item &&
+      typeof item === "object" &&
+      (item as { mode?: string }).mode === "local-html-audit"
+  ) as import("./local-seo").LocalSeoReport | undefined;
+
+  const jobReport = seoLocal
+    ? finalizeJobReport(
+        localSeoToJobReport(seoLocal, {
+          jobId: task?.id || "local-html-seo",
+          goal,
+        })
+      )
+    : undefined;
+
   return {
     status: "completed",
     goal,
     adapterId: adapter.id,
     matchedTask: task ? { ...task, score } : undefined,
+    jobReport,
     execution: {
       mode: "content-bridge",
       billed: backend.length > 0,
       local,
       backend: backend.length > 0 ? backend : undefined,
+      jobReport,
       note:
         backend.length > 0
           ? "MCP ran local analysis (free) plus text-based API tools from your html/text/code."

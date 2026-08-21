@@ -48,6 +48,9 @@ export function synthesizeFullSeoAudit(params: SynthesizeJobParams): JobReport {
       : scoreFromProxy(proxies.lcpScore) !== "good" ||
         scoreFromProxy(proxies.clsScore) !== "good";
 
+  const seoMissing = !seoReport && !seoPayload;
+  const highCount = findings.filter((f) => f.severity === "high").length;
+
   const scores: JobReport["scores"] = {
     overall: {
       label: "Combined SEO + speed proxy",
@@ -102,9 +105,13 @@ export function synthesizeFullSeoAudit(params: SynthesizeJobParams): JobReport {
     url
       ? `Audited ${url} with on-page SEO and page speed proxies.`
       : "Completed on-page SEO and page speed audit.",
-    findings.length
-      ? `${findings.filter((f) => f.severity === "high").length} high-severity issues need attention first.`
-      : "No high-severity issues detected in this pass.",
+    seoMissing || scores.technicalSeo.status === "unknown"
+      ? "On-page SEO score unavailable — do not treat this as a clean SEO pass."
+      : highCount
+        ? `${highCount} high-severity issues need attention first.`
+        : findings.length
+          ? `${findings.length} finding(s) remain — review prioritized actions.`
+          : "No findings in scored workstreams for this pass.",
     assetActions[0]
       ? `Speed asset priority: ${assetActions[0].action}`
       : prioritizedActions[0]
@@ -112,7 +119,7 @@ export function synthesizeFullSeoAudit(params: SynthesizeJobParams): JobReport {
         : "Review step details for optimization opportunities.",
   ];
 
-  return {
+  const report: JobReport = {
     schemaVersion: "toolyour.jobReport@1",
     jobId: params.jobId || workflowId,
     workflowId,
@@ -132,8 +139,22 @@ export function synthesizeFullSeoAudit(params: SynthesizeJobParams): JobReport {
     steps: stepResults,
     limitations: [
       "Speed metrics are HTML-based proxies, not Chrome UX Report field data.",
-      "Run improve-core-web-vitals for a deeper CWV-focused diagnosis.",
+      "Run page-performance (core-web-vitals-job) for a deeper CWV-focused diagnosis.",
       "Asset optimizer hints come from pageSpeedAnalyzer evidence when speed proxies are weak.",
+      "Gate fails when on-page SEO score is unknown — re-run after the SEO step succeeds.",
     ],
   };
+
+  if (seoMissing || scores.technicalSeo.status === "unknown") {
+    return {
+      ...report,
+      incomplete: true,
+      summary: [
+        "INCOMPLETE: On-page SEO step did not produce a score. Do not treat as gate pass.",
+        ...report.summary.filter((s) => !/^INCOMPLETE:/i.test(s)),
+      ],
+    };
+  }
+
+  return report;
 }

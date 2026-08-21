@@ -15,6 +15,7 @@ import {
   localEquivalentTaskId,
 } from "./payload-intent";
 import { decidePlanLoop, type LoopEligibility } from "./loop-scope";
+import { resolveLocalhostUrl } from "./local-dev";
 
 const CREDITS_PER_STEP = 3;
 const CREDITS_PER_TOOL = 2;
@@ -131,27 +132,52 @@ export function planTask(
     const topPlaybook = alternatives.find((a) => a.kind === "playbook");
     const confidence = match ? "low" : "none";
     const loop = decidePlanLoop({ confidence });
+    // Out-of-catalog / low confidence: do not spam unrelated toolHints.
+    const toolHints: PlanTaskResult["toolHints"] = [];
     return {
       status: "plan",
       goal: trimmedGoal,
       free: true,
       estimatedCredits: 0,
       confidence,
-      alternatives: alternatives.slice(0, 8),
-      toolHints: rawToolHints,
+      alternatives: confidence === "none" ? [] : alternatives.slice(0, 4),
+      toolHints,
       loop,
       next: loop.inScope
         ? "Clarify the goal before running a playbook. Do not start verify_task yet."
-        : topPlaybook
+        : topPlaybook && confidence === "low"
           ? `Possible playbook "${topPlaybook.id}" — confirm the goal maps to a ToolYour job before running it. Do not start verify_task yet.`
-          : alternatives.length || rawToolHints.length
-            ? "Clarify the goal. Do not start the harness loop until a closable MCP job matches."
-            : loop.reason,
+          : "Out of ToolYour MCP scope (SEO, security, ship-gate, documents, conversion, text). Do not start the harness loop.",
     };
   }
 
   let { task } = match;
   const live = hasLiveUrlSignal(trimmedGoal, input);
+  const localhostUrl = resolveLocalhostUrl(trimmedGoal, input);
+  if (localhostUrl) {
+    const loop = decidePlanLoop({
+      confidence: "high",
+      recommendedKind: "local",
+    });
+    return {
+      status: "plan",
+      goal: trimmedGoal,
+      free: true,
+      estimatedCredits: 0,
+      confidence: "high",
+      recommended: {
+        kind: "local",
+        id: "pass-html-or-preview-url",
+        title: "Localhost blocked — pass workspace HTML or a public URL",
+        score: match.score,
+        requiredInput: ["html", "text", "code"],
+      },
+      alternatives: alternatives.slice(0, 4),
+      toolHints: [],
+      loop: { ...loop, initiate: false, inScope: true },
+      next: `MCP cannot fetch ${localhostUrl}. Pass input.html / input.text / input.code from the workspace, or a public/preview https:// URL (or tunnel). Do not start run_playbook with localhost.`,
+    };
+  }
   if (!live) {
     const altId = localEquivalentTaskId(task.id);
     const alt = altId ? tasks.find((t) => t.id === altId) : undefined;

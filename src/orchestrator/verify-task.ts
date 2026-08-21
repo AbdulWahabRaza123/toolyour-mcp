@@ -313,7 +313,13 @@ export async function executeVerifyTask(
       freshStatus === "need_input" ||
       freshStatus === "need_workflow"
         ? freshStatus
-        : "verified",
+        : progress.stop
+          ? "stopped"
+          : delta.gate === "pass"
+            ? "verified"
+            : delta.gate === "fail"
+              ? "fail"
+              : "continue",
     goal,
     delta,
     after: compactFresh,
