@@ -51,7 +51,7 @@ export function synthesizeSecretsHygiene(params: SynthesizeJobParams): JobReport
     });
   }
 
-  if (jwt) {
+  if (jwt && !jwt.skipped) {
     const warnings = Array.isArray(jwt.warnings) ? jwt.warnings.map(String) : [];
     for (const w of warnings) {
       findings.push({

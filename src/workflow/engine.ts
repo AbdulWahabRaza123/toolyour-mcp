@@ -100,13 +100,20 @@ export async function runWorkflow(
           ? (stepResults[step.inputFrom] as Record<string, unknown>)
           : (lastOutput as Record<string, unknown>);
 
-      if (
-        route.method.toUpperCase() === "GET" &&
-        typeof stepInput.url !== "string"
-      ) {
-        const url =
-          extractUrlFromPayload(stepInput) ?? extractUrlFromPayload(input);
-        if (url) stepInput = { ...stepInput, url };
+      // Carry workflow URL forward — prior step payloads (e.g. pageSpeed) often
+      // omit top-level url and break POST tools like seoAnalyze on step 2+.
+      const workflowUrl =
+        extractUrlFromPayload(input) ||
+        (typeof input.url === "string" ? input.url.trim() : undefined);
+      if (workflowUrl) {
+        const stepUrl =
+          typeof stepInput.url === "string"
+            ? stepInput.url.trim()
+            : extractUrlFromPayload(stepInput);
+        if (!stepUrl) {
+          // Prefer original workflow input — do not POST prior shaped noise.
+          stepInput = { ...input, url: workflowUrl };
+        }
       }
 
       // Multi-URL steps (seoChangeDiff): prefer urlA/urlB from workflow input
@@ -133,6 +140,21 @@ export async function runWorkflow(
       }
 
       stepInput = normalizeStepInput(step.operationId, stepInput);
+
+      // Skip jwtDecoder when pasted text has no JWT — avoid 400 + incomplete jobs.
+      if (
+        step.operationId === "jwtDecoder" &&
+        (typeof stepInput.token !== "string" || !String(stepInput.token).trim())
+      ) {
+        stepResults[step.id] = {
+          status: 200,
+          skipped: true,
+          reason: "no_jwt_in_input",
+          data: { status: true, result: { skipped: true, warnings: [] } },
+        };
+        completedSteps.push(step.id);
+        continue;
+      }
 
       const payload = buildGatewayInvokePayload(route, stepInput);
 

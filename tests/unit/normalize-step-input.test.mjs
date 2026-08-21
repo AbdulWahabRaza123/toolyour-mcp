@@ -45,4 +45,12 @@ describe("normalizeStepInput", () => {
     });
     assert.deepEqual(out.urls, ["https://example.com/hero.jpg"]);
   });
+
+  it("does not invent a JWT token when text has none", async () => {
+    const { normalizeStepInput } = await import("../../dist/gateway/request.js");
+    const out = normalizeStepInput("jwtDecoder", {
+      text: "STRIPE_KEY=sk_live_51ABCDEFdeadbeef\n",
+    });
+    assert.equal(out.token, undefined);
+  });
 });

@@ -145,15 +145,22 @@ describe("mocked gateway + workflow integration", () => {
 
   it("runWorkflow completes multi-step when gateway succeeds", async () => {
     let step = 0;
-    globalThis.fetch = async (input) => {
+    /** @type {string[]} */
+    const seoBodies = [];
+    globalThis.fetch = async (input, init) => {
       const url = String(input);
       if (url.includes("validate-key")) return okValidate();
       step += 1;
       gatewayCalls.push({ url, status: 200 });
+      if (url.includes("seo-tools/analyze")) {
+        const body = init?.body ? JSON.parse(String(init.body)) : {};
+        seoBodies.push(body);
+      }
+      // Speed-like payload WITHOUT top-level url — must not break seo step.
       return new Response(
         JSON.stringify({
           status: 200,
-          data: { url: "https://example.com", step },
+          data: { step, performance: { score: 70 } },
           report: {
             summary: { totalScore: 70 },
             metrics: {
@@ -187,6 +194,60 @@ describe("mocked gateway + workflow integration", () => {
       assert.ok(result.completedSteps.length >= 2);
       assert.ok(result.jobReport);
       assert.ok(result.jobReport.scores.LCP || result.jobReport.scores.TTFB);
+      // seoAnalyze (step 2) must receive workflow url, not only prior noise
+      assert.ok(
+        seoBodies.some((b) => b && b.url === "https://example.com"),
+        `expected seo body with url, got ${JSON.stringify(seoBodies)}`
+      );
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it("secrets-hygiene skips jwtDecoder when text has no JWT", async () => {
+    /** @type {string[]} */
+    const ops = [];
+    globalThis.fetch = async (input) => {
+      const url = String(input);
+      if (url.includes("validate-key")) return okValidate();
+      ops.push(url);
+      if (url.includes("jwt")) {
+        return new Response(JSON.stringify({ error: "should not call jwt" }), {
+          status: 400,
+          headers: { "content-type": "application/json" },
+        });
+      }
+      return new Response(
+        JSON.stringify({
+          status: true,
+          result: {
+            matchCount: 1,
+            matches: [{ type: "stripe-key", message: "stripe", line: 1 }],
+          },
+        }),
+        { status: 200, headers: { "content-type": "application/json" } }
+      );
+    };
+
+    try {
+      const result = await runWorkflow(
+        "secrets-hygiene-job",
+        { text: "STRIPE_KEY=sk_live_51ABCDEFdeadbeefxxxx" },
+        {
+          apiKey: "ty_test",
+          mcpSessionId: "sess-sec",
+          registry,
+          logger,
+        }
+      );
+      assert.equal(result.status, "completed");
+      assert.ok(!ops.some((u) => /jwt/i.test(u)), `jwt should be skipped: ${ops}`);
+      assert.ok(result.jobReport);
+      assert.ok(
+        result.steps.jwt &&
+          typeof result.steps.jwt === "object" &&
+          result.steps.jwt.skipped === true
+      );
     } finally {
       globalThis.fetch = originalFetch;
     }

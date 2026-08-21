@@ -202,7 +202,17 @@ export function findingsFromReport(
             ? (item.evidence as Record<string, unknown>)
             : undefined,
       };
-    });
+    })
+    .filter((f) => !isPassOnlyFinding(f.title));
+}
+
+/** Clean-bill findings ("No mixed-content issues…") are noise for agents. */
+export function isPassOnlyFinding(title: string): boolean {
+  const t = String(title || "").toLowerCase();
+  return (
+    /^no\s/.test(t) &&
+    /(issue|problem|mixed-content|mixed content|vulnerabilit)/.test(t)
+  );
 }
 
 export function stableFindingId(
