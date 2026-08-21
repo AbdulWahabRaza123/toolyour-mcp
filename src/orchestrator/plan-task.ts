@@ -101,7 +101,7 @@ export function planTask(
 
   const includeTools =
     ranked.length > 0 && ranked[0].score >= constants.taskMatchMinScore;
-  const toolHints = includeTools
+  const rawToolHints = includeTools
     ? searchTools(registry.getManifest(), trimmedGoal, undefined, 5).map(
         (t) => ({
           operationId: t.operationId,
@@ -110,6 +110,22 @@ export function planTask(
         })
       )
     : [];
+
+  /** Prefer workflow/playbook step operationIds over keyword search noise. */
+  function scopedToolHints(stepIds: string[] | undefined): PlanTaskResult["toolHints"] {
+    if (!stepIds || stepIds.length === 0) {
+      return rawToolHints.slice(0, 0);
+    }
+    const allow = new Set(stepIds);
+    const scoped = rawToolHints.filter((h) => allow.has(h.operationId));
+    if (scoped.length > 0) return scoped;
+    // Fall back to step ids as hints when search missed them
+    return stepIds.slice(0, 8).map((operationId) => ({
+      operationId,
+      name: operationId,
+      category: "workflow",
+    }));
+  }
 
   if (!match || !confident) {
     const topPlaybook = alternatives.find((a) => a.kind === "playbook");
@@ -122,13 +138,13 @@ export function planTask(
       estimatedCredits: 0,
       confidence,
       alternatives: alternatives.slice(0, 8),
-      toolHints,
+      toolHints: rawToolHints,
       loop,
       next: loop.inScope
         ? "Clarify the goal before running a playbook. Do not start verify_task yet."
         : topPlaybook
           ? `Possible playbook "${topPlaybook.id}" — confirm the goal maps to a ToolYour job before running it. Do not start verify_task yet.`
-          : alternatives.length || toolHints.length
+          : alternatives.length || rawToolHints.length
             ? "Clarify the goal. Do not start the harness loop until a closable MCP job matches."
             : loop.reason,
     };
@@ -189,7 +205,7 @@ export function planTask(
       alternatives: alternatives
         .filter((a) => a.id !== playbookSkill.id && a.id !== task.target)
         .slice(0, 4),
-      toolHints,
+      toolHints: scopedToolHints(steps),
       loop,
       next: loop.initiate
         ? `${runLine} After the run, call verify_task only if that result has loop.initiate true.`
@@ -230,7 +246,10 @@ export function planTask(
       workflowId: task.type === "workflow" ? task.target : undefined,
     },
     alternatives: alternatives.filter((a) => a.id !== task.target && a.id !== task.id).slice(0, 4),
-    toolHints,
+    toolHints:
+      task.type === "tool"
+        ? scopedToolHints([task.target])
+        : scopedToolHints(steps),
     loop,
     next: loop.initiate
       ? `${runLine} After the run, call verify_task only if that result has loop.initiate true. Do not start with invoke_tool.`

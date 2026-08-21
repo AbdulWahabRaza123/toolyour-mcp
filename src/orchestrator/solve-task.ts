@@ -16,7 +16,11 @@ import {
   extractContentBundle,
   hasDirectContent,
 } from "./content-input";
-import { localDevGuidance } from "./local-dev";
+import {
+  buildLocalhostNeedInput,
+  localDevGuidance,
+  resolveLocalhostUrl,
+} from "./local-dev";
 import { incr } from "../observability/counters";
 import { constants } from "../config";
 import {
@@ -234,7 +238,7 @@ export async function solveTask(
       matchedTask: matchedMeta,
       message: guidance.message,
       options: guidance.options,
-      hint: "Pass rendered HTML (or text/code) from the workspace — local analysis is free unless enhance=true. Do not ask for a public URL unless the user asked to analyze a live link.",
+      hint: "Pass rendered HTML (or text/code) from the workspace — local analysis is free unless enhance=true. Do not pass localhost. A public/preview https:// URL is only needed if the user asked to analyze a live link.",
       nextActions: [
         "Read page HTML or source from the repo and re-call solve_task with input.html / input.text / input.code",
         "Set input.enhance=true only if you want billed text APIs",
@@ -288,6 +292,18 @@ export async function solveTask(
   }
 
   if (task.type === "workflow") {
+    const localhostUrl = resolveLocalhostUrl(trimmedGoal, normalized.data);
+    if (localhostUrl) {
+      return shapeAgentResult(
+        buildLocalhostNeedInput({
+          goal: trimmedGoal,
+          url: localhostUrl,
+          matchedTask: matchedMeta,
+        }),
+        mode
+      );
+    }
+
     const result = await runWorkflow(task.target, normalized.data, {
       apiKey: ctx.apiKey,
       mcpSessionId: ctx.mcpSessionId,

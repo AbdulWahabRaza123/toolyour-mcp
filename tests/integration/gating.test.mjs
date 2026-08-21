@@ -6,4 +6,8 @@ describe("hasApi gating messages", () => {
   it("defines tool_not_api_backed", () => {
     assert.equal(MCP_ERROR_CODES.TOOL_NOT_API_BACKED, "tool_not_api_backed");
   });
+
+  it("defines need_baseline for verify_task", () => {
+    assert.equal(MCP_ERROR_CODES.NEED_BASELINE, "need_baseline");
+  });
 });

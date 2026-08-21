@@ -223,7 +223,7 @@ export function payloadNeedInput(params: {
     missing: params.fetchOnly ? ["url"] : ["text", "code", "html"],
     message: params.fetchOnly
       ? "This job fetches a live page. Pass input.url only if the user asked to analyze a deployed or preview link — otherwise pass workspace files for a local check."
-      : "Read workspace files and pass their contents. Do not ask for a public URL unless the user asked to analyze a live link.",
+      : "Read workspace files and pass their contents (input.html / input.code / input.text). Do not ask for a public URL unless the user asked to analyze a live or preview https:// link. MCP cannot fetch localhost.",
     hint: params.fetchOnly
       ? `Matched "${params.matchedTask.title}" — this tool cannot run on local files. Re-call with input.url, or switch to a payload job (pr-code-gate / seo-audit-local / content-ship).`
       : `Matched "${params.matchedTask.title}" — re-call solve_task with input.text, input.code, or input.html from the repo.`,

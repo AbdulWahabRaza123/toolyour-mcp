@@ -172,6 +172,11 @@ if (stillFail.gate !== "fail" || stillFail.remainingFixes.length < 1) {
 } else {
   ok(`remainingFixes=${stillFail.remainingFixes.length}, nextActions=${stillFail.nextActions.length}`);
 }
+if (stillFail.nextActions.length !== 1) {
+  bad(`expected rank-1 nextActions, got ${stillFail.nextActions.length}`);
+} else {
+  ok("nextActions is rank-1 only");
+}
 const fixes = buildRemainingFixes(afterFail);
 if (computeVerifyGate(afterFail) !== "fail" || fixes[0]?.actions?.[0] !== "Add Content-Security-Policy") {
   bad("buildRemainingFixes missing howToFix");
@@ -182,6 +187,65 @@ if (fixes[0]?.patchType !== "http-header" || !fixes[0]?.acceptance) {
   bad("buildRemainingFixes missing patchType/acceptance");
 } else {
   ok("buildRemainingFixes includes patchType + acceptance");
+}
+
+console.log("\n--- ship-gate gate policy ---");
+{
+  const shipFix = fixtures["developer-ship-checklist"];
+  if (!shipFix) {
+    bad("missing developer-ship-checklist fixture");
+  } else {
+    const shipReport = synthesizeJobReport({
+      synthesizerId: "developer-ship-checklist",
+      workflowId: "ship-gate-job",
+      jobId: "ship-gate",
+      input: shipFix.input || { url: "https://example.com" },
+      steps: shipFix.steps || [],
+      stepResults: shipFix.stepResults || {},
+    });
+    if (!shipReport || shipReport.gatePolicy !== "ship") {
+      bad(`ship report missing gatePolicy=ship (got ${shipReport?.gatePolicy})`);
+    } else if (computeVerifyGate(shipReport) !== "fail") {
+      bad(`expected ship fixture gate=fail, got ${computeVerifyGate(shipReport)}`);
+    } else {
+      ok("ship-gate fixture fails under ship gatePolicy");
+    }
+
+    const shipPass = {
+      ...shipReport,
+      findings: [],
+      scores: {
+        overall: { label: "Ship readiness", value: 90, status: "good" },
+        securityHeaders: { label: "Security headers", value: 90, status: "good" },
+        tls: { label: "TLS", value: "90d", status: "good" },
+        mixedContent: { label: "Mixed content", value: 95, status: "good" },
+        httpStatus: { label: "HTTP status", value: 100, status: "good" },
+        performance: { label: "Page speed proxy", value: 70, status: "needs_improvement" },
+      },
+    };
+    if (computeVerifyGate(shipPass) !== "pass") {
+      bad(`ship pass with speed NI should pass, got ${computeVerifyGate(shipPass)}`);
+    } else {
+      ok("ship-gate allows performance needs_improvement when criticals are good");
+    }
+
+    const shipNiHeaders = {
+      ...shipPass,
+      scores: {
+        ...shipPass.scores,
+        securityHeaders: {
+          label: "Security headers",
+          value: 65,
+          status: "needs_improvement",
+        },
+      },
+    };
+    if (computeVerifyGate(shipNiHeaders) !== "fail") {
+      bad("ship should fail when securityHeaders is needs_improvement");
+    } else {
+      ok("ship-gate fails on critical needs_improvement");
+    }
+  }
 }
 
 if (failed) {

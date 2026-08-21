@@ -9,6 +9,7 @@ import type { Logger } from "../observability/logger";
 import { randomUUID } from "crypto";
 import { synthesizeJobReport } from "../jobs/synthesize";
 import type { WorkflowStepMeta } from "../jobs/types";
+import { markIncompleteJobReport } from "../jobs/utils";
 import { incr } from "../observability/counters";
 
 export function loadWorkflows(): McpWorkflowDef[] {
@@ -218,16 +219,25 @@ export async function runWorkflow(
       })
     : null;
 
-  incr(Object.keys(stepErrors).length ? "workflowPartial" : "workflowCompleted");
+  const hasStepErrors = Object.keys(stepErrors).length > 0;
+  incr(hasStepErrors ? "workflowPartial" : "workflowCompleted");
+
+  const finalReport =
+    hasStepErrors && jobReport
+      ? markIncompleteJobReport(
+          jobReport,
+          "One or more workflow steps returned errors (continueOnError)."
+        )
+      : jobReport;
 
   return {
-    status: Object.keys(stepErrors).length ? "partial" : "completed",
+    status: hasStepErrors ? "partial" : "completed",
     workflowId,
     completedSteps,
-    stepErrors: Object.keys(stepErrors).length ? stepErrors : undefined,
+    stepErrors: hasStepErrors ? stepErrors : undefined,
     steps: stepResults,
-    result: jobReport || lastOutput,
-    jobReport: jobReport || undefined,
+    result: finalReport || lastOutput,
+    jobReport: finalReport || undefined,
   };
 }
 
@@ -239,7 +249,7 @@ function partialJobReport(
 ) {
   if (!wf.synthesizer || Object.keys(stepResults).length === 0) return null;
   try {
-    return synthesizeJobReport({
+    const report = synthesizeJobReport({
       synthesizerId: wf.synthesizer,
       workflowId: wf.id,
       jobId: wf.id,
@@ -247,6 +257,11 @@ function partialJobReport(
       steps: stepMeta,
       stepResults,
     });
+    if (!report) return null;
+    return markIncompleteJobReport(
+      report,
+      "Workflow stopped early — remaining steps were not run."
+    );
   } catch {
     return null;
   }

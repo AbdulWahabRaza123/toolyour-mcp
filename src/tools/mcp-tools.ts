@@ -23,6 +23,10 @@ import {
   registerControlPlaneTools,
   resolveMcpInstructions,
 } from "../control-plane/mcp";
+import {
+  buildLocalhostNeedInput,
+  resolveLocalhostUrl,
+} from "../orchestrator/local-dev";
 
 export interface McpServerContext {
   apiKey: string;
@@ -191,7 +195,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "verify_task",
-    "Close the loop only when the prior result has loop.initiate true. Re-run vs baseline; read loop.gate and loop.remainingFixes. If loop.initiate is false, stop.",
+    "Close the loop only when the prior result has loop.initiate true. Requires a usable baseline jobReport. Read loop.gate; apply rank-1 loop.nextActions. Stops when loop.stop is set (max_rounds or same_findings) or loop.initiate is false.",
     {
       goal: z.string(),
       input: z.any().optional(),
@@ -501,6 +505,16 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
       const input = (args.input || {}) as Record<string, unknown>;
       const mode = parseResponseMode(args.responseMode);
       const work = async () => {
+        const localhostUrl = resolveLocalhostUrl(`run_workflow(${workflowId})`, input);
+        if (localhostUrl) {
+          return shapeAgentResult(
+            buildLocalhostNeedInput({
+              goal: `run_workflow(${workflowId})`,
+              url: localhostUrl,
+            }),
+            mode
+          );
+        }
         const result = await runWorkflow(workflowId, input, {
           apiKey: ctx.apiKey,
           mcpSessionId: ctx.mcpSessionId,

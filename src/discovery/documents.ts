@@ -33,7 +33,7 @@ const META_TOOLS = [
   {
     name: "verify_task",
     description:
-      "Close the loop: re-run vs baseline. Read loop.gate and loop.remainingFixes (patchType + acceptance). Optional async:true; poll get_run.",
+      "Close the loop: requires a usable baseline jobReport. Read loop.gate; apply rank-1 loop.nextActions (full list: remainingFixes). Stops on loop.stop (max_rounds|same_findings) or loop.initiate false. Optional async:true; poll get_run.",
   },
   {
     name: "list_skills",
@@ -163,10 +163,12 @@ export function buildServerCard() {
     },
     tools: [...META_TOOLS],
     notes: [
-      "Two loops — pick exactly one per goal. Skill loop: plan_task → run_playbook or solve_task → apply loop.remainingFixes → verify_task. Completion loop: job_status → host toolyour-check-run; do not invent check_submit.",
+      "Two loops — pick exactly one per goal. Skill loop: plan_task → run_playbook or solve_task → apply rank-1 loop.nextActions (full list: remainingFixes) → verify_task. Completion loop: job_status → host toolyour-check-run; do not invent check_submit.",
       "invoke_tool is advanced (one-off operationId). Do not use it as the default path for ship-gate, SEO, or security jobs.",
       "Catalog tools are dynamic — only hasApi tools are exposed. Discovery meta-tools are free; execution shares the REST monthly credit quota.",
-      "solve_task / run_playbook responses include loop.remainingFixes (patchType + acceptance) even on the first run.",
+      "solve_task / run_playbook responses include loop.remainingFixes (patchType + acceptance) even on the first run. loop.nextActions is rank-1 only — apply that item first; remainingFixes is the full list.",
+      "verify_task refuses without a usable baseline jobReport (prior solve_task/run_playbook result, verify_task.after, or raw jobReport).",
+      "Loop stop: default maxRounds=5 and sameFindingsLimit=2. When loop.stop is set (max_rounds|same_findings), loop.initiate is false — escalate; do not re-verify.",
       "Large responses may include dataRefId — use fetch_payload (free in-process TTL store, no paid blob).",
       "Optional async:true on solve_task / run_playbook / run_workflow / verify_task returns runId; always poll get_run and read resultStatus (suggest|need_input|verified|error|…). REDIS_URL enables cross-replica. Dashboard mcp.job.finished webhook is optional best-effort and never required for correctness.",
     ],

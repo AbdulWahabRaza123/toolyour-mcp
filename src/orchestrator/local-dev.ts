@@ -1,3 +1,4 @@
+import { MCP_ERROR_CODES } from "../contracts";
 import { normalizeGoalText, extractUrlFromText } from "./match-task";
 
 const LOCAL_SIGNALS = [
@@ -95,7 +96,7 @@ export function localDevGuidance(): {
 } {
   return {
     message:
-      "Read workspace files and pass their contents. Ask for a live URL only if the user wants link analysis, or the job cannot run without a fetch (PageSpeed, TLS, mixed content, live headers).",
+      "MCP cannot read localhost or your disk. Read workspace files and pass input.html, input.code, or input.text — or a public/preview https:// URL. Do not pass http://localhost.",
     options: [
       {
         mode: "pass_html",
@@ -113,15 +114,71 @@ export function localDevGuidance(): {
           "Pass input.code from TSX/JSX/HTML/source files — MCP cannot read disk; the host agent must attach contents",
       },
       {
-        mode: "tunnel_url",
+        mode: "preview_url",
         description:
-          "Only if the user asked to analyze a live/preview site: expose via Cloudflare Tunnel or ngrok, then pass that https:// URL",
+          "If the page is already on a public or preview https:// URL (Vercel/Netlify/Cloudflare preview, staging), pass that URL — not localhost",
       },
       {
-        mode: "deployed_url",
+        mode: "tunnel_url",
         description:
-          "Only if the user asked to fetch a staging/production URL (PageSpeed, TLS, live headers)",
+          "Only if the app is localhost-only: expose via Cloudflare Tunnel or ngrok, then pass that https:// URL",
       },
     ],
   };
+}
+
+/**
+ * Block live-URL jobs against localhost before any gateway invoke.
+ * Partial synthesizers on unreachable hosts look like false passes.
+ */
+export function buildLocalhostNeedInput(opts: {
+  goal: string;
+  url: string;
+  matchedTask?: {
+    id: string;
+    title: string;
+    type: string;
+    target: string;
+    score?: number;
+  };
+  skillId?: string;
+}): Record<string, unknown> {
+  const guidance = localDevGuidance();
+  return {
+    status: "need_input" as const,
+    code: MCP_ERROR_CODES.LOCAL_PREVIEW_REQUIRED,
+    goal: opts.goal,
+    url: opts.url,
+    ...(opts.matchedTask ? { matchedTask: opts.matchedTask } : {}),
+    ...(opts.skillId ? { skillId: opts.skillId } : {}),
+    message: guidance.message,
+    options: guidance.options,
+    hint: "Do not pass http://localhost or 127.0.0.1. Use workspace HTML/text/code, or a public/preview https:// URL.",
+    nextActions: [
+      "Read page HTML or source from the repo and re-call with input.html / input.text / input.code",
+      "Or pass a public/preview https:// URL (not localhost)",
+      "Only if needed: expose local via Cloudflare Tunnel / ngrok, then pass that https:// URL",
+    ],
+    missing: ["url", "html", "text", "code"],
+    exampleInput: {
+      html: "<!doctype html><html><head><title>…</title></head><body>…</body></html>",
+      enhance: false,
+    },
+  };
+}
+
+/** True when goal or input resolves to a localhost URL. */
+export function resolveLocalhostUrl(
+  goal: string,
+  input: Record<string, unknown> | undefined
+): string | undefined {
+  const url = resolveUrlFromGoalAndInput(goal, input);
+  if (url && isLocalhostUrl(url)) return url;
+  if (input) {
+    for (const key of ["url", "urlA", "urlB", "pageUrl", "siteUrl"] as const) {
+      const v = input[key];
+      if (typeof v === "string" && isLocalhostUrl(v)) return v.trim();
+    }
+  }
+  return undefined;
 }

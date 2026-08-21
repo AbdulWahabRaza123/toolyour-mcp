@@ -1,21 +1,27 @@
 # Example: ToolYour MCP ship-gate on a preview URL
 #
-# Copy into your app repo (not enabled in this MCP package CI by default).
-# Requires secrets: TOOLYOUR_API_KEY
-# Requires env: SHIP_URL (preview / staging URL)
+# Copy into *your app repo* (this file is a template).
+# Requires:
+#   secrets.TOOLYOUR_API_KEY  — ty_… from the ToolYour dashboard
+#   SHIP_URL                  — public/preview HTTPS URL (not localhost)
 #
-# Docs: docs/CI-AGENT-LOOP.md · docs/HARNESS-MIGRATION.md
+# Gate uses the same ship policy as the MCP server (gatePolicy: "ship"):
+# fail on high findings, poor scores, or needs_improvement/unknown on TLS,
+# security headers, HTTP status, or mixed content. Speed proxy NI alone does not fail.
+#
+# Docs: https://www.toolyour.com/developers/ship-gate
+#       toolyour-mcp/docs/CI-AGENT-LOOP.md
 
-name: ToolYour ship-gate (example)
+name: ToolYour ship-gate
 
 on:
   workflow_dispatch:
     inputs:
       ship_url:
-        description: "Public URL to run ship-gate against"
+        description: "Public HTTPS URL to run ship-gate against"
         required: true
         type: string
-  # Uncomment when you have preview URLs per PR:
+  # Uncomment when each PR has a public preview URL:
   # pull_request:
   #   types: [opened, synchronize, reopened]
 
@@ -23,7 +29,7 @@ jobs:
   ship-gate:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout ToolYour MCP scripts
+      - name: Checkout ToolYour MCP (for ci-ship-gate script)
         uses: actions/checkout@v4
         with:
           repository: AbdulWahabRaza123/toolyour-mcp
@@ -32,7 +38,15 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: toolyour-mcp/package-lock.json
+
+      - name: Install + build
+        working-directory: toolyour-mcp
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+          npm run build
 
       - name: Run ship-gate
         working-directory: toolyour-mcp
@@ -40,4 +54,13 @@ jobs:
           TOOLYOUR_API_KEY: ${{ secrets.TOOLYOUR_API_KEY }}
           SHIP_URL: ${{ inputs.ship_url || vars.SHIP_URL }}
           REQUIRE_PASS: "true"
-        run: node scripts/ci-ship-gate.mjs
+        run: |
+          if [ -z "$TOOLYOUR_API_KEY" ]; then
+            echo "FAIL: set secrets.TOOLYOUR_API_KEY"
+            exit 1
+          fi
+          if [ -z "$SHIP_URL" ]; then
+            echo "FAIL: set ship_url input or vars.SHIP_URL"
+            exit 1
+          fi
+          npm run ci:ship-gate

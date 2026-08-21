@@ -1,8 +1,13 @@
+import { MCP_ERROR_CODES } from "../contracts";
 import type { JobFinding, JobMetricStatus, JobReport } from "../jobs/types";
 import type { SolveTaskContext } from "./solve-task";
 import { solveTask } from "./solve-task";
 import { type ResponseMode } from "./compact-response";
-import { shapeAgentResult, withHarnessLoop } from "./harness-loop";
+import {
+  advanceLoopProgress,
+  shapeAgentResult,
+  withHarnessLoop,
+} from "./harness-loop";
 import {
   buildNextActions,
   buildRemainingFixes,
@@ -13,6 +18,7 @@ import {
   type VerifyGate,
   type VerifyNextAction,
 } from "./job-report";
+import type { LoopStop } from "./loop-stop";
 
 export type {
   RemainingFix,
@@ -48,6 +54,11 @@ export interface VerifyDelta {
   /** pass = no high findings and no poor primary scores on after report. */
   gate: VerifyGate;
   summary: string[];
+  /** Verify iteration (1 on first verify_task). */
+  round?: number;
+  maxRounds?: number;
+  sameFindingsStreak?: number;
+  stop?: LoopStop;
 }
 
 const STATUS_RANK: Record<JobMetricStatus, number> = {
@@ -58,7 +69,7 @@ const STATUS_RANK: Record<JobMetricStatus, number> = {
 };
 
 function findingKey(f: JobFinding): string {
-  return `${f.workstream || ""}|${f.title}`.toLowerCase();
+  return (f.findingId || `${f.workstream || ""}|${f.title}`).toLowerCase();
 }
 
 function enrichDelta(
@@ -74,7 +85,7 @@ function enrichDelta(
     summary.push("Gate: pass — no high-severity findings or poor scores on the fresh run.");
   } else if (gate === "fail") {
     summary.push(
-      `Gate: fail — ${remainingFixes.length} remaining fix(es); apply loop.remainingFixes (or delta.nextActions) then verify_task again.`
+      `Gate: fail — ${remainingFixes.length} remaining fix(es); apply rank-1 loop.nextActions then verify_task again. Full list: loop.remainingFixes.`
     );
   }
   return {
@@ -84,6 +95,37 @@ function enrichDelta(
     nextActions,
     gate,
     summary,
+  };
+}
+
+function attachProgress(
+  delta: VerifyDelta,
+  baseline: unknown
+): { delta: VerifyDelta; progress: ReturnType<typeof advanceLoopProgress> } {
+  const progress = advanceLoopProgress({
+    baseline,
+    remainingFixes: delta.remainingFixes,
+    gate: delta.gate,
+    deltaStatus: delta.status,
+  });
+  const summary = [...delta.summary];
+  if (progress.stop) {
+    summary.push(`Stop: ${progress.stop.code} — ${progress.stop.message}`);
+  } else if (delta.gate === "fail") {
+    summary.push(
+      `Round ${progress.round}/${progress.maxRounds}; sameFindingsStreak ${progress.sameFindingsStreak}/${progress.sameFindingsLimit}.`
+    );
+  }
+  return {
+    progress,
+    delta: {
+      ...delta,
+      summary,
+      round: progress.round,
+      maxRounds: progress.maxRounds,
+      sameFindingsStreak: progress.sameFindingsStreak,
+      ...(progress.stop ? { stop: progress.stop } : {}),
+    },
   };
 }
 
@@ -199,8 +241,14 @@ export function diffJobReports(
 export interface VerifyTaskResult {
   status: string;
   goal: string;
-  delta: VerifyDelta;
-  after: unknown;
+  code?: string;
+  message?: string;
+  hint?: unknown;
+  nextActions?: string[];
+  missing?: string[];
+  exampleInput?: Record<string, unknown>;
+  delta?: VerifyDelta;
+  after?: unknown;
 }
 
 /**
@@ -215,9 +263,42 @@ export async function executeVerifyTask(
   mode: ResponseMode
 ): Promise<VerifyTaskResult> {
   const before = extractJobReport(baseline);
+  if (!before) {
+    return withHarnessLoop(
+      {
+        status: "need_input",
+        code: MCP_ERROR_CODES.NEED_BASELINE,
+        goal,
+        message:
+          "verify_task requires a usable baseline jobReport. Pass the prior solve_task or run_playbook result (or verify_task.after / a raw jobReport). Do not re-run until you have that payload.",
+        hint: {
+          baseline:
+            "Pass the entire previous solve_task, run_playbook, or verify_task result as baseline.",
+        },
+        nextActions: [
+          "Call solve_task or run_playbook first and keep the result",
+          "Re-call verify_task with that entire result as baseline",
+        ],
+        exampleInput: {
+          baseline: {
+            schemaVersion: "toolyour.jobReport@1",
+            jobId: "…",
+            findings: [],
+            scores: {},
+          },
+        },
+        missing: ["baseline"],
+      },
+      "verify"
+    );
+  }
+
   const fresh = await solveTask(goal, input, ctx, "full");
   const after = extractJobReport(fresh);
-  const delta = diffJobReports(before, after);
+  const { delta, progress } = attachProgress(
+    diffJobReports(before, after),
+    baseline
+  );
   const compactFresh = shapeAgentResult(fresh, mode, "run");
   const freshStatus =
     fresh && typeof fresh === "object"
@@ -237,5 +318,5 @@ export async function executeVerifyTask(
     delta,
     after: compactFresh,
   };
-  return withHarnessLoop(payload, "verify");
+  return withHarnessLoop(payload, "verify", { baseline, progress });
 }

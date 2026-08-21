@@ -4,8 +4,9 @@
  *
  *   TOOLYOUR_API_KEY=ty_... SHIP_URL=https://preview.example.com node scripts/ci-ship-gate.mjs
  *
- * Exit 0 when gate is pass (no high findings / poor scores on jobReport, or verify delta.gate=pass).
- * Exit 1 on fail / errors. Exit 0 with SKIP if no key (local optional).
+ * Exit 0 when gate is pass (ship policy: no high findings / poor scores, and critical
+ * TLS/headers/status/mixed scores are good). Exit 1 on fail / unknown / errors.
+ * Exit 0 with SKIP if no key (local optional).
  *
  * Optional:
  *   MCP_URL=https://api.toolyour.com/mcp/http
@@ -13,6 +14,10 @@
  *   REQUIRE_PASS=true (default) — set false to always exit 0 after printing report
  */
 import "dotenv/config";
+import {
+  computeVerifyGate,
+  extractJobReport,
+} from "../dist/orchestrator/job-report.js";
 
 const apiKey =
   process.env.TOOLYOUR_API_KEY ||
@@ -63,24 +68,14 @@ function toolJson(payload) {
   return payload;
 }
 
-function extractReport(payload) {
-  if (!payload || typeof payload !== "object") return null;
-  if (payload.schemaVersion === "toolyour.jobReport@1") return payload;
-  if (payload.jobReport) return payload.jobReport;
-  if (payload.execution?.jobReport) return payload.execution.jobReport;
-  if (payload.after) return extractReport(payload.after);
-  if (payload.result) return extractReport(payload.result);
-  return null;
-}
-
-function gateFromReport(report) {
-  if (!report) return "unknown";
-  const high = (report.findings || []).some((f) => f.severity === "high");
-  const poor = Object.values(report.scores || {}).some(
-    (s) => s && s.status === "poor"
-  );
-  if (high || poor) return "fail";
-  return "pass";
+function resolveCiGate(solve, verify) {
+  const status = String(verify?.status || solve?.status || "");
+  if (status === "partial" || status === "error") return "fail";
+  if (verify?.loop?.stop) return "fail";
+  if (verify?.delta?.gate) return verify.delta.gate;
+  if (solve?.loop?.gate) return solve.loop.gate;
+  const report = extractJobReport(verify) || extractJobReport(solve);
+  return computeVerifyGate(report);
 }
 
 async function main() {
@@ -111,7 +106,7 @@ async function main() {
   await rpc("initialize", {
     protocolVersion: "2024-11-05",
     capabilities: {},
-    clientInfo: { name: "toolyour-ci-ship-gate", version: "1.0.0" },
+    clientInfo: { name: "toolyour-ci-ship-gate", version: "1.1.0" },
   });
   if (!sessionId) throw new Error("no mcp-session-id from initialize");
 
@@ -129,12 +124,7 @@ async function main() {
     },
   });
   const solve = toolJson(solvePayload);
-  const report = extractReport(solve);
-  let gate =
-    solve?.delta?.gate ||
-    gateFromReport(report);
 
-  // Optional verify against self as baseline for remainingFixes shape
   const verifyPayload = await rpc("tools/call", {
     name: "verify_task",
     arguments: {
@@ -145,18 +135,23 @@ async function main() {
     },
   });
   const verify = toolJson(verifyPayload);
-  if (verify?.delta?.gate) gate = verify.delta.gate;
+  const gate = resolveCiGate(solve, verify);
 
-  const fixes = verify?.delta?.remainingFixes || [];
-  const next = verify?.delta?.nextActions || [];
+  const fixes = verify?.delta?.remainingFixes || solve?.loop?.remainingFixes || [];
+  const next = verify?.delta?.nextActions || solve?.loop?.nextActions || [];
+  const report = extractJobReport(verify) || extractJobReport(solve);
 
   console.log(
     JSON.stringify(
       {
         gate,
         resultStatus: verify?.status || solve?.status,
+        loopInitiate: verify?.loop?.initiate ?? solve?.loop?.initiate,
+        loopStop: verify?.loop?.stop || null,
+        round: verify?.loop?.round ?? solve?.loop?.round,
+        gatePolicy: report?.gatePolicy || null,
         remainingFixes: fixes.slice(0, 5),
-        nextActions: next.slice(0, 5),
+        nextActions: next.slice(0, 1),
         summary: verify?.delta?.summary || report?.summary,
       },
       null,

@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { synthesizeFullSeoAudit } from "../../dist/jobs/full-seo-audit.js";
-import { synthesizeCoreWebVitals } from "../../dist/jobs/core-web-vitals.js";
+import { synthesizeJobReport } from "../../dist/jobs/synthesize.js";
 
 const seoShaped = {
   status: 200,
@@ -112,7 +112,7 @@ describe("job synthesizers", () => {
   });
 
   it("builds core-web-vitals scores by metric", () => {
-    const report = synthesizeCoreWebVitals({
+    const report = synthesizeJobReport({
       synthesizerId: "core-web-vitals",
       workflowId: "core-web-vitals-job",
       input: { url: "https://example.com" },
@@ -122,10 +122,19 @@ describe("job synthesizers", () => {
       ],
       stepResults: { speed: speedShaped, seo: seoShaped },
     });
+    assert.ok(report);
 
     assert.equal(report.scores.LCP.status, "poor");
     assert.equal(report.scores.TTFB.value, "840ms");
     assert.ok(report.limitations?.some((l) => /proxy/i.test(l)));
+    assert.ok(
+      report.limitations?.some((l) => /not Chrome field CrUX|Lighthouse/i.test(l)),
+      "CWV limitations must state proxies are not CrUX/Lighthouse"
+    );
+    assert.ok(
+      report.findings.every((f) => f.findingId),
+      "findings need findingId via finalizeJobReport"
+    );
     assert.ok(report.prioritizedActions[0].action.includes("hero.jpg") || report.prioritizedActions.length > 0);
     assert.ok(
       report.prioritizedActions.some((a) => a.workstream === "assets"),

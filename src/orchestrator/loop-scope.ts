@@ -186,3 +186,10 @@ export const LOOP_COPY = {
   gatePass: LOOP_GATE_PASS,
   incomplete: LOOP_INCOMPLETE,
 } as const;
+
+export {
+  LOOP_MAX_ROUNDS,
+  LOOP_SAME_FINDINGS,
+  DEFAULT_MAX_VERIFY_ROUNDS,
+  DEFAULT_SAME_FINDINGS_LIMIT,
+} from "./loop-stop";

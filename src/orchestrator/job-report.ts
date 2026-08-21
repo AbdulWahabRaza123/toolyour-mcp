@@ -4,8 +4,17 @@ import type {
   JobScore,
   PrioritizedAction,
 } from "../jobs/types";
+import { stampFindingIds } from "../jobs/utils";
 
 export type VerifyGate = "pass" | "fail" | "unknown";
+
+/** Ship-gate critical workstreams — NI/unknown here fails the gate (speed proxy excluded). */
+export const SHIP_CRITICAL_SCORE_KEYS = [
+  "tls",
+  "securityHeaders",
+  "httpStatus",
+  "mixedContent",
+] as const;
 
 /** Where the host agent should apply the fix (it owns editor/git). */
 export type RemainingFixPatchType =
@@ -18,6 +27,7 @@ export type RemainingFixPatchType =
 
 export interface RemainingFix {
   rank: number;
+  findingId?: string;
   workstream: string;
   severity?: JobFinding["severity"];
   title: string;
@@ -32,6 +42,7 @@ export interface RemainingFix {
 
 export interface VerifyNextAction {
   id: string;
+  findingId?: string;
   label: string;
   workstream?: string;
   severity?: JobFinding["severity"];
@@ -111,11 +122,15 @@ function acceptanceLine(title: string): string {
  */
 export function buildRemainingFixes(after: JobReport | null): RemainingFix[] {
   if (!after) return [];
+  const stamped = {
+    ...after,
+    findings: stampFindingIds(after.findings),
+  };
   const fixes: RemainingFix[] = [];
   let rank = 1;
 
-  for (const f of sortFindings(after.findings || [])) {
-    if (!findingNeedsHostFix(f, after.scores || {})) continue;
+  for (const f of sortFindings(stamped.findings || [])) {
+    if (!findingNeedsHostFix(f, stamped.scores || {})) continue;
     const actions = (f.howToFix || [])
       .map((s) => String(s).trim())
       .filter(Boolean);
@@ -124,6 +139,7 @@ export function buildRemainingFixes(after: JobReport | null): RemainingFix[] {
     const title = f.title;
     fixes.push({
       rank: rank++,
+      findingId: f.findingId,
       workstream,
       severity: f.severity,
       title,
@@ -139,7 +155,7 @@ export function buildRemainingFixes(after: JobReport | null): RemainingFix[] {
   }
 
   const covered = new Set(fixes.map((x) => x.title.toLowerCase()));
-  for (const a of after.prioritizedActions || []) {
+  for (const a of stamped.prioritizedActions || []) {
     const key = String(a.action || "").toLowerCase();
     if (!key || covered.has(key)) continue;
     if (fixes.some((f) => f.actions.some((x) => x.toLowerCase() === key))) {
@@ -147,7 +163,7 @@ export function buildRemainingFixes(after: JobReport | null): RemainingFix[] {
     }
     const workstream = a.workstream || "general";
     if (
-      after.scores?.[workstream]?.status === "good" &&
+      stamped.scores?.[workstream]?.status === "good" &&
       a.expectedImpact === "low"
     ) {
       continue;
@@ -168,9 +184,11 @@ export function buildRemainingFixes(after: JobReport | null): RemainingFix[] {
   return fixes.slice(0, 12);
 }
 
+/** Rank-1 only — full fix list stays on remainingFixes. */
 export function buildNextActions(fixes: RemainingFix[]): VerifyNextAction[] {
-  return fixes.slice(0, 5).map((f, i) => ({
-    id: `fix_${i + 1}`,
+  return fixes.slice(0, 1).map((f) => ({
+    id: f.findingId || `fix_${f.rank}`,
+    findingId: f.findingId,
     label: f.actions[0] || f.title,
     workstream: f.workstream,
     severity: f.severity,
@@ -179,10 +197,12 @@ export function buildNextActions(fixes: RemainingFix[]): VerifyNextAction[] {
 
 export function computeVerifyGate(after: JobReport | null): VerifyGate {
   if (!after) return "unknown";
+  if (after.incomplete) return "fail";
   const high = (after.findings || []).some((f) => f.severity === "high");
   const scoreValues = Object.values(after.scores || {});
   const poor = scoreValues.some((s) => s.status === "poor");
   if (high || poor) return "fail";
+
   // Empty/unknown scorecards (typical of failed first step) are not a pass.
   if (
     scoreValues.length > 0 &&
@@ -190,27 +210,53 @@ export function computeVerifyGate(after: JobReport | null): VerifyGate {
   ) {
     return "unknown";
   }
+
+  // Ship policy: critical deploy signals must be good (not NI/unknown).
+  // Page-speed proxy stays on default rules only (poor already failed above).
+  if (after.gatePolicy === "ship") {
+    for (const key of SHIP_CRITICAL_SCORE_KEYS) {
+      const st = after.scores?.[key]?.status;
+      if (
+        !st ||
+        st === "unknown" ||
+        st === "needs_improvement" ||
+        st === "poor"
+      ) {
+        return "fail";
+      }
+    }
+  }
+
   return "pass";
 }
 
 /**
  * Peel common agent envelopes to a JobReport.
  */
+function withStampedFindings(report: JobReport): JobReport {
+  return {
+    ...report,
+    findings: stampFindingIds(report.findings),
+  };
+}
+
 export function extractJobReport(payload: unknown): JobReport | null {
   if (!payload || typeof payload !== "object") return null;
   const root = payload as Record<string, unknown>;
   if (root.schemaVersion === "toolyour.jobReport@1") {
-    return root as unknown as JobReport;
+    return withStampedFindings(root as unknown as JobReport);
   }
   if (root.jobReport && typeof root.jobReport === "object") {
-    return root.jobReport as JobReport;
+    return withStampedFindings(root.jobReport as JobReport);
   }
   if (
     root.execution &&
     typeof root.execution === "object" &&
     (root.execution as Record<string, unknown>).jobReport
   ) {
-    return (root.execution as Record<string, unknown>).jobReport as JobReport;
+    return withStampedFindings(
+      (root.execution as Record<string, unknown>).jobReport as JobReport
+    );
   }
   if (root.after !== undefined) {
     const nested = extractJobReport(root.after);

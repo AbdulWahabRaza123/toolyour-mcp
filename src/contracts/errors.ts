@@ -16,6 +16,7 @@ export const MCP_ERROR_CODES = {
   SKILL_NOT_FOUND: "skill_not_found",
   REGISTRY_UNAVAILABLE: "registry_unavailable",
   LOCAL_PREVIEW_REQUIRED: "local_preview_required",
+  NEED_BASELINE: "need_baseline",
 } as const;
 
 export function mcpError(

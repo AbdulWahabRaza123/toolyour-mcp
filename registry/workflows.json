@@ -148,7 +148,7 @@
     {
       "id": "developer-ship-checklist-job",
       "title": "Developer Ship Checklist",
-      "description": "Pre-deploy gate: security headers, TLS, mixed content, HTTP status, and page speed.",
+      "description": "URL smoke pre-deploy gate: security headers, TLS, mixed content, HTTP status, and page-speed proxy. Not a pen test.",
       "synthesizer": "developer-ship-checklist",
       "steps": [
         { "id": "headers", "operationId": "securityHeadersAnalyzer" },
@@ -161,7 +161,7 @@
     {
       "id": "ship-gate-job",
       "title": "Ship Gate",
-      "description": "Pass/fail pre-deploy gate (alias of developer ship checklist): headers, TLS, mixed content, status, speed.",
+      "description": "URL smoke pre-deploy gate (alias of developer ship checklist): headers, TLS, mixed content, status, speed proxy. Not a pen test.",
       "synthesizer": "developer-ship-checklist",
       "steps": [
         { "id": "headers", "operationId": "securityHeadersAnalyzer" },

@@ -8,9 +8,11 @@ import {
   mergeFindings,
   mergePrioritizedActions,
   operationIdsFromSteps,
+  PROXY_SPEED_LIMITATIONS,
   rankActions,
   scoreFromProxy,
   unwrapToolPayload,
+  capOverallBySiblingScores,
 } from "./utils";
 
 function inferMetricFromTitle(title: string): string | undefined {
@@ -143,20 +145,71 @@ export function synthesizeCoreWebVitals(params: SynthesizeJobParams): JobReport 
   const assetActions = assetActionsFromSpeedReport(speedReport, 8);
   const prioritizedActions = mergePrioritizedActions(assetActions, findingActions).slice(0, 12);
 
+  const missingSteps: string[] = [];
+  if (!speedReport) missingSteps.push("page speed");
+  if (steps.some((s) => s.id === "seo" || s.operationId === "seoAnalyze") && !seoReport) {
+    missingSteps.push("SEO");
+  }
+  if (
+    steps.some((s) => s.id === "social" || /social/i.test(s.operationId)) &&
+    !socialReport
+  ) {
+    missingSteps.push("social preview");
+  }
+
   const worst =
     (["LCP", "TTFB", "INP", "CLS"] as const).find((m) => scores[m]?.status === "poor") ||
     (["LCP", "TTFB", "INP", "CLS"] as const).find(
       (m) => scores[m]?.status === "needs_improvement"
     );
 
+  const hasProxyCoverage =
+    Boolean(speedReport) &&
+    [lcpStatus, clsStatus, inpStatus, ttfbStatus].every((s) => s !== "unknown");
+
+  const evidence =
+    speedReport?.evidence && typeof speedReport.evidence === "object"
+      ? (speedReport.evidence as Record<string, unknown>)
+      : {};
+  const ao = assetOptimizer || {};
+  const compressN = Array.isArray(ao.compressImages) ? ao.compressImages.length : 0;
+  const deferN = Array.isArray(ao.deferScripts) ? ao.deferScripts.length : 0;
+  const hasLcpCandidate = Boolean(evidence.lcpCandidate);
+  const thinPageOptimism =
+    hasProxyCoverage &&
+    !worst &&
+    compressN === 0 &&
+    deferN === 0 &&
+    !hasLcpCandidate &&
+    speedFindings.length === 0;
+
+  const metricLine = missingSteps.length
+    ? `Incomplete: missing ${missingSteps.join(", ")} — do not treat proxy scores as a clean pass.`
+    : worst
+      ? `Weakest metric area: ${worst}.`
+      : thinPageOptimism
+        ? "Proxy scores look strong on this thin HTML snapshot — real field CrUX/Lighthouse on a full product page can still be worse. Do not treat this as production CWV proof."
+        : hasProxyCoverage
+          ? "No poor/needs_improvement proxy metrics in the scored areas (HTML proxies, not CrUX/Lighthouse)."
+          : "Proxy coverage incomplete — re-run with a reachable URL before treating metrics as acceptable.";
+
   const summary = [
     url ? `Core Web Vitals diagnosis for ${url}.` : "Core Web Vitals diagnosis complete.",
-    worst ? `Weakest metric area: ${worst}.` : "All proxy metrics look acceptable in this pass.",
+    metricLine,
     assetActions[0]
       ? `Top asset fix: ${assetActions[0].action}`
       : prioritizedActions[0]
         ? `Highest-impact fix: ${prioritizedActions[0].action}`
         : "Review findings for render and asset optimizations.",
+  ];
+
+  const limitations = [
+    ...PROXY_SPEED_LIMITATIONS,
+    ...(thinPageOptimism
+      ? [
+          "Thin or mostly-static HTML often scores well on these proxies; verify with CrUX or lab Lighthouse before claiming Core Web Vitals readiness.",
+        ]
+      : []),
   ];
 
   return {
@@ -165,7 +218,7 @@ export function synthesizeCoreWebVitals(params: SynthesizeJobParams): JobReport 
     workflowId,
     url,
     summary,
-    scores,
+    scores: capOverallBySiblingScores(scores),
     findings,
     prioritizedActions,
     workstreams: {
@@ -178,11 +231,6 @@ export function synthesizeCoreWebVitals(params: SynthesizeJobParams): JobReport 
     },
     toolsUsed: operationIdsFromSteps(steps),
     steps: stepResults,
-    limitations: [
-      "LCP/CLS/INP scores are HTML-based proxies unless field CrUX data is integrated.",
-      "INP is approximated via Total Blocking Time (TBT) proxy (see scores.INP.label).",
-      "TTFB prefers Server-Timing when present; otherwise uses fetch timing to first HTML response (not Chrome trace).",
-      "assetOptimizer lists are heuristic (image HEAD sizes + HTML attributes), not Lighthouse audits.",
-    ],
+    limitations,
   };
 }

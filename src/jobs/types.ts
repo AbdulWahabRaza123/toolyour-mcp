@@ -1,6 +1,8 @@
 export type JobSeverity = "low" | "medium" | "high";
 export type JobMetricStatus = "good" | "needs_improvement" | "poor" | "unknown";
 export type JobImpact = "high" | "medium" | "low";
+/** default = high findings / poor scores; ship = also fail critical NI/unknown. */
+export type GatePolicy = "default" | "ship";
 
 export interface JobScore {
   label: string;
@@ -10,6 +12,8 @@ export interface JobScore {
 }
 
 export interface JobFinding {
+  /** Stable across verify rounds when title wording drifts. */
+  findingId?: string;
   workstream?: string;
   severity: JobSeverity;
   title: string;
@@ -40,6 +44,10 @@ export interface JobReport {
   toolsUsed: string[];
   steps: Record<string, unknown>;
   limitations?: string[];
+  /** When set, computeVerifyGate applies playbook-specific rules. */
+  gatePolicy?: GatePolicy;
+  /** True when one or more workflow steps failed or were skipped. */
+  incomplete?: boolean;
 }
 
 export interface WorkflowStepMeta {

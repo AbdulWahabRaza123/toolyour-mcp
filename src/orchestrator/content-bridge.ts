@@ -186,6 +186,8 @@ function buildNeedInput(
         "Pass input.text for copy-focused tools (headlines, jargon, snippets, PII scrub).",
       pass_code:
         "Pass input.code with TSX/JSX/HTML source — MCP extracts text and routes to the right tools.",
+      preview_url:
+        "Or pass a public/preview https:// URL. MCP cannot fetch http://localhost.",
     },
     execution: {
       mode: "content-bridge",

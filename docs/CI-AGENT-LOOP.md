@@ -10,7 +10,7 @@ Agents and CI should treat ToolYour as a **poll-first** harness. Webhooks are op
 3. read resultStatus (and result.status) — completed ≠ success
 4. keep result (or jobReport) as baseline
 5. after fixes: verify_task(..., baseline, async: true) → poll again
-6. stop when delta.gate === "pass" (or policy allows remainingFixes)
+6. stop when delta.gate === "pass", or loop.initiate is false / loop.stop is set (max_rounds|same_findings)
 ```
 
 ## get_run fields that matter
@@ -32,14 +32,18 @@ Agents and CI should treat ToolYour as a **poll-first** harness. Webhooks are op
 ## Ship-gate script (this repo)
 
 ```bash
+# Requires a prior npm run build (script imports dist/).
 TOOLYOUR_API_KEY=ty_... SHIP_URL=https://preview.example.com \
-  node scripts/ci-ship-gate.mjs
+  npm run ci:ship-gate
 ```
 
-- Exit `0` when `delta.gate === "pass"` (or local jobReport has no high findings / poor scores).  
-- Exit `1` on `fail` / errors.  
-- Exit `0` with `SKIP` if no API key (optional local).  
+- Uses the same `computeVerifyGate` helper as the MCP server (`gatePolicy: "ship"`).
+- Exit `0` when gate is `pass`.
+- Exit `1` on `fail` / `unknown` / errors / `loop.stop`.
+- Exit `0` with `SKIP` if no API key (optional local).
 - `REQUIRE_PASS=false` prints the report without failing the job.
+
+**Monorepo:** offline ship policy runs in `.github/workflows/mcp-ci.yml` via `eval:golden`. Optional live smoke: `.github/workflows/ship-gate-live.yml` (`workflow_dispatch` / weekly; needs `secrets.TOOLYOUR_API_KEY`).
 
 ## Control-plane merge gate (coding jobs)
 
@@ -63,7 +67,7 @@ Phase 5 (ToolYour-owned sandbox / `execution.run`): **NO-GO**. Host Playwright M
 
 ## GitHub Actions example (ship-gate URL jobs)
 
-Copy [`examples/github-actions/ship-gate.yml`](../examples/github-actions/ship-gate.yml) into your app repo. Wire `secrets.TOOLYOUR_API_KEY` and a preview `SHIP_URL`.
+Copy [`examples/github-actions/ship-gate.yml`](../examples/github-actions/ship-gate.yml) into your app repo. Wire `secrets.TOOLYOUR_API_KEY` and a preview `SHIP_URL`. The example **builds** MCP first (required for `dist/` imports).
 
 Or use the SDK in your own Node step:
 

@@ -74,7 +74,15 @@ describe("compact response mode", () => {
     assert.equal(shaped.loop.phase, "run");
     assert.equal(shaped.loop.gate, "fail");
     assert.equal(shaped.loop.remainingFixes[0].patchType, "http-header");
-    assert.match(String(shaped.loop.next), /verify_task/);
+    assert.ok(shaped.loop.remainingFixes[0].findingId);
+    assert.equal(shaped.loop.nextActions.length, 1);
+    assert.equal(shaped.loop.round, 0);
+    assert.equal(shaped.loop.maxRounds, 5);
+    assert.equal(shaped.loop.sameFindingsStreak, 0);
+    assert.ok(shaped.loop.receipt);
+    assert.equal(shaped.loop.receipt.round, 0);
+    assert.ok(shaped.loop.receipt.estimatedCredits >= 2);
+    assert.match(String(shaped.loop.next), /rank-1|verify_task/);
     assert.match(String(shaped.loop.next), /Do not invoke_tool/);
   });
 
@@ -223,6 +231,27 @@ describe("plan_task", () => {
     assert.equal(/extract a url/i.test(String(plan.next)), false);
     assert.equal(/invoke_tool/i.test(String(plan.next)), false);
   });
+
+  it("scopes ship-gate toolHints to gate tools only", () => {
+    const registry = new RegistryLoader(createLogger("error"));
+    registry.reload(true);
+    const plan = planTask("ship gate for https://example.com", {}, registry);
+    assert.ok(plan.recommended);
+    assert.ok(plan.toolHints.length > 0);
+    const ids = plan.toolHints.map((h) => h.operationId);
+    for (const id of ids) {
+      assert.equal(
+        /youtube|caption|converter|docx|pdf/i.test(id),
+        false,
+        `unexpected hint ${id}`
+      );
+    }
+    assert.ok(
+      ids.some((id) =>
+        /securityHeaders|sslTls|mixedContent|httpStatus|pageSpeed/i.test(id)
+      )
+    );
+  });
 });
 
 describe("suggest hygiene", () => {
@@ -295,7 +324,72 @@ describe("verify delta", () => {
     assert.equal(delta.remainingFixes[0].actions[0], "Add CSP");
     assert.equal(delta.remainingFixes[0].patchType, "http-header");
     assert.ok(String(delta.remainingFixes[0].acceptance).includes("Missing CSP"));
-    assert.ok(delta.nextActions.length >= 1);
+    assert.equal(delta.nextActions.length, 1);
+    assert.ok(delta.remainingFixes[0].findingId);
+  });
+
+  it("stable findingId survives title wording drift across verify rounds", () => {
+    const before = {
+      schemaVersion: "toolyour.jobReport@1",
+      jobId: "a",
+      workflowId: "a",
+      summary: [],
+      scores: { overall: { label: "o", value: 40, status: "poor" } },
+      findings: [
+        {
+          severity: "high",
+          title: "Missing CSP",
+          whyItMatters: "x",
+          howToFix: ["Add CSP"],
+          workstream: "headers",
+        },
+      ],
+      prioritizedActions: [],
+      toolsUsed: [],
+      steps: {},
+    };
+    const after = {
+      ...before,
+      findings: [
+        {
+          severity: "high",
+          title: "Missing CSP",
+          whyItMatters: "still open",
+          howToFix: ["Add CSP header"],
+          workstream: "headers",
+        },
+      ],
+    };
+    const delta = diffJobReports(before, after);
+    assert.equal(delta.status, "unchanged");
+    assert.equal(delta.newFindings.length, 0);
+    assert.equal(delta.resolvedFindings.length, 0);
+    assert.ok(delta.remainingFixes[0].findingId);
+  });
+
+  it("executeVerifyTask refuses without a usable baseline", async () => {
+    const { executeVerifyTask } = await import(
+      "../../dist/orchestrator/verify-task.js"
+    );
+    const { MCP_ERROR_CODES } = await import("../../dist/contracts/errors.js");
+    const registry = new RegistryLoader(createLogger("error"));
+    registry.reload(true);
+    const result = await executeVerifyTask(
+      "ship gate for https://example.com",
+      { url: "https://example.com" },
+      { status: "completed", note: "no jobReport" },
+      {
+        apiKey: "ty_test",
+        mcpSessionId: "test",
+        registry,
+        logger: createLogger("error"),
+      },
+      "compact"
+    );
+    assert.equal(result.status, "need_input");
+    assert.equal(result.code, MCP_ERROR_CODES.NEED_BASELINE);
+    assert.deepEqual(result.missing, ["baseline"]);
+    assert.equal(result.delta, undefined);
   });
 
   it("does not treat lower numbers as regression when status stays good", () => {

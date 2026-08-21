@@ -23,7 +23,7 @@
 {"goal":"open graph social preview for https://example.com","expectedJobId":"social-preview-audit","category":"social"}
 {"goal":"diagnose cls layout shift on https://example.com","expectedJobId":"improve-core-web-vitals","category":"cwv"}
 {"goal":"spf dkim dmarc email auth for https://example.com","expectedJobId":"email-auth-security","category":"security"}
-{"goal":"ship gate for https://example.com","expectedJobId":"ship-gate","category":"developer"}
+{"goal":"ship gate for https://example.com","expectedJobId":"ship-gate","requiredJobFields":["scores.tls","scores.securityHeaders","scores.httpStatus","scores.mixedContent","gatePolicy","limitations","findings"],"category":"developer"}
 {"goal":"fix verify ship gate for https://example.com","expectedJobId":"fix-verify-ship-gate","category":"verify"}
 {"goal":"fix verify security headers for https://example.com","expectedJobId":"fix-verify-security-headers","category":"verify"}
 {"goal":"fix verify social preview for https://example.com","expectedJobId":"fix-verify-social-preview","category":"verify"}

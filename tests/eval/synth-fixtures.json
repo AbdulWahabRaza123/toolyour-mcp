@@ -410,5 +410,87 @@
         }
       }
     }
+  },
+  "developer-ship-checklist": {
+    "input": { "url": "https://example.com" },
+    "steps": [
+      { "id": "headers", "operationId": "securityHeadersAnalyzer" },
+      { "id": "tls", "operationId": "sslTlsCertificateChecker" },
+      { "id": "mixed", "operationId": "mixedContentChecker" },
+      { "id": "status", "operationId": "httpStatusChecker" },
+      { "id": "speed", "operationId": "pageSpeedAnalyzer" }
+    ],
+    "stepResults": {
+      "headers": {
+        "status": 200,
+        "operationId": "securityHeadersAnalyzer",
+        "data": {
+          "status": true,
+          "result": {
+            "score": 45,
+            "grade": "F",
+            "checks": [
+              {
+                "id": "csp",
+                "name": "Content-Security-Policy",
+                "present": false,
+                "severity": "fail",
+                "advice": "Add a CSP"
+              }
+            ],
+            "summary": { "pass": 0, "warn": 0, "fail": 1 }
+          }
+        }
+      },
+      "tls": {
+        "status": 200,
+        "operationId": "sslTlsCertificateChecker",
+        "data": {
+          "status": true,
+          "result": {
+            "severity": "warn",
+            "daysRemaining": 20,
+            "checks": [],
+            "summary": { "pass": 0, "warn": 1, "fail": 0 }
+          }
+        }
+      },
+      "mixed": {
+        "status": 200,
+        "operationId": "mixedContentChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "data": { "url": "https://example.com" },
+          "report": {
+            "summary": { "totalScore": 90 },
+            "findings": []
+          }
+        }
+      },
+      "status": {
+        "status": 200,
+        "operationId": "httpStatusChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "data": { "url": "https://example.com" },
+          "report": {
+            "summary": { "totalScore": 95 },
+            "findings": []
+          }
+        }
+      },
+      "speed": {
+        "status": 200,
+        "operationId": "pageSpeedAnalyzer",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "data": { "url": "https://example.com", "loadTime": 400 },
+          "report": {
+            "summary": { "totalScore": 72 },
+            "findings": []
+          }
+        }
+      }
+    }
   }
 }

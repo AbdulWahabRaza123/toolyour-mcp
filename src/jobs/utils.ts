@@ -1,4 +1,11 @@
-import type { JobFinding, JobImpact, JobMetricStatus, PrioritizedAction } from "./types";
+import type {
+  JobFinding,
+  JobImpact,
+  JobMetricStatus,
+  JobReport,
+  JobScore,
+  PrioritizedAction,
+} from "./types";
 
 const SEVERITY_RANK: Record<string, number> = { high: 0, medium: 1, low: 2 };
 
@@ -88,6 +95,80 @@ export function scoreFromProxy(proxyScore: unknown, good = 80, ok = 60): JobMetr
   return "poor";
 }
 
+const STATUS_RANK: Record<JobMetricStatus, number> = {
+  poor: 0,
+  needs_improvement: 1,
+  unknown: 2,
+  good: 3,
+};
+
+/** Worst status wins — overall must never look better than a critical score. */
+export function worstMetricStatus(
+  statuses: Array<JobMetricStatus | undefined>
+): JobMetricStatus {
+  let worst: JobMetricStatus = "good";
+  for (const st of statuses) {
+    if (!st) continue;
+    if (STATUS_RANK[st] < STATUS_RANK[worst]) worst = st;
+  }
+  return worst;
+}
+
+export function capOverallBySiblingScores(
+  scores: Record<string, JobScore>
+): Record<string, JobScore> {
+  const overall = scores.overall;
+  if (!overall) return scores;
+  const siblings = Object.entries(scores)
+    .filter(([k]) => k !== "overall")
+    .map(([, s]) => s.status);
+  if (siblings.length === 0) return scores;
+  const capped = worstMetricStatus([overall.status, ...siblings]);
+  if (capped === overall.status) return scores;
+  return {
+    ...scores,
+    overall: { ...overall, status: capped },
+  };
+}
+
+/**
+ * Incomplete runs must not read as a clean bill of health.
+ */
+export function markIncompleteJobReport(
+  report: JobReport,
+  reason = "One or more workflow steps failed or were skipped."
+): JobReport {
+  const banner = `INCOMPLETE: ${reason} Do not treat as ship-ready or gate pass.`;
+  const summary = [banner, ...(report.summary || []).filter((s) => !/^INCOMPLETE:/i.test(s))];
+  const scores = { ...report.scores };
+  for (const [key, score] of Object.entries(scores)) {
+    if (score.status === "good") {
+      scores[key] = { ...score, status: "unknown" };
+    }
+  }
+  if (scores.overall) {
+    scores.overall = {
+      ...scores.overall,
+      status: "unknown",
+      value:
+        typeof scores.overall.value === "number"
+          ? scores.overall.value
+          : scores.overall.value,
+    };
+  }
+  const limitations = [
+    "This report is incomplete — missing or failed steps were not scored.",
+    ...(report.limitations || []),
+  ];
+  return {
+    ...report,
+    incomplete: true,
+    summary,
+    scores: capOverallBySiblingScores(scores),
+    limitations,
+  };
+}
+
 export function metricLabel(status: JobMetricStatus): string {
   if (status === "good") return "good";
   if (status === "needs_improvement") return "needs improvement";
@@ -107,11 +188,13 @@ export function findingsFromReport(
     .filter((f) => f && typeof f === "object")
     .map((f) => {
       const item = f as Record<string, unknown>;
+      const title = String(item.title ?? "Finding");
+      const resolvedMetric = metric || (typeof item.metric === "string" ? item.metric : undefined);
       return {
         workstream,
-        metric,
+        metric: resolvedMetric,
         severity: (item.severity as JobFinding["severity"]) || "medium",
-        title: String(item.title ?? "Finding"),
+        title,
         whyItMatters: String(item.whyItMatters ?? ""),
         howToFix: Array.isArray(item.howToFix) ? item.howToFix.map(String) : [],
         evidence:
@@ -122,12 +205,59 @@ export function findingsFromReport(
     });
 }
 
+export function stableFindingId(
+  workstream: string | undefined,
+  title: string,
+  metric?: string
+): string {
+  const raw = [workstream || "general", metric || "", title]
+    .join(":")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+  return raw || "finding";
+}
+
+export function stampFindingIds(findings: JobFinding[] | undefined): JobFinding[] {
+  return (findings || []).map((f) => ({
+    ...f,
+    findingId: f.findingId || stableFindingId(f.workstream, f.title, f.metric),
+  }));
+}
+
+export const PROXY_SPEED_LIMITATIONS = [
+  "LCP/CLS/INP scores are HTML-based proxies, not Chrome field CrUX or Lighthouse lab metrics.",
+  "INP is approximated via Total Blocking Time (TBT) when labeled as a proxy.",
+  "TTFB prefers Server-Timing when present; otherwise uses fetch timing to first HTML response (not a Chrome trace).",
+  "assetOptimizer lists are heuristic (image sizes + HTML attributes), not Lighthouse audits.",
+] as const;
+
+export function finalizeJobReport(report: JobReport): JobReport {
+  const findings = stampFindingIds(report.findings);
+  const usesSpeed = (report.toolsUsed || []).includes("pageSpeedAnalyzer");
+  let limitations = [...(report.limitations || [])];
+  if (usesSpeed) {
+    for (const line of PROXY_SPEED_LIMITATIONS) {
+      if (!limitations.includes(line)) limitations.push(line);
+    }
+  }
+  const scores = capOverallBySiblingScores(report.scores || {});
+  return {
+    ...report,
+    findings,
+    scores,
+    gatePolicy: report.gatePolicy,
+    limitations: limitations.length ? limitations : report.limitations,
+  };
+}
+
 export function mergeFindings(...groups: JobFinding[][]): JobFinding[] {
   const seen = new Set<string>();
   const out: JobFinding[] = [];
   for (const group of groups) {
     for (const f of group) {
-      const key = `${f.workstream}|${f.title}`.toLowerCase();
+      const key = f.findingId || `${f.workstream}|${f.title}`.toLowerCase();
       if (seen.has(key)) continue;
       seen.add(key);
       out.push(f);

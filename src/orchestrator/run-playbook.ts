@@ -15,6 +15,10 @@ import {
   payloadNeedInput,
   urlNeedInput,
 } from "./payload-intent";
+import {
+  buildLocalhostNeedInput,
+  resolveLocalhostUrl,
+} from "./local-dev";
 
 export interface RunPlaybookContext {
   apiKey: string;
@@ -147,6 +151,25 @@ export async function runPlaybook(
       },
       missing: ["url"],
     });
+  }
+
+  const localhostUrl = resolveLocalhostUrl(`run_playbook(${id})`, data);
+  if (localhostUrl && !payloadPlaybook) {
+    return shapeAgentResult(
+      buildLocalhostNeedInput({
+        goal: `run_playbook(${id})`,
+        url: localhostUrl,
+        skillId: id,
+        matchedTask: {
+          id,
+          title: meta.title,
+          type: "workflow",
+          target: workflowId,
+          score: 1,
+        },
+      }),
+      parseResponseMode(responseMode)
+    );
   }
 
   const result = await runWorkflow(workflowId, data, {

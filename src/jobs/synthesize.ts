@@ -1,4 +1,5 @@
 import type { JobReport, SynthesizeJobParams } from "./types";
+import { finalizeJobReport } from "./utils";
 import { synthesizeCoreWebVitals } from "./core-web-vitals";
 import { synthesizeFullSeoAudit } from "./full-seo-audit";
 import { synthesizeFullSeoOptimization } from "./full-seo-optimization";
@@ -70,7 +71,7 @@ const SYNTHESIZERS: Record<string, (params: SynthesizeJobParams) => JobReport> =
 export function synthesizeJobReport(params: SynthesizeJobParams): JobReport | null {
   const fn = SYNTHESIZERS[params.synthesizerId];
   if (!fn) return null;
-  return fn(params);
+  return finalizeJobReport(fn(params));
 }
 
 export function listSynthesizerIds(): string[] {
