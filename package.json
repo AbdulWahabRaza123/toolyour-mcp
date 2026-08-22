@@ -23,6 +23,7 @@
     "smoke:jobs:offline": "npm run build && node scripts/smoke-jobs-offline.mjs",
     "smoke:jobs:live": "node scripts/test-mcp-use-cases.mjs",
     "smoke:live:agent": "node scripts/smoke-live-agent-loop.mjs",
+    "smoke:tier1:live": "node scripts/smoke-tier1-live.mjs",
     "smoke:staging": "node scripts/smoke-staging.mjs",
     "ci:ship-gate": "node scripts/ci-ship-gate.mjs",
     "eval:control-plane": "node scripts/eval-control-plane.mjs",
