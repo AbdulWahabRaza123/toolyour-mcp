@@ -41,7 +41,7 @@ export {
 } from "./loop-stop";
 
 export const LOOP_NEXT_FAIL =
-  "Apply the rank-1 item in loop.nextActions (full list: loop.remainingFixes) in the host repo (editor/git). Then call verify_task with this entire result as baseline. Do not invoke_tool for the same job.";
+  "Apply ONLY the rank-1 item in loop.nextActions (see patchType, acceptance, roleHint). Full backlog: loop.remainingFixes. Change the host workspace (editor/git/config) — do not invoke_tool for the same job. Then call verify_task with this entire result as baseline until loop.gate is pass, or stop when loop.stop / loop.initiate is false.";
 
 const CREDITS_PER_TOOL_EST = 2;
 

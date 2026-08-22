@@ -34,6 +34,9 @@ export type RemainingFixPatchType =
   | "content"
   | "investigate";
 
+/** Advice only: where the host should focus (not a Cursor Task type). */
+export type RemainingFixRoleHint = "edit" | "config" | "read" | "shell";
+
 export interface RemainingFix {
   rank: number;
   findingId?: string;
@@ -45,6 +48,8 @@ export interface RemainingFix {
   source: "finding" | "prioritizedAction";
   /** Hint for the host agent — ToolYour does not patch the repo. */
   patchType: RemainingFixPatchType;
+  /** Advice only: where the host should focus (not a Cursor Task type). */
+  roleHint: RemainingFixRoleHint;
   /** What verify_task should see after the host applies this fix. */
   acceptance: string;
 }
@@ -55,6 +60,9 @@ export interface VerifyNextAction {
   label: string;
   workstream?: string;
   severity?: JobFinding["severity"];
+  patchType?: RemainingFixPatchType;
+  roleHint?: RemainingFixRoleHint;
+  acceptance?: string;
 }
 
 const SEVERITY_RANK: Record<string, number> = { high: 0, medium: 1, low: 2 };
@@ -122,8 +130,30 @@ function findingNeedsHostFix(
   return true;
 }
 
-function acceptanceLine(title: string): string {
-  return `After the host applies this fix, verify_task should no longer list "${title}" as a high finding (or the related score should leave poor).`;
+export function inferRoleHint(
+  patchType: RemainingFixPatchType
+): RemainingFixRoleHint {
+  if (patchType === "http-header" || patchType === "config") return "config";
+  if (patchType === "investigate") return "read";
+  if (patchType === "file") return "edit";
+  return "edit";
+}
+
+function acceptanceLine(
+  title: string,
+  patchType: RemainingFixPatchType
+): string {
+  const where =
+    patchType === "http-header"
+      ? "server/CDN response headers (or framework security headers)"
+      : patchType === "config"
+        ? "env/config (rotate or remove secrets; never commit them)"
+        : patchType === "html" || patchType === "content"
+          ? "HTML/templates/CMS content"
+          : patchType === "file"
+            ? "repo assets or frontend build pipeline"
+            : "the relevant host workspace files";
+  return `Done when: after changing ${where}, verify_task no longer lists "${title}" as an open high finding (and related ship-critical scores are not poor/needs_improvement/unknown).`;
 }
 
 /**
@@ -146,6 +176,7 @@ export function buildRemainingFixes(after: JobReport | null): RemainingFix[] {
     if (!actions.length && f.severity === "low") continue;
     const workstream = f.workstream || f.metric || "general";
     const title = f.title;
+    const patchType = inferPatchType(workstream, title, f.metric);
     fixes.push({
       rank: rank++,
       findingId: f.findingId,
@@ -158,8 +189,9 @@ export function buildRemainingFixes(after: JobReport | null): RemainingFix[] {
             "Investigate and remediate this finding, then re-run verify_task.",
           ],
       source: "finding",
-      patchType: inferPatchType(workstream, title, f.metric),
-      acceptance: acceptanceLine(title),
+      patchType,
+      roleHint: inferRoleHint(patchType),
+      acceptance: acceptanceLine(title, patchType),
     });
   }
 
@@ -178,6 +210,7 @@ export function buildRemainingFixes(after: JobReport | null): RemainingFix[] {
       continue;
     }
     const title = a.action;
+    const patchType = inferPatchType(workstream, title);
     fixes.push({
       rank: rank++,
       workstream,
@@ -185,8 +218,9 @@ export function buildRemainingFixes(after: JobReport | null): RemainingFix[] {
       actions: [a.action],
       expectedImpact: a.expectedImpact,
       source: "prioritizedAction",
-      patchType: inferPatchType(workstream, title),
-      acceptance: acceptanceLine(title),
+      patchType,
+      roleHint: inferRoleHint(patchType),
+      acceptance: acceptanceLine(title, patchType),
     });
   }
 
@@ -201,6 +235,9 @@ export function buildNextActions(fixes: RemainingFix[]): VerifyNextAction[] {
     label: f.actions[0] || f.title,
     workstream: f.workstream,
     severity: f.severity,
+    patchType: f.patchType,
+    roleHint: f.roleHint,
+    acceptance: f.acceptance,
   }));
 }
 

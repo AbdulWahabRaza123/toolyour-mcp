@@ -11,20 +11,28 @@ workflowId: secrets-hygiene-job
 
 Use this playbook for **token/password/hash/secret-leak/webhook** tasks (not live URL crawling).
 
-## Preferred path
+## Host contract (any MCP agent)
 
-1. Pasted env/config/logs → **`run_playbook("secrets-and-auth-hygiene", { text })`** → `secrets-hygiene-job`
-   - Steps: secretLeakScanner → jwtDecoder (when a JWT is present in the text)
-2. JWT-first paste → `run_playbook("auth-token-hygiene", { token })`
-3. Before pasting production logs → `piiScrub` when available
-4. Verify JWT signature → `jwtSignatureVerifier` (secret or publicKey/JWK)
-5. Webhook header verify → `webhookSignatureVerifier`
-6. Password strength / generate → `passwordStrengthChecker` / `securePasswordGenerator`
-7. Hash / HMAC / bcrypt|argon2id → `hashGenerator` / `hmacGenerator` / `bcryptHashGenerator`
-8. Do not store production secrets; summarize match types / verify results only.
+1. Host reads env/diff/logs from the workspace into `input.text` (do not invent secrets)  
+2. `plan_task` (optional, free) → `run_playbook("secrets-and-auth-hygiene", { text })` → `secrets-hygiene-job`  
+3. Apply **only** rank-1 `loop.nextActions` (`patchType: config`, `roleHint: config`) — rotate/redact; never commit real secrets  
+4. `verify_task` with **cleaned** `input.text` + prior result as `baseline` until `loop.gate` is pass  
+5. Stop on `loop.stop`. Do not `invoke_tool` for the same hygiene job  
 
-## Output format
+JWT step is skipped when the paste has no JWT (job stays complete).
 
-- What was checked
-- Warnings (leaks, alg=none, signature mismatch, weak password)
-- Safe next action (rotate, verify server-side, use Argon2id for new password stores)
+## Related one-offs (`invoke_tool` only when asked)
+
+- JWT-first paste → `run_playbook("auth-token-hygiene", { token })`
+- Before pasting production logs → `piiScrub` when available
+- Verify JWT signature → `jwtSignatureVerifier`
+- Webhook header verify → `webhookSignatureVerifier`
+- Password / hash helpers → `passwordStrengthChecker` / `hashGenerator` / etc.
+
+## Output
+
+- Match types / warnings only (redacted previews)
+- Safe next action (rotate, scrub, verify server-side)
+- `gatePolicy: secrets` — any open secret/jwt finding fails until clean
+
+Golden path: `docs/TIER1-GOLDEN-PATH.md`

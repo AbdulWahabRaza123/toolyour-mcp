@@ -105,9 +105,14 @@ export const ALLOWED_COMMANDS = new Set([
 
 export const DEFAULT_MCP_INSTRUCTIONS =
   "ToolYour has two loops. Pick exactly one per user goal — never both. " +
-  "Skill loop (SEO, security, ship-gate, converters, catalog): First call plan_task. If loop.initiate is false, stop; do not call verify_task. Then solve_task or run_playbook, then verify_task. " +
-  "Completion loop (frozen coding jobId): call job_status only; edit on the host; run toolyour-check-run or control-plane-host.mjs. Do not invent check_submit. Do not call plan_task, solve_task, or verify_task for that jobId. Do not call job_start unless the user asked to start a frozen task. " +
-  "Host keeps editor, git, and terminal. This server does not replace Cursor.";
+  "Skill loop (SEO, security, ship-gate, secrets, catalog): " +
+  "(1) plan_task — if loop.initiate is false, stop; do not verify_task. " +
+  "(2) solve_task or run_playbook — read loop.gate, loop.nextActions (rank-1 only), loop.remainingFixes (full list with patchType + acceptance + roleHint). " +
+  "(3) Host applies ONLY the rank-1 nextActions item in the workspace (editor/git/config) — do not invent tools or call invoke_tool for the same job. " +
+  "(4) verify_task with the prior result as baseline until loop.gate is pass, or stop when loop.stop / loop.initiate is false (maxRounds=5, sameFindingsLimit=2). " +
+  "Never pass localhost URLs. Credits buy evidence and re-checks — incomplete/OOS runs are not a pass. " +
+  "Completion loop (frozen coding jobId): job_status only; edit on the host; run toolyour-check-run or control-plane-host.mjs. Do not invent check_submit. Do not mix plan_task/solve_task/verify_task with that jobId. " +
+  "Host keeps editor, git, and terminal. This server does not replace Cursor, Claude, or any host agent.";
 
 export function resolveMcpInstructions(): string {
   return DEFAULT_MCP_INSTRUCTIONS;

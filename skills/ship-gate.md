@@ -17,13 +17,15 @@ Use when the user wants a **go/no-go deploy smoke gate** on a **live or preview 
 
 **URL only** when they explicitly want a live fetch (preview deploy, staging, headers on the site). **Never pass localhost** — use workspace HTML or a public/preview https:// URL (or a tunnel URL).
 
-## Preferred path
+## Host contract (any MCP agent)
 
-1. `plan_task("ship gate for https://…")` — free estimate; `toolHints` match the five gate tools
-2. `run_playbook("ship-gate", { url })` or `solve_task("ship gate https://…")`
-3. After fixes: `verify_task` with the previous result as `baseline` until `loop.gate` is pass. Do not `invoke_tool` for the same job.
+1. `plan_task("ship gate for https://…")` — free; stop if `loop.initiate` is false  
+2. `run_playbook("ship-gate", { url })` or `solve_task("ship gate https://…")`  
+3. Apply **only** `loop.nextActions[0]` using `patchType` / `acceptance` / `roleHint` (usually `config` for headers)  
+4. `verify_task` with the prior result as `baseline` until `loop.gate` is pass — or stop on `loop.stop`  
+5. Do **not** `invoke_tool` for the same job  
 
-First-run responses already include `loop.remainingFixes` (`patchType` + `acceptance`) and `loop.receipt` (round + estimated credits) — apply rank-1 in the repo, then verify.
+First-run responses include `loop.remainingFixes`, `loop.receipt`, and rank-1 `loop.nextActions`.
 
 ## Gate policy (`gatePolicy: ship`)
 
@@ -37,3 +39,5 @@ First-run responses already include `loop.remainingFixes` (`patchType` + `accept
 - High-severity blockers first
 - Prioritized actions from `jobReport`
 - Do not claim production-ready without human QA
+
+Golden path: `docs/TIER1-GOLDEN-PATH.md`
