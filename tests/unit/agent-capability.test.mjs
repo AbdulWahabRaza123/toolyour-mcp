@@ -82,8 +82,9 @@ describe("compact response mode", () => {
     assert.ok(shaped.loop.receipt);
     assert.equal(shaped.loop.receipt.round, 0);
     assert.ok(shaped.loop.receipt.estimatedCredits >= 2);
+    assert.ok(shaped.loop.receipt.toolsUsed >= 1);
     assert.match(String(shaped.loop.next), /rank-1|verify_task/);
-    assert.match(String(shaped.loop.next), /Do not invoke_tool/);
+    assert.match(String(shaped.loop.next), /do not invoke_tool/i);
   });
 
   it("partial run never advertises gate=pass", () => {

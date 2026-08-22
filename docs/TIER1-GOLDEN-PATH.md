@@ -31,7 +31,7 @@ SMOKE_GOAL="ship gate for https://example.com" npm run smoke:live:agent
 | 3 | Host | Apply header/TLS/mixed fix on **your** server (example.com itself won’t accept your patch — use a URL you control for a true pass) |
 | 4 | MCP | `verify_task` with baseline until `loop.gate` is pass or `loop.stop` |
 
-**Demo note:** `example.com` is good to show **fail + remainingFixes**. For **gate=pass**, use a staging URL you can harden.
+**Demo note:** After toolbox deploys with CSP / X-Frame-Options / COOP, `https://www.toolyour.com` is the preferred **closable** ship-gate URL. Until then, `example.com` still demos **fail + remainingFixes**. For a true pass on your own app, harden the three headers MCP lists in rank-1 fixes.
 
 **Never:** localhost URL.
 

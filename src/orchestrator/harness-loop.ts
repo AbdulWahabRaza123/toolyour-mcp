@@ -48,7 +48,9 @@ const CREDITS_PER_TOOL_EST = 2;
 export interface LoopReceipt {
   round: number;
   maxRounds: number;
-  /** Rough estimate from tools used this run — SaaS bills 1–10 per tool. */
+  /** Count of API tools used on this run (from jobReport.toolsUsed when present). */
+  toolsUsed: number;
+  /** Rough estimate — SaaS bills 1–10 credits per tool. */
   estimatedCredits: number;
   note: string;
 }
@@ -68,22 +70,22 @@ export interface HarnessLoop extends LoopEligibility {
   receipt: LoopReceipt;
 }
 
-function estimateCreditsFromPayload(payload: unknown): number {
+function countToolsUsed(payload: unknown): number {
   const report = extractJobReport(payload);
-  if (report?.toolsUsed?.length) {
-    return report.toolsUsed.length * CREDITS_PER_TOOL_EST;
-  }
+  if (report?.toolsUsed?.length) return report.toolsUsed.length;
   if (!payload || typeof payload !== "object") return 0;
   const root = payload as Record<string, unknown>;
   const exec = root.execution;
   if (exec && typeof exec === "object") {
     const steps = (exec as { completedSteps?: unknown }).completedSteps;
-    if (Array.isArray(steps)) return steps.length * CREDITS_PER_TOOL_EST;
+    if (Array.isArray(steps)) return steps.length;
   }
-  if (Array.isArray(root.completedSteps)) {
-    return root.completedSteps.length * CREDITS_PER_TOOL_EST;
-  }
+  if (Array.isArray(root.completedSteps)) return root.completedSteps.length;
   return 0;
+}
+
+function estimateCreditsFromPayload(payload: unknown): number {
+  return countToolsUsed(payload) * CREDITS_PER_TOOL_EST;
 }
 
 function assembleLoop(
@@ -118,6 +120,7 @@ function assembleLoop(
   }
 
   const estimatedCredits = estimateCreditsFromPayload(payload);
+  const toolsUsed = countToolsUsed(payload);
 
   return {
     ...decided,
@@ -135,9 +138,12 @@ function assembleLoop(
     receipt: {
       round: progress.round,
       maxRounds: progress.maxRounds,
+      toolsUsed,
       estimatedCredits,
       note:
-        "estimatedCredits is a rough count from tools used (≈2 each); actual debit is 1–10 credits per tool on the shared REST+MCP quota.",
+        toolsUsed > 0
+          ? `This run used ${toolsUsed} API tool(s). estimatedCredits≈${estimatedCredits} (rough ×${CREDITS_PER_TOOL_EST}); SaaS bills 1–10 credits per tool on the shared REST+MCP quota. Credits buy evidence + re-checks — apply rank-1, then verify_task.`
+          : "No API tools counted on this payload. estimatedCredits is rough when tools run (1–10 credits each on the shared REST+MCP quota).",
     },
   };
 }
