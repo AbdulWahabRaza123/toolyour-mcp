@@ -83,6 +83,24 @@ describe("ship gate policy", () => {
     assert.equal(computeVerifyGate(report), "pass");
   });
 
+  it("ship policy allows performance unknown when critical scores are good", () => {
+    const report = {
+      schemaVersion: "toolyour.jobReport@1",
+      jobId: "ship-gate",
+      workflowId: "ship-gate-job",
+      gatePolicy: "ship",
+      summary: [],
+      scores: baseScores({
+        performance: { label: "Page speed proxy", value: "—", status: "unknown" },
+      }),
+      findings: [],
+      prioritizedActions: [],
+      toolsUsed: [],
+      steps: {},
+    };
+    assert.equal(computeVerifyGate(report), "pass");
+  });
+
   it("synthesizer stamps gatePolicy=ship", () => {
     const report = synthesizeJobReport({
       synthesizerId: "developer-ship-checklist",

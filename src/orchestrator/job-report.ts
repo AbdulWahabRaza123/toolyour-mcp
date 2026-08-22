@@ -21,6 +21,9 @@ const OPTIONAL_METRIC_SCORE_KEYS = new Set([
   "INP",
   "TTFB",
   "FCP",
+  // HTML page-speed proxy: ship policy already excludes it from critical keys;
+  // unknown/"—" must not fail the gate when headers/TLS/status/mixed are good.
+  "performance",
 ]);
 
 export type VerifyGate = "pass" | "fail" | "unknown";
