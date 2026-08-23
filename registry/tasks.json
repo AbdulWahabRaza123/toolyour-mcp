@@ -1146,11 +1146,11 @@
       "title": "Dev JSON pipeline",
       "description": "Validate and format JSON, then generate Zod (or invoke TypeScript/Go/Python).",
       "keywords": [
-        "json to zod",
         "json codegen",
         "json pipeline",
         "dev json pipeline",
-        "yaml to json schema"
+        "yaml to json schema",
+        "validate format zod"
       ],
       "type": "workflow",
       "target": "dev-json-pipeline-job",
@@ -1174,6 +1174,24 @@
       ],
       "type": "tool",
       "target": "jsonToTypescript",
+      "requiredInput": ["json"]
+    },
+    {
+      "id": "json-to-zod",
+      "title": "JSON to Zod / generate schema",
+      "description": "Generate a Zod schema plus z.infer type from one JSON sample (one-shot developer utility).",
+      "keywords": [
+        "json to zod",
+        "zod schema generator",
+        "generate zod schema",
+        "zod from json",
+        "json to zod schema",
+        "zod schema from json",
+        "runtime validation schema",
+        "infer zod schema"
+      ],
+      "type": "tool",
+      "target": "jsonToZod",
       "requiredInput": ["json"]
     },
     {
