@@ -1286,6 +1286,24 @@
       "requiredInput": ["xml"]
     },
     {
+      "id": "jwt-generator",
+      "title": "JWT generator / HS256 test tokens",
+      "description": "Sign a JSON payload into an HS256 JWT with optional expiry (one-shot developer utility; test secrets only).",
+      "keywords": [
+        "jwt generator",
+        "generate jwt",
+        "hs256 jwt",
+        "sign jwt token",
+        "create test jwt",
+        "jwt builder",
+        "test jwt",
+        "mint jwt"
+      ],
+      "type": "tool",
+      "target": "jwtGenerator",
+      "requiredInput": ["payload", "secret"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
@@ -1444,12 +1462,12 @@
       "title": "Dev auth debug",
       "description": "Generate a test JWT and decode claims; headers/request builder via invoke_tool.",
       "keywords": [
-        "generate jwt",
-        "jwt generator",
         "debug auth token",
-        "test jwt",
         "auth debug",
-        "decode generated jwt"
+        "decode generated jwt",
+        "dev auth debug",
+        "jwt mint and decode",
+        "auth token pipeline"
       ],
       "type": "workflow",
       "target": "dev-auth-debug-job",
