@@ -1440,6 +1440,21 @@
       "requiredInput": ["sql"]
     },
     {
+      "id": "sql-validator",
+      "title": "SQL validator / heuristic syntax check",
+      "description": "Flag empty statements, unbalanced parentheses, stacked statements, and missing verbs (one-shot; no DB).",
+      "keywords": [
+        "sql validator",
+        "validate sql",
+        "check sql query",
+        "sql syntax checker",
+        "sql lint"
+      ],
+      "type": "tool",
+      "target": "sqlValidator",
+      "requiredInput": ["sql"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
