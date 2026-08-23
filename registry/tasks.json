@@ -1195,6 +1195,24 @@
       "requiredInput": ["json"]
     },
     {
+      "id": "json-to-go-struct",
+      "title": "JSON to Go struct / generate Go types",
+      "description": "Generate nested Go structs with json tags from one JSON sample (one-shot developer utility).",
+      "keywords": [
+        "json to go struct",
+        "json to go",
+        "go struct generator",
+        "json to golang",
+        "generate go types",
+        "go json tags",
+        "golang struct from json",
+        "json to go types"
+      ],
+      "type": "tool",
+      "target": "jsonToGoStruct",
+      "requiredInput": ["json"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
