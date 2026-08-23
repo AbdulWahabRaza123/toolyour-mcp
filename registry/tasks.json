@@ -1395,6 +1395,21 @@
       "requiredInput": ["html"]
     },
     {
+      "id": "css-formatter",
+      "title": "CSS formatter / pretty-print stylesheets",
+      "description": "Pretty-print CSS with Prettier for readable stylesheets and cleaner diffs (one-shot).",
+      "keywords": [
+        "css formatter",
+        "format css",
+        "pretty print css",
+        "indent stylesheet",
+        "css pretty print"
+      ],
+      "type": "tool",
+      "target": "cssFormatter",
+      "requiredInput": ["css"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
