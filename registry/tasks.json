@@ -124,6 +124,25 @@
       "requiredInput": ["file"]
     },
     {
+      "id": "compress-svg",
+      "title": "Compress SVG markup",
+      "description": "Optimize an SVG with SVGO-style cleanup and return smaller markup (one-shot convertor).",
+      "keywords": [
+        "compress svg",
+        "svg compressor",
+        "optimize svg",
+        "svg optimize",
+        "minify svg",
+        "reduce svg size",
+        "svg file size",
+        "svgo",
+        "this svg"
+      ],
+      "type": "tool",
+      "target": "compressSvg",
+      "requiredInput": ["file"]
+    },
+    {
       "id": "frontend-webp",
       "title": "Convert frontend images to WebP",
       "description": "Find compressible page images, convert them to WebP, and list img/srcset replacements.",
