@@ -1425,6 +1425,21 @@
       "requiredInput": ["code"]
     },
     {
+      "id": "sql-formatter",
+      "title": "SQL formatter / pretty-print queries",
+      "description": "Reformat SQL with keyword casing and clause breaks for review (one-shot heuristic).",
+      "keywords": [
+        "sql formatter",
+        "format sql",
+        "pretty print sql",
+        "sql beautifier",
+        "format sql query"
+      ],
+      "type": "tool",
+      "target": "sqlFormatter",
+      "requiredInput": ["sql"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
@@ -1615,7 +1630,6 @@
       "keywords": [
         "format html css",
         "format html and css",
-        "sql formatter",
         "dev format transform",
         "multi format transform",
         "yaml json xml pipeline",
