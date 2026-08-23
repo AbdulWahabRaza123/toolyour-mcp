@@ -111,6 +111,28 @@ export function synthesizeDeveloperShipChecklist(
   const prioritizedActions = rankActions(findings, 14);
   const high = findings.filter((f) => f.severity === "high").length;
 
+  const criticalKeys = [
+    "tls",
+    "securityHeaders",
+    "httpStatus",
+    "mixedContent",
+  ] as const;
+  const criticalUnclear = criticalKeys.some((key) => {
+    const st = cappedScores[key]?.status;
+    return (
+      !st ||
+      st === "unknown" ||
+      st === "needs_improvement" ||
+      st === "poor"
+    );
+  });
+  const anyPoor = Object.values(cappedScores).some((s) => s.status === "poor");
+  const closingLine = prioritizedActions[0]
+    ? `Top action: ${prioritizedActions[0].action}`
+    : high || criticalUnclear || anyPoor
+      ? "Ship gate not clear yet — review score statuses before treating this as ship-ready."
+      : "Ship gate pass on critical checks. Ready for a human smoke test.";
+
   return {
     schemaVersion: "toolyour.jobReport@1",
     jobId: params.jobId || workflowId,
@@ -124,9 +146,7 @@ export function synthesizeDeveloperShipChecklist(
       high
         ? `${high} high-severity blockers — fix before production.`
         : "No high-severity blockers in this pass.",
-      prioritizedActions[0]
-        ? `Top action: ${prioritizedActions[0].action}`
-        : "Ready for a human smoke test.",
+      closingLine,
     ],
     scores: cappedScores,
     findings,

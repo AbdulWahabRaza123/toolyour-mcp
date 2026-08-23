@@ -4,6 +4,7 @@ import { constants, getEnv, loadManifestFile } from "../config";
 import type { McpRegistryManifest, McpToolRoute } from "../contracts";
 import type { Logger } from "../observability/logger";
 import { scoreFuzzyQuery } from "../search/fuzzy-search";
+import { expandQueryForDiscovery } from "../search/query-expand";
 
 export class RegistryLoader {
   private manifest: McpRegistryManifest | null = null;
@@ -93,15 +94,17 @@ export function searchTools(
     return items.slice(0, max);
   }
 
+  const queries = expandQueryForDiscovery(q);
   const scored = items
-    .map((t) => ({
-      tool: t,
-      score: scoreFuzzyQuery(
-        q,
-        [t.operationId, t.name, t.description, t.category],
-        [1.4, 1.2, 0.8, 0.5]
-      ),
-    }))
+    .map((t) => {
+      const fields = [t.operationId, t.name, t.description, t.category];
+      const weights = [1.4, 1.2, 0.8, 0.5];
+      let score = 0;
+      for (const variant of queries) {
+        score = Math.max(score, scoreFuzzyQuery(variant, fields, weights));
+      }
+      return { tool: t, score };
+    })
     .filter((row) => row.score > 0)
     .sort((a, b) => b.score - a.score);
 

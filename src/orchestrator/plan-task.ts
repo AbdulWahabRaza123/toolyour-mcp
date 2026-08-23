@@ -66,6 +66,88 @@ function playbookHit(goal: string, skill: { id: string; title: string; descripti
 }
 
 /**
+ * Vague human health checks without a URL — ask for URL + offer Tier-1 jobs
+ * instead of hard out-of-scope.
+ */
+export function isVagueSiteHealthGoal(goal: string): boolean {
+  const g = goal.trim().toLowerCase().replace(/[?.!]+$/g, "");
+  if (!g) return false;
+  if (/\bhttps?:\/\//i.test(g)) return false;
+  if (/\b(localhost|127\.0\.0\.1)\b/i.test(g)) return false;
+  // Already names a concrete job — let normal matching handle it.
+  if (
+    /\b(ship[\s-]?gate|seo\s+audit|security\s+headers?|secrets?|web\s+security|page\s+speed|crawl)\b/i.test(
+      g
+    )
+  ) {
+    return false;
+  }
+  return (
+    /\bis\s+(my\s+)?(web\s*)?(site|website|page)\s+(ok|okay|fine|good|healthy|secure|ready|safe)\b/.test(
+      g
+    ) ||
+    /\bhow('s|\s+is)\s+(my\s+)?(web\s*)?(site|website)\b/.test(g) ||
+    /^(check|audit|review|test)\s+(my\s+)?(web\s*)?(site|website)$/.test(g) ||
+    /^(is\s+it\s+(ok|okay|fine|safe|secure|ready))$/.test(g) ||
+    /^(web\s*)?(site|website)\s+(ok|okay|fine|healthy)\??$/.test(g)
+  );
+}
+
+function vagueSiteHealthPlan(trimmedGoal: string): PlanTaskResult {
+  const loop = {
+    initiate: false,
+    inScope: true,
+    reason:
+      "Need a public https:// URL (or say which job: ship-gate, SEO audit, or security audit).",
+  };
+  return {
+    status: "plan",
+    goal: trimmedGoal,
+    free: true,
+    estimatedCredits: 0,
+    confidence: "medium",
+    recommended: {
+      kind: "playbook",
+      id: "ship-gate",
+      title: "Ship Gate",
+      score: 6,
+      requiredInput: ["url"],
+      steps: [
+        "securityHeadersAnalyzer",
+        "sslTlsCertificateChecker",
+        "mixedContentChecker",
+        "httpStatusChecker",
+        "pageSpeedAnalyzer",
+      ],
+      workflowId: "ship-gate-job",
+    },
+    alternatives: [
+      {
+        kind: "playbook",
+        id: "seo-site-audit",
+        title: "SEO Site Audit",
+        score: 5,
+      },
+      {
+        kind: "playbook",
+        id: "web-security-audit",
+        title: "Web Security Audit",
+        score: 5,
+      },
+      {
+        kind: "playbook",
+        id: "pr-code-gate",
+        title: "PR Code Gate",
+        score: 3,
+      },
+    ],
+    toolHints: [],
+    loop,
+    next: 'Ask the user for a public https:// URL, then run_playbook("ship-gate", { url }). If they meant SEO or security, use seo-site-audit or web-security-audit instead. Do not start verify_task yet.',
+  };
+}
+
+/**
  * Free planning pass — no tool execution, no billing.
  */
 export function planTask(
@@ -129,6 +211,9 @@ export function planTask(
   }
 
   if (!match || !confident) {
+    if (isVagueSiteHealthGoal(trimmedGoal)) {
+      return vagueSiteHealthPlan(trimmedGoal);
+    }
     const topPlaybook = alternatives.find((a) => a.kind === "playbook");
     const confidence = match ? "low" : "none";
     const loop = decidePlanLoop({ confidence });
