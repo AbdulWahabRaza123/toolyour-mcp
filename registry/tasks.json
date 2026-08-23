@@ -203,6 +203,26 @@
       "requiredInput": ["textA", "textB"]
     },
     {
+      "id": "convert-to-slug",
+      "title": "Slug generator / title to URL slug",
+      "description": "Convert a title into a URL-safe kebab-case slug (one-shot text utility).",
+      "keywords": [
+        "slug generator",
+        "url slug",
+        "url slug generator",
+        "convert to slug",
+        "title to slug",
+        "kebab case slug",
+        "make a slug",
+        "slugify",
+        "slugify title",
+        "permalink slug"
+      ],
+      "type": "tool",
+      "target": "convert_to_slug_post",
+      "requiredInput": ["text"]
+    },
+    {
       "id": "compress-svg",
       "title": "Compress SVG markup",
       "description": "Optimize an SVG with SVGO-style cleanup and return smaller markup (one-shot convertor).",
