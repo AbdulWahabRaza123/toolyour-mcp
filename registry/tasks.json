@@ -1148,14 +1148,33 @@
       "keywords": [
         "json to zod",
         "json to typescript",
-        "validate json",
-        "format json",
         "json codegen",
         "json pipeline",
+        "dev json pipeline",
         "yaml to json schema"
       ],
       "type": "workflow",
       "target": "dev-json-pipeline-job",
+      "requiredInput": ["text"]
+    },
+    {
+      "id": "json-formatter",
+      "title": "JSON formatter / pretty-print or minify",
+      "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
+      "keywords": [
+        "json formatter",
+        "format json",
+        "pretty print json",
+        "minify json",
+        "json beautifier",
+        "json pretty print",
+        "beautify json",
+        "prettify json",
+        "json minify",
+        "format this json"
+      ],
+      "type": "tool",
+      "target": "jsonFormatter",
       "requiredInput": ["text"]
     },
     {
