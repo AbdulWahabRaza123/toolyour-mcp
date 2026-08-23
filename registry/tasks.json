@@ -1198,6 +1198,26 @@
       "requiredInput": ["text"]
     },
     {
+      "id": "base64-encoder-decoder",
+      "title": "Base64 encode / decode",
+      "description": "Encode UTF-8 text to Base64 or decode Base64 back to text (one-shot developer utility).",
+      "keywords": [
+        "base64 encoder",
+        "base64 decoder",
+        "base64 encoder decoder",
+        "encode base64",
+        "decode base64",
+        "base64 to text",
+        "text to base64",
+        "base64 encode",
+        "base64 decode",
+        "convert to base64"
+      ],
+      "type": "tool",
+      "target": "base64EncoderDecoder",
+      "requiredInput": ["text"]
+    },
+    {
       "id": "fix-verify-dev-json-pipeline",
       "title": "Fix-verify dev JSON pipeline",
       "description": "Re-run JSON validate/format/Zod after fixes (pair with verify_task).",
