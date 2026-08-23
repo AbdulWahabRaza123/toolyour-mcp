@@ -1410,6 +1410,21 @@
       "requiredInput": ["css"]
     },
     {
+      "id": "js-formatter",
+      "title": "JS formatter / pretty-print JavaScript",
+      "description": "Pretty-print JavaScript with Prettier (babel) for readable scripts (one-shot).",
+      "keywords": [
+        "js formatter",
+        "format javascript",
+        "pretty print javascript",
+        "javascript beautifier",
+        "format js"
+      ],
+      "type": "tool",
+      "target": "jsFormatter",
+      "requiredInput": ["code"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
