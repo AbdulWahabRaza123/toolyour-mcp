@@ -1178,6 +1178,26 @@
       "requiredInput": ["text"]
     },
     {
+      "id": "json-validator",
+      "title": "JSON validator / check JSON syntax",
+      "description": "Check whether a string parses as JSON and report the root type (one-shot developer utility).",
+      "keywords": [
+        "json validator",
+        "validate json",
+        "validate this json",
+        "is this valid json",
+        "check json syntax",
+        "json syntax checker",
+        "json parse check",
+        "valid json",
+        "json validation",
+        "does this json parse"
+      ],
+      "type": "tool",
+      "target": "jsonValidator",
+      "requiredInput": ["text"]
+    },
+    {
       "id": "fix-verify-dev-json-pipeline",
       "title": "Fix-verify dev JSON pipeline",
       "description": "Re-run JSON validate/format/Zod after fixes (pair with verify_task).",
