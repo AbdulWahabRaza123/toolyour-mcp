@@ -243,6 +243,26 @@
       "requiredInput": ["text"]
     },
     {
+      "id": "text-case-converter",
+      "title": "Case converter / title case",
+      "description": "Convert text to upper, lower, title, sentence, camel, snake, kebab, or other cases (one-shot text utility).",
+      "keywords": [
+        "case converter",
+        "text case converter",
+        "uppercase converter",
+        "lowercase converter",
+        "title case",
+        "title case converter",
+        "sentence case",
+        "camelCase converter",
+        "convert to uppercase",
+        "convert to lowercase"
+      ],
+      "type": "tool",
+      "target": "text_case_converter_post",
+      "requiredInput": ["text"]
+    },
+    {
       "id": "compress-svg",
       "title": "Compress SVG markup",
       "description": "Optimize an SVG with SVGO-style cleanup and return smaller markup (one-shot convertor).",
