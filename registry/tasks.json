@@ -1251,6 +1251,23 @@
       "requiredInput": ["yaml"]
     },
     {
+      "id": "json-to-yaml",
+      "title": "JSON to YAML / readable config",
+      "description": "Convert JSON into readable indented YAML (one-shot developer utility).",
+      "keywords": [
+        "json to yaml",
+        "convert json to yaml",
+        "yaml from json",
+        "json yaml converter",
+        "json to yaml converter",
+        "config json to yaml",
+        "emit yaml from json"
+      ],
+      "type": "tool",
+      "target": "jsonToYaml",
+      "requiredInput": ["json"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
