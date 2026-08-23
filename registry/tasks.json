@@ -1238,6 +1238,26 @@
       "requiredInput": ["text"]
     },
     {
+      "id": "uuid-generator",
+      "title": "UUID generator / random UUID",
+      "description": "Generate up to 50 UUID v4 or approximate v7 identifiers (one-shot developer utility).",
+      "keywords": [
+        "uuid generator",
+        "generate uuid",
+        "generate uuids",
+        "uuid v4",
+        "uuid v7",
+        "random uuid",
+        "unique id generator",
+        "create uuid",
+        "bulk uuid",
+        "uuid online"
+      ],
+      "type": "tool",
+      "target": "uuidGenerator",
+      "requiredInput": []
+    },
+    {
       "id": "fix-verify-dev-json-pipeline",
       "title": "Fix-verify dev JSON pipeline",
       "description": "Re-run JSON validate/format/Zod after fixes (pair with verify_task).",
