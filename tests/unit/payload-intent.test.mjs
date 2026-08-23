@@ -8,6 +8,7 @@ import {
   hasPayloadInput,
   impliesRemoteSite,
   localEquivalentTaskId,
+  needsLiveUrlClarification,
   payloadFirstIntent,
 } from "../../dist/orchestrator/payload-intent.js";
 
@@ -29,6 +30,29 @@ describe("payload-intent", () => {
     assert.equal(hasLiveUrlSignal("SEO audit this site"), true);
     assert.equal(hasConcreteUrl("SEO audit this site"), false);
     assert.equal(hasConcreteUrl("SEO audit https://example.com"), true);
+  });
+
+  it("asks for URL on bare live jobs unless payload-first", () => {
+    const seo = { id: "seo-audit", requiredInput: ["url"] };
+    const ship = { id: "ship-gate", requiredInput: ["url"] };
+    assert.equal(needsLiveUrlClarification("SEO audit", {}, seo), true);
+    assert.equal(needsLiveUrlClarification("ship gate", {}, ship), true);
+    assert.equal(
+      needsLiveUrlClarification("SEO audit", { url: "https://example.com" }, seo),
+      false
+    );
+    assert.equal(
+      needsLiveUrlClarification("SEO audit", { html: "<html></html>" }, seo),
+      false
+    );
+    assert.equal(
+      needsLiveUrlClarification("audit this html before deploy", {}, seo),
+      false
+    );
+    assert.equal(
+      needsLiveUrlClarification("ship this PR before merge", {}, ship),
+      false
+    );
   });
 
   it("detects payload-first phrasing", () => {

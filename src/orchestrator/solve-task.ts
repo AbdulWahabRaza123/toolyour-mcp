@@ -34,6 +34,7 @@ import {
   hasLiveUrlSignal,
   hasPayloadInput,
   localEquivalentTaskId,
+  needsLiveUrlClarification,
   payloadNeedInput,
   taskRequiresUrl,
   urlNeedInput,
@@ -194,6 +195,23 @@ export async function solveTask(
 
   let { task } = match;
   const live = hasLiveUrlSignal(trimmedGoal, input);
+
+  if (needsLiveUrlClarification(trimmedGoal, input, task)) {
+    return shapeAgentResult(
+      urlNeedInput({
+        goal: trimmedGoal,
+        matchedTask: {
+          id: task.id,
+          title: task.title,
+          type: task.type,
+          target: task.target,
+          score: match.score,
+        },
+        missing: ["url"],
+      }),
+      mode
+    );
+  }
 
   if (!live && taskRequiresUrl(task)) {
     const altId = localEquivalentTaskId(task.id);

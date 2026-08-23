@@ -132,6 +132,22 @@ export function hasConcreteUrl(
   return Boolean(extractUrlFromText(goal)) || hasUrlishInput(input);
 }
 
+/**
+ * Closable live jobs named without URL/HTML (e.g. "SEO audit", "ship gate").
+ * Prefer asking for https:// over flipping to local payload — unless the goal
+ * is explicitly payload-first ("this HTML", "this PR", …).
+ */
+export function needsLiveUrlClarification(
+  goal: string,
+  input: Record<string, unknown> | undefined,
+  task: Pick<McpTaskDef, "id" | "requiredInput">
+): boolean {
+  if (hasConcreteUrl(goal, input)) return false;
+  if (hasPayloadInput(input)) return false;
+  if (payloadFirstIntent(goal)) return false;
+  return taskRequiresUrl(task) || Boolean(localEquivalentTaskId(task.id));
+}
+
 function flattenInput(
   input: Record<string, unknown> | undefined
 ): Record<string, unknown> {

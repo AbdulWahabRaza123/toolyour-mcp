@@ -11,12 +11,9 @@ import {
 import { loadSkills } from "../skills/loader";
 import { enrichAllSkills, skillForWorkflow } from "../skills/enrich";
 import {
-  hasConcreteUrl,
   hasLiveUrlSignal,
-  hasPayloadInput,
-  impliesRemoteSite,
   localEquivalentTaskId,
-  taskRequiresUrl,
+  needsLiveUrlClarification,
 } from "./payload-intent";
 import { decidePlanLoop, type LoopEligibility } from "./loop-scope";
 import { resolveLocalhostUrl } from "./local-dev";
@@ -242,8 +239,6 @@ export function planTask(
 
   let { task } = match;
   const live = hasLiveUrlSignal(trimmedGoal, input);
-  const concreteUrl = hasConcreteUrl(trimmedGoal, input);
-  const hasPayload = hasPayloadInput(input);
   const localhostUrl = resolveLocalhostUrl(trimmedGoal, input);
   if (localhostUrl) {
     const loop = decidePlanLoop({
@@ -270,12 +265,9 @@ export function planTask(
     };
   }
 
-  // "SEO audit this site" / "security on my website" without URL → ask for
-  // https://; do not flip to local HTML or tell the agent not to ask for a URL.
-  const wantsLivePage =
-    impliesRemoteSite(trimmedGoal) ||
-    (live && !concreteUrl && (taskRequiresUrl(task) || Boolean(localEquivalentTaskId(task.id))));
-  if (wantsLivePage && !concreteUrl && !hasPayload) {
+  // Bare "SEO audit" / "ship gate" / "this site" without URL or HTML → ask for
+  // https://; do not flip to local or tell the agent not to ask for a URL.
+  if (needsLiveUrlClarification(trimmedGoal, input, task)) {
     let steps: string[] | undefined;
     let estimatedCredits = 0;
     if (task.type === "workflow") {
@@ -329,8 +321,8 @@ export function planTask(
       toolHints: scopedToolHints(steps),
       loop,
       next: playbookSkill
-        ? `Ask the user for a public https:// URL, then run_playbook("${playbookSkill.id}", { url }). If they meant local HTML from the repo, pass input.html to solve_task instead. Do not start verify_task yet.`
-        : `Ask the user for a public https:// URL in input.url, then re-call plan_task / solve_task. If they meant workspace HTML, pass input.html instead. Do not start verify_task yet.`,
+        ? `Ask the user for a public https:// URL, then run_playbook("${playbookSkill.id}", { url }). If they meant local HTML / PR from the repo, pass input.html or input.text to solve_task instead. Do not start verify_task yet.`
+        : `Ask the user for a public https:// URL in input.url, then re-call plan_task / solve_task. If they meant workspace HTML/PR, pass input.html / input.text instead. Do not start verify_task yet.`,
     };
   }
 
