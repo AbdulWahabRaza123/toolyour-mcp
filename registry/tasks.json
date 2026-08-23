@@ -1309,13 +1309,16 @@
       "description": "Fetch a public URL and list every response header for CORS, cache, and content-type debugging (one-shot; not a security score).",
       "keywords": [
         "http headers checker",
+        "http headers",
+        "headers checker",
         "check response headers",
         "view http headers",
         "cors headers",
         "cache control header",
         "response headers inspector",
         "inspect http headers",
-        "list response headers"
+        "list response headers",
+        "response header map"
       ],
       "type": "tool",
       "target": "httpHeadersChecker",
