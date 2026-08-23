@@ -1218,6 +1218,26 @@
       "requiredInput": ["text"]
     },
     {
+      "id": "url-encoder-decoder",
+      "title": "URL encode / percent-encode",
+      "description": "Percent-encode or decode URI components with encodeURIComponent semantics (one-shot developer utility).",
+      "keywords": [
+        "url encoder",
+        "url decoder",
+        "url encoder decoder",
+        "url encode",
+        "url decode",
+        "percent encode",
+        "percent decode",
+        "encodeuricomponent",
+        "decode uri component",
+        "encode query parameter"
+      ],
+      "type": "tool",
+      "target": "urlEncoderDecoder",
+      "requiredInput": ["text"]
+    },
+    {
       "id": "fix-verify-dev-json-pipeline",
       "title": "Fix-verify dev JSON pipeline",
       "description": "Re-run JSON validate/format/Zod after fixes (pair with verify_task).",
