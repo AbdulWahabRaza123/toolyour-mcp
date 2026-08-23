@@ -1147,7 +1147,6 @@
       "description": "Validate and format JSON, then generate Zod (or invoke TypeScript/Go/Python).",
       "keywords": [
         "json to zod",
-        "json to typescript",
         "json codegen",
         "json pipeline",
         "dev json pipeline",
@@ -1156,6 +1155,26 @@
       "type": "workflow",
       "target": "dev-json-pipeline-job",
       "requiredInput": ["text"]
+    },
+    {
+      "id": "json-to-typescript",
+      "title": "JSON to TypeScript / infer types",
+      "description": "Infer an exported TypeScript type from one JSON sample (one-shot developer utility).",
+      "keywords": [
+        "json to typescript",
+        "json to ts",
+        "json to ts type",
+        "infer typescript type",
+        "typescript type generator",
+        "json to interface",
+        "generate typescript type",
+        "json sample to type",
+        "typescript from json",
+        "convert json to typescript"
+      ],
+      "type": "tool",
+      "target": "jsonToTypescript",
+      "requiredInput": ["json"]
     },
     {
       "id": "json-formatter",
