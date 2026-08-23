@@ -1234,6 +1234,23 @@
       "requiredInput": ["json"]
     },
     {
+      "id": "yaml-to-json",
+      "title": "YAML to JSON / convert config",
+      "description": "Convert a YAML document to pretty-printed JSON (one-shot developer utility).",
+      "keywords": [
+        "yaml to json",
+        "convert yaml to json",
+        "yaml converter",
+        "yaml parser",
+        "yaml to json converter",
+        "config yaml to json",
+        "parse yaml to json"
+      ],
+      "type": "tool",
+      "target": "yamlToJson",
+      "requiredInput": ["yaml"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
@@ -1422,12 +1439,12 @@
       "title": "Dev format transform",
       "description": "YAML↔JSON, XML pretty-print, and related formatters.",
       "keywords": [
-        "yaml to json",
-        "json to yaml",
         "format xml",
         "format html css",
         "sql formatter",
-        "dev format transform"
+        "dev format transform",
+        "multi format transform",
+        "yaml json xml pipeline"
       ],
       "type": "workflow",
       "target": "dev-format-transform-job",
