@@ -95,6 +95,18 @@ describe("payload-first routing contract", () => {
 
     const live = planTask("ship gate for https://example.com", {}, registry);
     assert.match(String(live.next), /https:\/\//i);
+
+    const siteSeo = planTask("SEO audit this site", {}, registry);
+    assert.equal(siteSeo.loop.initiate, false);
+    assert.equal(siteSeo.recommended?.kind, "playbook");
+    assert.notEqual(siteSeo.recommended?.id, "seo-audit-local");
+    assert.match(String(siteSeo.next), /https:\/\//i);
+    assert.equal(/Do not ask for a public URL/i.test(String(siteSeo.next)), false);
+
+    const siteSec = planTask("security audit my website", {}, registry);
+    assert.equal(siteSec.loop.initiate, false);
+    assert.match(String(siteSec.next), /https:\/\//i);
+    assert.equal(/Do not ask for a public URL/i.test(String(siteSec.next)), false);
   });
 
   it("run_playbook pr-code-gate without files asks for payload", async () => {

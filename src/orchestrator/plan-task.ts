@@ -11,8 +11,12 @@ import {
 import { loadSkills } from "../skills/loader";
 import { enrichAllSkills, skillForWorkflow } from "../skills/enrich";
 import {
+  hasConcreteUrl,
   hasLiveUrlSignal,
+  hasPayloadInput,
+  impliesRemoteSite,
   localEquivalentTaskId,
+  taskRequiresUrl,
 } from "./payload-intent";
 import { decidePlanLoop, type LoopEligibility } from "./loop-scope";
 import { resolveLocalhostUrl } from "./local-dev";
@@ -238,6 +242,8 @@ export function planTask(
 
   let { task } = match;
   const live = hasLiveUrlSignal(trimmedGoal, input);
+  const concreteUrl = hasConcreteUrl(trimmedGoal, input);
+  const hasPayload = hasPayloadInput(input);
   const localhostUrl = resolveLocalhostUrl(trimmedGoal, input);
   if (localhostUrl) {
     const loop = decidePlanLoop({
@@ -263,6 +269,71 @@ export function planTask(
       next: `MCP cannot fetch ${localhostUrl}. Pass input.html / input.text / input.code from the workspace, or a public/preview https:// URL (or tunnel). Do not start run_playbook with localhost.`,
     };
   }
+
+  // "SEO audit this site" / "security on my website" without URL → ask for
+  // https://; do not flip to local HTML or tell the agent not to ask for a URL.
+  const wantsLivePage =
+    impliesRemoteSite(trimmedGoal) ||
+    (live && !concreteUrl && (taskRequiresUrl(task) || Boolean(localEquivalentTaskId(task.id))));
+  if (wantsLivePage && !concreteUrl && !hasPayload) {
+    let steps: string[] | undefined;
+    let estimatedCredits = 0;
+    if (task.type === "workflow") {
+      const wf = workflows.find((w) => w.id === task.target);
+      steps = wf?.steps.map((s) => s.operationId);
+      estimatedCredits = estimateCredits("workflow", steps?.length || 1);
+    } else if (task.type === "tool") {
+      estimatedCredits = estimateCredits("tool", 1);
+    }
+    const playbookSkill =
+      task.type === "workflow"
+        ? skillForWorkflow(task.target, skills, task.id)
+        : undefined;
+    const localAlt = localEquivalentTaskId(task.id);
+    const alts = alternatives
+      .filter((a) => a.id !== (playbookSkill?.id || task.id) && a.id !== task.target)
+      .slice(0, 3);
+    if (localAlt && !alts.some((a) => a.id === localAlt)) {
+      const localTask = tasks.find((t) => t.id === localAlt);
+      if (localTask) {
+        alts.unshift({
+          kind: "local",
+          id: localTask.id,
+          title: localTask.title,
+          score: 4,
+        });
+      }
+    }
+    const recId = playbookSkill?.id || (task.type === "workflow" ? task.target : task.id);
+    const loop = {
+      initiate: false,
+      inScope: true,
+      reason: "Need a public https:// URL before starting this live-site job.",
+    };
+    return {
+      status: "plan",
+      goal: trimmedGoal,
+      free: true,
+      estimatedCredits,
+      confidence: "medium",
+      recommended: {
+        kind: playbookSkill ? "playbook" : task.type,
+        id: recId,
+        title: playbookSkill?.title || task.title,
+        score: match.score,
+        requiredInput: ["url"],
+        steps,
+        workflowId: task.type === "workflow" ? task.target : undefined,
+      },
+      alternatives: alts.slice(0, 4),
+      toolHints: scopedToolHints(steps),
+      loop,
+      next: playbookSkill
+        ? `Ask the user for a public https:// URL, then run_playbook("${playbookSkill.id}", { url }). If they meant local HTML from the repo, pass input.html to solve_task instead. Do not start verify_task yet.`
+        : `Ask the user for a public https:// URL in input.url, then re-call plan_task / solve_task. If they meant workspace HTML, pass input.html instead. Do not start verify_task yet.`,
+    };
+  }
+
   if (!live) {
     const altId = localEquivalentTaskId(task.id);
     const alt = altId ? tasks.find((t) => t.id === altId) : undefined;

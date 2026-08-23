@@ -106,9 +106,30 @@ export function explicitLiveUrlIntent(goal: string): boolean {
   return LIVE_LINK_PHRASES.some((p) => g.includes(p));
 }
 
+/**
+ * Human deixis for a deployed page ("this site", "my website") without an
+ * https:// URL — treat as live-link intent, not local HTML / PR payload.
+ */
+export function impliesRemoteSite(goal: string): boolean {
+  if (payloadFirstIntent(goal)) return false;
+  const g = normalizeGoalText(goal);
+  return (
+    /\b(my|our|this|the|your)\s+(web\s*)?(site|website|page|domain)\b/.test(g) ||
+    /\bon\s+(my|our|the|your)\s+(web\s*)?(site|website|page)\b/.test(g)
+  );
+}
+
 export function payloadFirstIntent(goal: string): boolean {
   const g = ` ${normalizeGoalText(goal)} `;
   return PAYLOAD_FIRST_PHRASES.some((p) => g.includes(p));
+}
+
+/** Concrete URL in goal text or input.url — not phrase-only live intent. */
+export function hasConcreteUrl(
+  goal: string,
+  input?: Record<string, unknown>
+): boolean {
+  return Boolean(extractUrlFromText(goal)) || hasUrlishInput(input);
 }
 
 function flattenInput(
@@ -192,7 +213,11 @@ export function hasLiveUrlSignal(
   goal: string,
   input?: Record<string, unknown>
 ): boolean {
-  return explicitLiveUrlIntent(goal) || hasUrlishInput(input);
+  return (
+    explicitLiveUrlIntent(goal) ||
+    impliesRemoteSite(goal) ||
+    hasUrlishInput(input)
+  );
 }
 
 export function taskRequiresUrl(task: Pick<McpTaskDef, "requiredInput">): boolean {

@@ -3,7 +3,10 @@ import assert from "node:assert/strict";
 import {
   applyPayloadAliases,
   explicitLiveUrlIntent,
+  hasConcreteUrl,
+  hasLiveUrlSignal,
   hasPayloadInput,
+  impliesRemoteSite,
   localEquivalentTaskId,
   payloadFirstIntent,
 } from "../../dist/orchestrator/payload-intent.js";
@@ -15,6 +18,17 @@ describe("payload-intent", () => {
     assert.equal(explicitLiveUrlIntent("headers on the site"), true);
     assert.equal(explicitLiveUrlIntent("ship this PR before merge"), false);
     assert.equal(explicitLiveUrlIntent("audit this html before deploy"), false);
+  });
+
+  it("detects remote site deixis without treating HTML/PR as live", () => {
+    assert.equal(impliesRemoteSite("SEO audit this site"), true);
+    assert.equal(impliesRemoteSite("security audit my website"), true);
+    assert.equal(impliesRemoteSite("check security headers on my site"), true);
+    assert.equal(impliesRemoteSite("audit this html before deploy"), false);
+    assert.equal(impliesRemoteSite("ship this PR before merge"), false);
+    assert.equal(hasLiveUrlSignal("SEO audit this site"), true);
+    assert.equal(hasConcreteUrl("SEO audit this site"), false);
+    assert.equal(hasConcreteUrl("SEO audit https://example.com"), true);
   });
 
   it("detects payload-first phrasing", () => {
