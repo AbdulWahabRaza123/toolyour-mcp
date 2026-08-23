@@ -59,6 +59,8 @@ const SYNONYM_MAP: Record<string, string[]> = {
   "site slow": ["core web vitals", "pagespeed", "page speed"],
   "page slow": ["core web vitals", "pagespeed"],
   "feels slow": ["core web vitals", "page speed"],
+  "json to go": ["json to go struct", "json to golang"],
+  "go struct": ["json to go struct", "golang struct"],
   "go live": ["ship gate", "deploy gate", "launch checklist"],
   "can i ship": ["ship gate", "go live check"],
   "ready to launch": ["ship gate", "go live check"],

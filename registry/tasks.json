@@ -1200,13 +1200,16 @@
       "description": "Generate nested Go structs with json tags from one JSON sample (one-shot developer utility).",
       "keywords": [
         "json to go struct",
-        "json to go",
         "go struct generator",
         "json to golang",
         "generate go types",
+        "generate go struct",
+        "go types",
         "go json tags",
         "golang struct from json",
-        "json to go types"
+        "json to go types",
+        "golang from json",
+        "json to golang struct"
       ],
       "type": "tool",
       "target": "jsonToGoStruct",
