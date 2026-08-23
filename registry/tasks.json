@@ -1304,6 +1304,24 @@
       "requiredInput": ["payload", "secret"]
     },
     {
+      "id": "http-headers-checker",
+      "title": "HTTP headers checker / response headers",
+      "description": "Fetch a public URL and list every response header for CORS, cache, and content-type debugging (one-shot; not a security score).",
+      "keywords": [
+        "http headers checker",
+        "check response headers",
+        "view http headers",
+        "cors headers",
+        "cache control header",
+        "response headers inspector",
+        "inspect http headers",
+        "list response headers"
+      ],
+      "type": "tool",
+      "target": "httpHeadersChecker",
+      "requiredInput": ["url"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
