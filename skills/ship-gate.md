@@ -25,7 +25,7 @@ Use when the user wants a **go/no-go deploy smoke gate** on a **live or preview 
 4. `verify_task` with the prior result as `baseline` until `loop.gate` is pass — or stop on `loop.stop`  
 5. Do **not** `invoke_tool` for the same job  
 
-First-run responses include `loop.remainingFixes`, `loop.receipt`, and rank-1 `loop.nextActions`.
+First-run responses include `loop.line` (gate · rank-1 · credits), `loop.remainingFixes`, `loop.receipt`, and rank-1 `loop.nextActions`.
 
 ## Gate policy (`gatePolicy: ship`)
 

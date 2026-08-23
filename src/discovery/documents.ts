@@ -166,7 +166,7 @@ export function buildServerCard() {
       "Two loops — pick exactly one per goal. Skill loop: plan_task → run_playbook or solve_task → apply rank-1 loop.nextActions (full list: remainingFixes) → verify_task. Completion loop: job_status → host toolyour-check-run; do not invent check_submit.",
       "invoke_tool is advanced (one-off operationId). Do not use it as the default path for ship-gate, SEO, or security jobs.",
       "Catalog tools are dynamic — only hasApi tools are exposed. Discovery meta-tools are free; execution shares the REST monthly credit quota.",
-      "solve_task / run_playbook responses include loop.remainingFixes (patchType + acceptance) even on the first run. loop.nextActions is rank-1 only — apply that item first; remainingFixes is the full list.",
+      "solve_task / run_playbook responses include loop.line (one-line gate · rank-1 · credits), loop.remainingFixes (patchType + acceptance), and rank-1 loop.nextActions. Apply rank-1 first; remainingFixes is the full list.",
       "verify_task refuses without a usable baseline jobReport (prior solve_task/run_playbook result, verify_task.after, or raw jobReport).",
       "Loop stop: default maxRounds=5 and sameFindingsLimit=2. When loop.stop is set (max_rounds|same_findings), loop.initiate is false — escalate; do not re-verify.",
       "Large responses may include dataRefId — use fetch_payload (free in-process TTL store, no paid blob).",

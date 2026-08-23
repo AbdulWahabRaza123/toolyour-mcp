@@ -46,6 +46,8 @@ export const LOOP_NEXT_FAIL =
 const CREDITS_PER_TOOL_EST = 2;
 
 export interface LoopReceipt {
+  /** One-line agent scan: gate · rank-1 · credits · next. */
+  line: string;
   round: number;
   maxRounds: number;
   /** Count of API tools used on this run (from jobReport.toolsUsed when present). */
@@ -56,6 +58,8 @@ export interface LoopReceipt {
 }
 
 export interface HarnessLoop extends LoopEligibility {
+  /** Same as receipt.line — first thing agents should read. */
+  line: string;
   phase: "run" | "verify";
   gate: VerifyGate;
   remainingFixes: RemainingFix[];
@@ -68,6 +72,67 @@ export interface HarnessLoop extends LoopEligibility {
   sameFindingsLimit: number;
   stop?: LoopStop;
   receipt: LoopReceipt;
+}
+
+function truncateLabel(text: string, max: number): string {
+  const t = String(text || "")
+    .trim()
+    .replace(/\s+/g, " ");
+  if (t.length <= max) return t;
+  return `${t.slice(0, Math.max(1, max - 1))}…`;
+}
+
+/**
+ * Single scannable line for agents (gate · rank-1 · credits · what to do).
+ */
+export function buildReceiptLine(opts: {
+  gate: VerifyGate;
+  initiate: boolean;
+  phase: "run" | "verify";
+  nextActions: VerifyNextAction[];
+  remainingFixes: RemainingFix[];
+  toolsUsed: number;
+  estimatedCredits: number;
+  stop?: LoopStop;
+}): string {
+  const parts: string[] = [`gate=${opts.gate}`];
+
+  if (opts.stop) {
+    parts.push(`stopped:${opts.stop.code}`);
+    parts.push("escalate — do not re-verify");
+  } else if (opts.gate === "pass") {
+    parts.push("clean");
+    parts.push("stop");
+  } else if (opts.nextActions[0]?.label) {
+    const action = opts.nextActions[0];
+    const patch = action.patchType ? ` [${action.patchType}]` : "";
+    parts.push(`rank-1: ${truncateLabel(action.label, 80)}${patch}`);
+    parts.push(
+      opts.initiate ? "apply then verify_task" : "stop — not remediable here"
+    );
+  } else if (opts.remainingFixes.length > 0) {
+    parts.push(`${opts.remainingFixes.length} remaining fix(es)`);
+    parts.push(opts.initiate ? "apply then verify_task" : "stop");
+  } else if (opts.gate === "fail" || opts.gate === "unknown") {
+    parts.push("no remediable fixes");
+    parts.push("stop");
+  } else {
+    parts.push(opts.initiate ? "continue" : "stop");
+  }
+
+  if (opts.toolsUsed > 0) {
+    parts.push(
+      `~${opts.estimatedCredits} credits (${opts.toolsUsed} tool${opts.toolsUsed === 1 ? "" : "s"})`
+    );
+  } else {
+    parts.push("~0 credits");
+  }
+
+  if (opts.phase === "verify") {
+    parts.push("verify");
+  }
+
+  return parts.join(" · ");
 }
 
 function countToolsUsed(payload: unknown): number {
@@ -121,13 +186,25 @@ function assembleLoop(
 
   const estimatedCredits = estimateCreditsFromPayload(payload);
   const toolsUsed = countToolsUsed(payload);
+  const effectiveNextActions = decided.initiate ? nextActions : [];
+  const line = buildReceiptLine({
+    gate,
+    initiate: decided.initiate,
+    phase,
+    nextActions: effectiveNextActions.length ? effectiveNextActions : nextActions,
+    remainingFixes,
+    toolsUsed,
+    estimatedCredits,
+    stop: progress.stop,
+  });
 
   return {
+    line,
     ...decided,
     phase,
     gate,
     remainingFixes,
-    nextActions: decided.initiate ? nextActions : [],
+    nextActions: effectiveNextActions,
     next: decided.initiate ? LOOP_NEXT_FAIL : decided.reason,
     round: progress.round,
     maxRounds: progress.maxRounds,
@@ -136,6 +213,7 @@ function assembleLoop(
     sameFindingsLimit: progress.sameFindingsLimit,
     ...(progress.stop ? { stop: progress.stop } : {}),
     receipt: {
+      line,
       round: progress.round,
       maxRounds: progress.maxRounds,
       toolsUsed,

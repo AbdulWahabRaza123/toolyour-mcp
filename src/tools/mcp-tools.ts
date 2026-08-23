@@ -104,7 +104,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "solve_task",
-    "Run a job from a plain-language goal. Returns loop.initiate — if false, MCP cannot close this with verify_task (out of scope or one-shot). If true, apply remainingFixes then verify_task.",
+    "Run a job from a plain-language goal. Returns loop.line (gate · rank-1 · credits) and loop.initiate — if false, MCP cannot close this with verify_task. If true, apply rank-1 then verify_task.",
     {
       goal: z
         .string()
@@ -154,7 +154,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "run_playbook",
-    "Run a skill playbook (ship-gate, SEO audit, security audit, …) in one call. Returns loop.remainingFixes + loop.gate. After host-repo fixes, verify_task with this result as baseline. Prefer over load_skill or invoke_tool.",
+    "Run a skill playbook (ship-gate, SEO audit, security audit, …) in one call. Read loop.line first (gate · rank-1 · credits), then loop.remainingFixes. After host-repo fixes, verify_task with this result as baseline. Prefer over load_skill or invoke_tool.",
     {
       skillId: z.string().describe("Skill id from list_skills"),
       input: z.any().optional(),
@@ -195,7 +195,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "verify_task",
-    "Close the loop only when the prior result has loop.initiate true. Requires a usable baseline jobReport. Read loop.gate; apply rank-1 loop.nextActions. Stops when loop.stop is set (max_rounds or same_findings) or loop.initiate is false.",
+    "Close the loop only when the prior result has loop.initiate true. Requires a usable baseline jobReport. Read loop.line / loop.gate; apply rank-1 loop.nextActions. Stops when loop.stop is set (max_rounds or same_findings) or loop.initiate is false.",
     {
       goal: z.string(),
       input: z.any().optional(),

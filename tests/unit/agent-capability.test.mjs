@@ -83,6 +83,10 @@ describe("compact response mode", () => {
     assert.equal(shaped.loop.receipt.round, 0);
     assert.ok(shaped.loop.receipt.estimatedCredits >= 2);
     assert.ok(shaped.loop.receipt.toolsUsed >= 1);
+    assert.match(String(shaped.loop.line), /gate=fail/);
+    assert.match(String(shaped.loop.line), /rank-1:/);
+    assert.match(String(shaped.loop.line), /credits/);
+    assert.equal(shaped.loop.line, shaped.loop.receipt.line);
     assert.match(String(shaped.loop.next), /rank-1|verify_task/);
     assert.match(String(shaped.loop.next), /do not invoke_tool/i);
   });
