@@ -1278,6 +1278,26 @@
       "requiredInput": ["value"]
     },
     {
+      "id": "regex-tester",
+      "title": "Regex tester / test regular expression",
+      "description": "Test a JavaScript RegExp against sample text and list matches, indexes, and capture groups (one-shot developer utility).",
+      "keywords": [
+        "regex tester",
+        "test regex",
+        "test regular expression",
+        "regexp tester",
+        "regex match",
+        "regex capture groups",
+        "javascript regex",
+        "check regex",
+        "regex debug",
+        "regexp match"
+      ],
+      "type": "tool",
+      "target": "regexTester",
+      "requiredInput": ["pattern", "text"]
+    },
+    {
       "id": "fix-verify-dev-json-pipeline",
       "title": "Fix-verify dev JSON pipeline",
       "description": "Re-run JSON validate/format/Zod after fixes (pair with verify_task).",
