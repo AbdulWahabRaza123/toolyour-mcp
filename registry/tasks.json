@@ -183,6 +183,26 @@
       "requiredInput": ["text"]
     },
     {
+      "id": "compare-texts",
+      "title": "Compare two texts / text diff",
+      "description": "Compare two pasted blocks for similarity, unique tokens, and common tokens in words or lines mode (one-shot text utility).",
+      "keywords": [
+        "compare texts",
+        "compare two texts",
+        "compare two strings",
+        "text diff",
+        "text diff online",
+        "diff two texts",
+        "compare text online",
+        "word comparison",
+        "line diff",
+        "similarity between texts"
+      ],
+      "type": "tool",
+      "target": "compare_texts_post",
+      "requiredInput": ["textA", "textB"]
+    },
+    {
       "id": "compress-svg",
       "title": "Compress SVG markup",
       "description": "Optimize an SVG with SVGO-style cleanup and return smaller markup (one-shot convertor).",
