@@ -1325,6 +1325,25 @@
       "requiredInput": ["url"]
     },
     {
+      "id": "api-request-builder",
+      "title": "API request builder / cURL and fetch",
+      "description": "Compose method, URL, headers, and body into cURL and fetch snippets without sending the request (one-shot).",
+      "keywords": [
+        "api request builder",
+        "curl command generator",
+        "fetch snippet generator",
+        "build http request",
+        "curl builder",
+        "generate curl",
+        "curl from headers",
+        "http request snippet",
+        "build curl command"
+      ],
+      "type": "tool",
+      "target": "apiRequestBuilder",
+      "requiredInput": ["method"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
