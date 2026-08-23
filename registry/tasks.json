@@ -142,6 +142,26 @@
       "requiredInput": ["file"]
     },
     {
+      "id": "comma-separate",
+      "title": "Add commas to a list",
+      "description": "Join whitespace- or line-separated tokens into a comma-separated string (one-shot text utility).",
+      "keywords": [
+        "comma separate",
+        "add commas to list",
+        "add commas",
+        "comma separated list",
+        "comma delimited",
+        "comma delimited list",
+        "join with commas",
+        "comma converter",
+        "make comma separated",
+        "lines to comma"
+      ],
+      "type": "tool",
+      "target": "comma_separate_post",
+      "requiredInput": ["text"]
+    },
+    {
       "id": "compress-svg",
       "title": "Compress SVG markup",
       "description": "Optimize an SVG with SVGO-style cleanup and return smaller markup (one-shot convertor).",
