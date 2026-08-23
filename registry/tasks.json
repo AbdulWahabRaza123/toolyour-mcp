@@ -1485,6 +1485,22 @@
       "requiredInput": []
     },
     {
+      "id": "cron-expression-parser",
+      "title": "Cron expression parser / next UTC runs",
+      "description": "Parse a five-field cron and list the next eight UTC run times (one-shot).",
+      "keywords": [
+        "cron expression parser",
+        "parse cron",
+        "parse cron expression",
+        "cron next run times",
+        "explain cron expression",
+        "cron schedule checker"
+      ],
+      "type": "tool",
+      "target": "cronExpressionParser",
+      "requiredInput": ["expression"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
