@@ -1380,6 +1380,24 @@
       "requiredInput": ["ip"]
     },
     {
+      "id": "html-formatter",
+      "title": "HTML formatter / pretty-print markup",
+      "description": "Pretty-print HTML with Prettier so templates and response bodies are reviewable (one-shot).",
+      "keywords": [
+        "html formatter",
+        "format html",
+        "pretty print html",
+        "html beautifier",
+        "indent html markup",
+        "beautify html",
+        "html pretty print",
+        "format this html"
+      ],
+      "type": "tool",
+      "target": "htmlFormatter",
+      "requiredInput": ["html"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
