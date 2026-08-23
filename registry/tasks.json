@@ -1362,6 +1362,24 @@
       "requiredInput": ["userAgent"]
     },
     {
+      "id": "ip-address-tools",
+      "title": "IP address tools / validate IPv4 IPv6",
+      "description": "Validate and classify IPv4/IPv6 strings including private and loopback ranges (one-shot; no geo/ASN).",
+      "keywords": [
+        "ip address tools",
+        "validate ip address",
+        "ipv4 checker",
+        "ipv6 validator",
+        "private ip range check",
+        "check ip address",
+        "is private ip",
+        "ip validator"
+      ],
+      "type": "tool",
+      "target": "ipAddressTools",
+      "requiredInput": ["ip"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
