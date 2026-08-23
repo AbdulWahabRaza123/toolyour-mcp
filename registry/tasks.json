@@ -1455,6 +1455,21 @@
       "requiredInput": ["sql"]
     },
     {
+      "id": "regex-generator",
+      "title": "Regex generator / vetted presets",
+      "description": "Return a curated regex preset for email, URL, IPv4, UUID, digits, or slug (one-shot; not AI-written).",
+      "keywords": [
+        "regex generator",
+        "generate regex",
+        "regex presets",
+        "email regex pattern",
+        "regex preset"
+      ],
+      "type": "tool",
+      "target": "regexGenerator",
+      "requiredInput": ["kind"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
