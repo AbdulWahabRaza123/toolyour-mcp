@@ -1470,6 +1470,21 @@
       "requiredInput": ["kind"]
     },
     {
+      "id": "cron-expression-generator",
+      "title": "Cron expression generator / build schedules",
+      "description": "Build a five-field cron from fields and preview next UTC runs (one-shot; not Quartz).",
+      "keywords": [
+        "cron expression generator",
+        "cron builder",
+        "generate cron schedule",
+        "crontab generator",
+        "build cron expression"
+      ],
+      "type": "tool",
+      "target": "cronExpressionGenerator",
+      "requiredInput": []
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
