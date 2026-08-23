@@ -1344,6 +1344,24 @@
       "requiredInput": ["method"]
     },
     {
+      "id": "user-agent-parser",
+      "title": "User agent parser / browser OS device",
+      "description": "Parse a User-Agent string into browser, OS, and device hints for log triage (one-shot heuristic).",
+      "keywords": [
+        "user agent parser",
+        "parse user agent",
+        "parse user agent string",
+        "ua parser",
+        "browser detection",
+        "user agent lookup",
+        "decode user agent",
+        "what browser is this ua"
+      ],
+      "type": "tool",
+      "target": "userAgentParser",
+      "requiredInput": ["userAgent"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
