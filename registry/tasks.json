@@ -1216,6 +1216,24 @@
       "requiredInput": ["json"]
     },
     {
+      "id": "json-to-python",
+      "title": "JSON to Python / dataclass sketch",
+      "description": "Infer a Python dataclass with type hints from one JSON sample (one-shot developer utility).",
+      "keywords": [
+        "json to python",
+        "json to dataclass",
+        "python dataclass generator",
+        "python type hints from json",
+        "json to python dataclass",
+        "generate python dataclass",
+        "python from json",
+        "dataclass from json"
+      ],
+      "type": "tool",
+      "target": "jsonToPython",
+      "requiredInput": ["json"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
