@@ -223,6 +223,26 @@
       "requiredInput": ["text"]
     },
     {
+      "id": "text-stats",
+      "title": "Word counter / text statistics",
+      "description": "Count words, characters, sentences, reading time, and top repeated words (one-shot text utility).",
+      "keywords": [
+        "word counter",
+        "word counter online",
+        "word count",
+        "character count",
+        "character counter",
+        "text statistics",
+        "text stats",
+        "reading time",
+        "reading time calculator",
+        "count words"
+      ],
+      "type": "tool",
+      "target": "text_stats_post",
+      "requiredInput": ["text"]
+    },
+    {
       "id": "compress-svg",
       "title": "Compress SVG markup",
       "description": "Optimize an SVG with SVGO-style cleanup and return smaller markup (one-shot convertor).",
