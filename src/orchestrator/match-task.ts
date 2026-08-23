@@ -61,7 +61,6 @@ const SYNONYM_MAP: Record<string, string[]> = {
   "feels slow": ["core web vitals", "page speed"],
   "json to go": ["json to go struct", "json to golang"],
   "go struct": ["json to go struct", "golang struct"],
-  "format html": ["html formatter", "pretty print html", "format html markup"],
   "curl builder": ["api request builder", "curl command generator", "build curl command"],
   "generate curl": ["curl builder", "api request builder", "curl command generator"],
   "http headers": ["http headers checker", "check response headers", "view http headers"],

@@ -1385,6 +1385,7 @@
       "description": "Pretty-print HTML with Prettier so templates and response bodies are reviewable (one-shot).",
       "keywords": [
         "html formatter",
+        "format html",
         "pretty print html",
         "html beautifier",
         "indent html markup",
@@ -1587,10 +1588,12 @@
       "description": "YAML↔JSON, XML pretty-print, and related formatters.",
       "keywords": [
         "format html css",
+        "format html and css",
         "sql formatter",
         "dev format transform",
         "multi format transform",
-        "yaml json xml pipeline"
+        "yaml json xml pipeline",
+        "html css format pipeline"
       ],
       "type": "workflow",
       "target": "dev-format-transform-job",
