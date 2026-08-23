@@ -393,9 +393,12 @@ export function planTask(
     recommendedKind: task.type,
     workflowId: task.type === "workflow" ? task.target : undefined,
   });
+  const needsFile = Boolean(task.requiredInput?.includes("file"));
   const runLine =
     task.type === "local"
       ? `Call solve_task with input.html / input.text / input.code (enhance defaults false; set enhance:true to bill text APIs). ${payloadNext}`
+      : task.type === "tool" && needsFile
+        ? `Read the file from the workspace, then invoke_tool("${task.target}") with the file upload (multipart). One-shot convert — do not start verify_task.`
       : live
         ? task.type === "workflow"
           ? `Call run_workflow("${task.target}", input) or list_skills for a matching playbook — ~${estimatedCredits} credits estimated.`
