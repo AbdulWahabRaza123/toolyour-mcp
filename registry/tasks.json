@@ -162,6 +162,27 @@
       "requiredInput": ["text"]
     },
     {
+      "id": "sort-lines",
+      "title": "Sort lines / alphabetize a list",
+      "description": "Sort one-item-per-line lists A→Z or Z→A with natural, length, or frequency modes (one-shot text utility).",
+      "keywords": [
+        "sort lines",
+        "sort this list",
+        "alphabetize list",
+        "alphabetize lines",
+        "line sorter",
+        "list sorter",
+        "online list sorter",
+        "online sorting tool",
+        "online sort",
+        "sort lines az",
+        "natural sort lines"
+      ],
+      "type": "tool",
+      "target": "sort_lines_post",
+      "requiredInput": ["text"]
+    },
+    {
       "id": "compress-svg",
       "title": "Compress SVG markup",
       "description": "Optimize an SVG with SVGO-style cleanup and return smaller markup (one-shot convertor).",
