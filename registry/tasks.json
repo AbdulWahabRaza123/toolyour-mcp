@@ -1258,6 +1258,26 @@
       "requiredInput": []
     },
     {
+      "id": "timestamp-converter",
+      "title": "Timestamp converter / Unix to ISO",
+      "description": "Convert Unix seconds, milliseconds, or date strings into ISO 8601, epoch, and UTC (one-shot developer utility).",
+      "keywords": [
+        "timestamp converter",
+        "unix timestamp",
+        "unix to iso",
+        "epoch to date",
+        "iso 8601 converter",
+        "unix time",
+        "convert timestamp",
+        "epoch converter",
+        "milliseconds to date",
+        "date to unix"
+      ],
+      "type": "tool",
+      "target": "timestampConverter",
+      "requiredInput": ["value"]
+    },
+    {
       "id": "fix-verify-dev-json-pipeline",
       "title": "Fix-verify dev JSON pipeline",
       "description": "Re-run JSON validate/format/Zod after fixes (pair with verify_task).",
