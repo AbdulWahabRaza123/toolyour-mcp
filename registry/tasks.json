@@ -1387,12 +1387,8 @@
         "html formatter",
         "format html",
         "pretty print html",
-        "html beautifier",
         "indent html markup",
-        "beautify html",
-        "html pretty print",
-        "format this html",
-        "format html markup"
+        "html pretty print"
       ],
       "type": "tool",
       "target": "htmlFormatter",
