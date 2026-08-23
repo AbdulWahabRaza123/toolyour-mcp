@@ -1268,6 +1268,24 @@
       "requiredInput": ["json"]
     },
     {
+      "id": "xml-formatter",
+      "title": "XML formatter / pretty-print XML",
+      "description": "Indent XML markup for readable SOAP, feeds, and configs (one-shot developer utility).",
+      "keywords": [
+        "xml formatter",
+        "format xml",
+        "pretty print xml",
+        "xml beautifier",
+        "indent xml",
+        "beautify xml",
+        "xml pretty print",
+        "format this xml"
+      ],
+      "type": "tool",
+      "target": "xmlFormatter",
+      "requiredInput": ["xml"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
@@ -1456,7 +1474,6 @@
       "title": "Dev format transform",
       "description": "YAML↔JSON, XML pretty-print, and related formatters.",
       "keywords": [
-        "format xml",
         "format html css",
         "sql formatter",
         "dev format transform",
