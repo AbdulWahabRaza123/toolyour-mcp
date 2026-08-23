@@ -83,8 +83,6 @@ const SYNONYM_MAP: Record<string, string[]> = {
   "internal links": ["internal linking", "orphan"],
   "keyword density": ["keywords", "seo analyze"],
   "meta description": ["meta tags", "seo analyze"],
-  "convert word": ["docx", "pdf"],
-  "word to pdf": ["docx", "pdf"],
 };
 
 /** Tokens too short/common to count as substring hits inside larger words. */
@@ -152,6 +150,21 @@ function significantTokens(text: string): string[] {
   );
 }
 
+/** Multi-word keywords must appear in order (pdf→word ≠ word→pdf). */
+function orderedKeywordWordsPresent(goal: string, words: string[]): boolean {
+  let from = 0;
+  let hit = false;
+  for (const raw of words) {
+    const w = raw.toLowerCase().trim();
+    if (!w || STOP_TOKENS.has(w)) continue;
+    const found = goal.indexOf(w, from);
+    if (found < 0) return false;
+    from = found + w.length;
+    hit = true;
+  }
+  return hit;
+}
+
 export function scoreTask(goal: string, task: McpTaskDef): number {
   const g = expandGoalWithSynonyms(goal);
   let score = 0;
@@ -164,7 +177,7 @@ export function scoreTask(goal: string, task: McpTaskDef): number {
       score += k.split(/\s+/).length + 3;
     } else {
       const words = k.split(/\s+/).filter(Boolean);
-      if (words.length > 1 && words.every((w) => g.includes(w))) {
+      if (words.length > 1 && orderedKeywordWordsPresent(g, words)) {
         score += words.length + 1;
       } else {
         // Fuzzy token match for typos (e.g. "vitlas" → "vitals")

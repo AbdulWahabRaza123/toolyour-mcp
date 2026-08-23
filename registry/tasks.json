@@ -117,10 +117,28 @@
         "word to pdf",
         "convert docx",
         "document to pdf",
-        "doc to pdf"
+        "doc to pdf",
+        "word document to pdf"
       ],
-      "type": "workflow",
-      "target": "document-convert-pipeline",
+      "type": "tool",
+      "target": "docx_to_pdf",
+      "requiredInput": ["file"]
+    },
+    {
+      "id": "pdf-to-docx",
+      "title": "Convert PDF to DOCX",
+      "description": "Convert a PDF to editable Word DOCX (one-shot document convert).",
+      "keywords": [
+        "pdf to docx",
+        "pdf to word",
+        "convert pdf to word",
+        "convert pdf to docx",
+        "pdf to editable word",
+        "this pdf to word",
+        "this pdf to docx"
+      ],
+      "type": "tool",
+      "target": "pdf_to_docx",
       "requiredInput": ["file"]
     },
     {
@@ -140,6 +158,50 @@
       ],
       "type": "tool",
       "target": "compressSvg",
+      "requiredInput": ["file"]
+    },
+    {
+      "id": "compress-image",
+      "title": "Compress raster image",
+      "description": "Shrink JPG, PNG, WebP, and other raster images for CMS limits and faster pages (one-shot convertor).",
+      "keywords": [
+        "compress image",
+        "compress this image",
+        "image compressor",
+        "compress png",
+        "compress jpg",
+        "compress jpeg",
+        "compress webp",
+        "reduce image size",
+        "optimize image",
+        "shrink image",
+        "smaller image file",
+        "this png",
+        "this jpg"
+      ],
+      "type": "tool",
+      "target": "compressImage",
+      "requiredInput": ["file"]
+    },
+    {
+      "id": "image-to-jpg",
+      "title": "Convert image to JPG",
+      "description": "Convert PNG, WebP, HEIC, and other images to JPG (one-shot convertor).",
+      "keywords": [
+        "image to jpg",
+        "convert image to jpg",
+        "heic to jpg",
+        "png to jpg",
+        "webp to jpg",
+        "convert to jpeg",
+        "convert to jpg",
+        "iphone heic to jpg",
+        "photo to jpg",
+        "this heic",
+        "this png to jpg"
+      ],
+      "type": "tool",
+      "target": "convertToJpg",
       "requiredInput": ["file"]
     },
     {
