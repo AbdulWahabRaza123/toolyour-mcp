@@ -1516,6 +1516,23 @@
       "requiredInput": ["css"]
     },
     {
+      "id": "js-minifier",
+      "title": "JS minifier / lite JavaScript compress",
+      "description": "Strip JS comments and whitespace with byte counts (one-shot lite pass; not Terser).",
+      "keywords": [
+        "js minifier",
+        "minify javascript",
+        "compress javascript",
+        "javascript minifier",
+        "minify js",
+        "javascript minify",
+        "js minify"
+      ],
+      "type": "tool",
+      "target": "jsMinifier",
+      "requiredInput": ["code"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
