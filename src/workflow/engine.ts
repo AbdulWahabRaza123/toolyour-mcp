@@ -1,7 +1,12 @@
 import { defsCache } from "../registry/defs-cache";
 import type { McpWorkflowDef } from "../contracts";
 import { invokeGatewayRoute } from "../gateway/client";
-import { buildGatewayInvokePayload, extractUrlFromPayload, normalizeStepInput } from "../gateway/request";
+import {
+  buildGatewayInvokePayload,
+  extractUrlFromPayload,
+  normalizeStepInput,
+  resolveDeveloperPasteStepInput,
+} from "../gateway/request";
 import { invalidateApiKeyCache, validateApiKey } from "../auth/session";
 import { RegistryLoader } from "../registry/loader";
 import { shapeResponseForLlm } from "../summarize/registry";
@@ -138,6 +143,13 @@ export async function runWorkflow(
       ) {
         stepInput = { ...input, ...stepInput };
       }
+
+      // JSON/YAML/XML paste tools: carry workflow text or prior result.json/formatted
+      stepInput = resolveDeveloperPasteStepInput(
+        step.operationId,
+        input,
+        stepInput
+      );
 
       stepInput = normalizeStepInput(step.operationId, stepInput);
 

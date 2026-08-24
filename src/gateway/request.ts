@@ -150,6 +150,87 @@ function nestedDownloadUrl(input: Record<string, unknown>): string | undefined {
   return undefined;
 }
 
+const DEVELOPER_PASTE_OPS = new Set([
+  "jsonFormatter",
+  "jsonValidator",
+  "jsonToZod",
+  "jsonToTypescript",
+  "jsonToGoStruct",
+  "jsonToPython",
+  "jsonToYaml",
+  "yamlToJson",
+  "xmlFormatter",
+]);
+
+const PASTE_FIELD_KEYS = [
+  "json",
+  "text",
+  "yaml",
+  "xml",
+  "code",
+  "html",
+  "css",
+  "sql",
+] as const;
+
+function hasDeveloperPasteFields(input: Record<string, unknown>): boolean {
+  for (const key of PASTE_FIELD_KEYS) {
+    const v = input[key];
+    if (typeof v === "string" && v.trim()) return true;
+  }
+  return false;
+}
+
+/**
+ * Pull pasteable content from a prior shaped gateway step
+ * (e.g. yamlToJson → result.json for jsonFormatter).
+ */
+export function extractDeveloperPasteFromPrior(
+  prior: Record<string, unknown>
+): Record<string, unknown> | null {
+  if (hasDeveloperPasteFields(prior)) return null;
+  const data = prior.data;
+  if (!data || typeof data !== "object") return null;
+  const result = (data as Record<string, unknown>).result;
+  if (!result || typeof result !== "object") return null;
+  const r = result as Record<string, unknown>;
+  if (typeof r.json === "string" && r.json.trim()) {
+    return { json: r.json, text: r.json };
+  }
+  if (typeof r.formatted === "string" && r.formatted.trim()) {
+    return { text: r.formatted, json: r.formatted, xml: r.formatted };
+  }
+  if (typeof r.yaml === "string" && r.yaml.trim()) {
+    return { yaml: r.yaml, text: r.yaml };
+  }
+  if (typeof r.xml === "string" && r.xml.trim()) {
+    return { xml: r.xml, text: r.xml };
+  }
+  return null;
+}
+
+/**
+ * Developer paste tools need workflow text/json after validate-style steps
+ * that return status shells without the original payload.
+ */
+export function resolveDeveloperPasteStepInput(
+  operationId: string,
+  workflowInput: Record<string, unknown>,
+  stepInput: Record<string, unknown>
+): Record<string, unknown> {
+  if (!DEVELOPER_PASTE_OPS.has(operationId)) return stepInput;
+  if (hasDeveloperPasteFields(stepInput)) return stepInput;
+
+  const fromPrior = extractDeveloperPasteFromPrior(stepInput);
+  if (fromPrior) return { ...workflowInput, ...fromPrior };
+
+  if (hasDeveloperPasteFields(workflowInput)) {
+    return { ...workflowInput };
+  }
+
+  return stepInput;
+}
+
 /**
  * Normalize common MCP input aliases before gateway invoke
  * (e.g. pasted text containing a JWT → token for jwtDecoder).
@@ -162,6 +243,16 @@ export function normalizeStepInput(
     if (typeof input.token === "string" && input.token.trim()) return input;
     if (typeof input.jwt === "string" && input.jwt.trim()) {
       return { ...input, token: input.jwt.trim() };
+    }
+    const priorResult =
+      input.data && typeof input.data === "object"
+        ? (input.data as Record<string, unknown>).result
+        : undefined;
+    if (priorResult && typeof priorResult === "object") {
+      const tok = (priorResult as Record<string, unknown>).token;
+      if (typeof tok === "string" && tok.trim()) {
+        return { ...input, token: tok.trim() };
+      }
     }
     const blob =
       (typeof input.text === "string" && input.text) ||
