@@ -1501,6 +1501,21 @@
       "requiredInput": ["expression"]
     },
     {
+      "id": "css-minifier",
+      "title": "CSS minifier / shrink stylesheets",
+      "description": "Strip CSS comments and whitespace and report byte counts (one-shot lite pass; not cssnano).",
+      "keywords": [
+        "css minifier",
+        "minify css",
+        "compress css",
+        "css compressor",
+        "reduce css file size"
+      ],
+      "type": "tool",
+      "target": "cssMinifier",
+      "requiredInput": ["css"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
