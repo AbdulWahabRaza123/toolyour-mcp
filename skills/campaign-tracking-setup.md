@@ -20,7 +20,9 @@ Pass UTM fields from the brief. `baseUrl`/`url` is for **building** query string
 | `utm_medium` | yes | e.g. `cpc` |
 | `utm_campaign` | yes | e.g. `spring-sale` |
 | `utm_term` / `utm_content` / `utm_id` | optional | Extra UTM params |
-| `platform` | optional | Ads macros: `google`, `meta`, `tiktok`, `linkedin`, `microsoft` |
+| `platform` | optional | Ads macros: `google`, `meta`, `tiktok`, `linkedin`, `microsoft` (defaults to `google` in the playbook) |
+
+Short aliases `source` / `medium` / `campaign` / `network` are accepted. After `utmBuilder`, the playbook pipes the built URL into `utmParser`.
 
 Example:
 
