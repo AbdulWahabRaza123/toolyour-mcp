@@ -27,6 +27,8 @@ Use when the user asks about **email authentication**, **DNS records**, or **sec
 3. Summarize missing SPF/DKIM/DMARC, MX/TXT gaps, and security.txt Contact/Expires.
 4. Do not claim DNSSEC validation (not covered).
 
+**Honesty:** SPF/DMARC/DKIM and MX are resolved on the **apex** when the input host is `www.*` (email DNS lives on the registrable domain). `security.txt` still checks the URL you passed (usually `www`).
+
 ## Output format
 
 - Email auth status (SPF / DKIM / DMARC)
