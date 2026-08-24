@@ -93,6 +93,10 @@ export function inferPatchType(
   if (/secret|token|jwt|api[_ -]?key|\.env|credential/.test(blob)) {
     return "config";
   }
+  // DNS / email-auth records — host updates DNS provider (not “read only”)
+  if (/spf|dkim|dmarc|emailauth|mx\b|dns\b/.test(blob)) {
+    return "config";
+  }
   // Publish security.txt / add SRI attrs — host edits files, not “investigate only”
   if (/security\.?txt|securitytxt|sri|subresource|integrity/.test(blob)) {
     return "file";
@@ -154,7 +158,7 @@ function acceptanceLine(
     patchType === "http-header"
       ? "server/CDN response headers (or framework security headers)"
       : patchType === "config"
-        ? "env/config (rotate or remove secrets; never commit them)"
+        ? "env/config or DNS (SPF/DKIM/DMARC TXT; rotate secrets — never commit them)"
         : patchType === "html" || patchType === "content"
           ? "HTML/templates/CMS content"
           : patchType === "file"

@@ -94,6 +94,10 @@ assert.equal(
 assert.equal(inferPatchType("sri", "Missing integrity attribute"), "file");
 ok("security.txt / SRI patchType → file + edit");
 
+assert.equal(inferPatchType("emailAuth", "spf"), "config");
+assert.equal(inferRoleHint(inferPatchType("emailAuth", "dmarc")), "config");
+ok("SPF/DMARC patchType → config");
+
 // --- Loop attachment ---
 const looped = buildHarnessLoopFromReport(
   {
