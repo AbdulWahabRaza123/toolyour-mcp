@@ -86,6 +86,14 @@ ok("ship-like remainingFixes: rank-1, roleHint, acceptance; noise filtered");
 assert.equal(inferRoleHint(inferPatchType("secrets", "stripe-key")), "config");
 ok("secrets patchType → config roleHint");
 
+assert.equal(inferPatchType("securityTxt", "security.txt present"), "file");
+assert.equal(
+  inferRoleHint(inferPatchType("securityTxt", "security.txt present")),
+  "edit"
+);
+assert.equal(inferPatchType("sri", "Missing integrity attribute"), "file");
+ok("security.txt / SRI patchType → file + edit");
+
 // --- Loop attachment ---
 const looped = buildHarnessLoopFromReport(
   {

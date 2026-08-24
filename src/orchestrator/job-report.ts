@@ -93,6 +93,10 @@ export function inferPatchType(
   if (/secret|token|jwt|api[_ -]?key|\.env|credential/.test(blob)) {
     return "config";
   }
+  // Publish security.txt / add SRI attrs — host edits files, not “investigate only”
+  if (/security\.?txt|securitytxt|sri|subresource|integrity/.test(blob)) {
+    return "file";
+  }
   if (/lcp|cls|inp|tbt|cwv|speed|asset|image|font|compress|defer|preload/.test(blob)) {
     return "file";
   }
@@ -154,7 +158,7 @@ function acceptanceLine(
         : patchType === "html" || patchType === "content"
           ? "HTML/templates/CMS content"
           : patchType === "file"
-            ? "repo assets or frontend build pipeline"
+            ? "repo files (e.g. public/.well-known, HTML assets, or build pipeline)"
             : "the relevant host workspace files";
   return `Done when: after changing ${where}, verify_task no longer lists "${title}" as an open high finding (and related ship-critical scores are not poor/needs_improvement/unknown).`;
 }
