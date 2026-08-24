@@ -317,7 +317,7 @@
     {
       "id": "dev-format-transform-job",
       "title": "Dev Format Transform",
-      "description": "YAML→JSON, format JSON, and pretty-print XML for agent pipelines.",
+      "description": "YAML→JSON, format JSON, and pretty-print XML for agent pipelines (not HTML/CSS/JS one-shots).",
       "synthesizer": "dev-format-transform",
       "steps": [
         { "id": "yaml", "operationId": "yamlToJson" },

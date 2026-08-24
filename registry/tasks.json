@@ -1736,7 +1736,7 @@
     {
       "id": "dev-format-transform",
       "title": "Dev format transform",
-      "description": "YAML↔JSON, XML pretty-print, and related formatters.",
+      "description": "YAML→JSON→XML format playbook (HTML/CSS/JS/SQL are separate one-shots).",
       "keywords": [
         "format html css",
         "format html and css",
