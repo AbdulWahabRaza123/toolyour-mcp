@@ -1533,6 +1533,23 @@
       "requiredInput": ["code"]
     },
     {
+      "id": "color-converter",
+      "title": "Color converter / hex RGB HSL",
+      "description": "Convert hex, rgb(a), or hsl(a) into all four notations with alpha preserved (one-shot).",
+      "keywords": [
+        "color converter",
+        "colour converter",
+        "hex to rgb",
+        "rgb to hsl",
+        "hsl to hex",
+        "rgba converter",
+        "convert hex to rgb"
+      ],
+      "type": "tool",
+      "target": "colorConverter",
+      "requiredInput": ["color"]
+    },
+    {
       "id": "json-formatter",
       "title": "JSON formatter / pretty-print or minify",
       "description": "Pretty-print or minify JSON with strict parse-first formatting (one-shot developer utility).",
