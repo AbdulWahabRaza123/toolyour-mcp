@@ -231,6 +231,89 @@ export function resolveDeveloperPasteStepInput(
   return stepInput;
 }
 
+const MARKETING_CARRY_OPS = new Set([
+  "utmBuilder",
+  "adsUtmBuilder",
+  "utmParser",
+  "utmBulkBuilder",
+  "utmNamingConventionChecker",
+  "adsCopyCounter",
+  "googleAdsRsaPreview",
+  "emailSubjectLineTester",
+  "emailSpamWordChecker",
+  "roasCalculator",
+  "cpcCalculator",
+  "ctrCalculator",
+  "cpaCalculator",
+  "cacCalculator",
+]);
+
+function isShapedPriorStep(input: Record<string, unknown>): boolean {
+  return (
+    input.status === 200 ||
+    input.status === 400 ||
+    (input.data != null && typeof input.data === "object") ||
+    typeof input.operationId === "string"
+  );
+}
+
+function extractUrlFromMarketingPrior(
+  prior: Record<string, unknown>
+): string | undefined {
+  const data = prior.data;
+  if (!data || typeof data !== "object") return undefined;
+  const result = (data as Record<string, unknown>).result;
+  if (!result || typeof result !== "object") return undefined;
+  const url = (result as Record<string, unknown>).url;
+  return typeof url === "string" && url.trim() ? url.trim() : undefined;
+}
+
+/**
+ * Marketing playbook steps lose baseUrl / utm_* / platform after step 1
+ * because lastOutput is a shaped gateway shell. Carry workflow fields and
+ * pipe utmBuilder result.url into utmParser.
+ */
+export function resolveMarketingStepInput(
+  operationId: string,
+  workflowInput: Record<string, unknown>,
+  stepInput: Record<string, unknown>
+): Record<string, unknown> {
+  if (!MARKETING_CARRY_OPS.has(operationId)) return stepInput;
+
+  let next = stepInput;
+  if (isShapedPriorStep(stepInput)) {
+    next = { ...workflowInput };
+    const builtUrl = extractUrlFromMarketingPrior(stepInput);
+    if (builtUrl && (operationId === "utmParser" || operationId === "utmNamingConventionChecker")) {
+      next = { ...next, url: builtUrl, link: builtUrl };
+    }
+  }
+
+  // Alias short keys agents often pass (also accepted by API utmParamsFromBody).
+  if (typeof next.source === "string" && !next.utm_source) {
+    next = { ...next, utm_source: next.source };
+  }
+  if (typeof next.medium === "string" && !next.utm_medium) {
+    next = { ...next, utm_medium: next.medium };
+  }
+  if (typeof next.campaign === "string" && !next.utm_campaign) {
+    next = { ...next, utm_campaign: next.campaign };
+  }
+  if (typeof next.network === "string" && !next.platform) {
+    next = { ...next, platform: next.network };
+  }
+
+  // adsUtmBuilder requires platform — default google when building from UTM brief.
+  if (
+    operationId === "adsUtmBuilder" &&
+    (typeof next.platform !== "string" || !String(next.platform).trim())
+  ) {
+    next = { ...next, platform: "google" };
+  }
+
+  return next;
+}
+
 /**
  * Normalize common MCP input aliases before gateway invoke
  * (e.g. pasted text containing a JWT → token for jwtDecoder).

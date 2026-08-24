@@ -101,3 +101,33 @@ describe("resolveDeveloperPasteStepInput", () => {
     assert.equal(out.json, '{\n  "a": 1\n}');
   });
 });
+
+describe("resolveMarketingStepInput", () => {
+  it("reuses workflow UTM fields after shaped prior step", async () => {
+    const { resolveMarketingStepInput } = await import(
+      "../../dist/gateway/request.js"
+    );
+    const workflow = {
+      baseUrl: "https://example.com",
+      source: "google",
+      medium: "cpc",
+      campaign: "spring",
+    };
+    const prior = {
+      status: 200,
+      data: {
+        result: {
+          toolId: "utm-builder",
+          url: "https://example.com?utm_source=google&utm_medium=cpc&utm_campaign=spring",
+        },
+      },
+    };
+    const ads = resolveMarketingStepInput("adsUtmBuilder", workflow, prior);
+    assert.equal(ads.baseUrl, "https://example.com");
+    assert.equal(ads.utm_source, "google");
+    assert.equal(ads.platform, "google");
+
+    const parse = resolveMarketingStepInput("utmParser", workflow, prior);
+    assert.match(String(parse.url), /utm_source=google/);
+  });
+});

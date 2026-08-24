@@ -6,6 +6,7 @@ import {
   extractUrlFromPayload,
   normalizeStepInput,
   resolveDeveloperPasteStepInput,
+  resolveMarketingStepInput,
 } from "../gateway/request";
 import { invalidateApiKeyCache, validateApiKey } from "../auth/session";
 import { RegistryLoader } from "../registry/loader";
@@ -146,6 +147,13 @@ export async function runWorkflow(
 
       // JSON/YAML/XML paste tools: carry workflow text or prior result.json/formatted
       stepInput = resolveDeveloperPasteStepInput(
+        step.operationId,
+        input,
+        stepInput
+      );
+
+      // Marketing UTM/ads/email/math: carry workflow fields + prior result.url
+      stepInput = resolveMarketingStepInput(
         step.operationId,
         input,
         stepInput
