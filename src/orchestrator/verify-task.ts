@@ -19,6 +19,15 @@ import {
   type VerifyNextAction,
 } from "./job-report";
 import type { LoopStop } from "./loop-stop";
+import {
+  attachVerificationEnvelope,
+  baselineFromProfileLastRun,
+  ensureVerificationProfile,
+  extractProfileId,
+  extractTargetUrl,
+  persistVerificationRun,
+} from "./verification-loop";
+import { randomUUID } from "crypto";
 
 export type {
   RemainingFix,
@@ -260,9 +269,33 @@ export async function executeVerifyTask(
   input: Record<string, unknown>,
   baseline: unknown,
   ctx: SolveTaskContext,
-  mode: ResponseMode
+  mode: ResponseMode,
+  opts?: { profileId?: string }
 ): Promise<VerifyTaskResult> {
-  const before = extractJobReport(baseline);
+  const profileId = opts?.profileId || extractProfileId(input);
+  let effectiveBaseline = baseline;
+  let profileMeta:
+    | Awaited<ReturnType<typeof ensureVerificationProfile>>
+    | undefined;
+
+  if (profileId) {
+    profileMeta = await ensureVerificationProfile({
+      apiKey: ctx.apiKey,
+      logger: ctx.logger,
+      profileId,
+      playbook: "verify",
+      autoCreate: false,
+    }).catch(() => undefined);
+
+    if (!extractJobReport(effectiveBaseline) && profileMeta?.lastRunSnapshot) {
+      const fromProfile = baselineFromProfileLastRun(profileMeta.lastRunSnapshot);
+      if (fromProfile) {
+        effectiveBaseline = fromProfile;
+      }
+    }
+  }
+
+  const before = extractJobReport(effectiveBaseline);
   if (!before) {
     return withHarnessLoop(
       {
@@ -270,14 +303,18 @@ export async function executeVerifyTask(
         code: MCP_ERROR_CODES.NEED_BASELINE,
         goal,
         message:
-          "verify_task requires a usable baseline jobReport. Pass the prior solve_task or run_playbook result (or verify_task.after / a raw jobReport). Do not re-run until you have that payload.",
+          "verify_task requires a usable baseline jobReport. Pass the prior solve_task or run_playbook result (or verify_task.after / a raw jobReport). When using profileId, run run_playbook first so lastRunSnapshot is stored.",
         hint: {
           baseline:
             "Pass the entire previous solve_task, run_playbook, or verify_task result as baseline.",
+          profileId: profileId || undefined,
         },
         nextActions: [
           "Call solve_task or run_playbook first and keep the result",
           "Re-call verify_task with that entire result as baseline",
+          profileId
+            ? `Or run run_playbook with profileId ${profileId} first to populate the profile snapshot`
+            : "Optional: pass profileId to auto-load last run snapshot after the first playbook",
         ],
         exampleInput: {
           baseline: {
@@ -288,6 +325,7 @@ export async function executeVerifyTask(
           },
         },
         missing: ["baseline"],
+        ...(profileId ? { profileId } : {}),
       },
       "verify"
     );
@@ -297,13 +335,15 @@ export async function executeVerifyTask(
   const after = extractJobReport(fresh);
   const { delta, progress } = attachProgress(
     diffJobReports(before, after),
-    baseline
+    effectiveBaseline
   );
   const compactFresh = shapeAgentResult(fresh, mode, "run");
   const freshStatus =
     fresh && typeof fresh === "object"
       ? String((fresh as { status?: string }).status || "")
       : "";
+
+  const runId = `run_${randomUUID().replace(/-/g, "").slice(0, 16)}`;
 
   const payload: VerifyTaskResult = {
     status:
@@ -323,6 +363,36 @@ export async function executeVerifyTask(
     goal,
     delta,
     after: compactFresh,
+    ...(profileId ? { profileId } : {}),
   };
-  return withHarnessLoop(payload, "verify", { baseline, progress });
+  const wrapped = withHarnessLoop(payload, "verify", {
+    baseline: effectiveBaseline,
+    progress,
+  }) as unknown as Record<string, unknown>;
+
+  attachVerificationEnvelope(wrapped, {
+    profileId: profileId || profileMeta?.profileId,
+    targetUrl: extractTargetUrl(input) || after?.url,
+    playbook: profileMeta?.profileId ? undefined : extractProfileId(input) ? "verify" : undefined,
+    runId,
+    baselineRunId: profileMeta?.lastPassRunId,
+    delta,
+    lastPassAt: profileMeta?.lastPassAt,
+    lastPassGate: profileMeta?.lastPassGate,
+    phase: "verify",
+  });
+
+  const loopGate = (wrapped.loop as { gate?: string } | undefined)?.gate;
+  if (profileId || profileMeta?.profileId) {
+    await persistVerificationRun({
+      apiKey: ctx.apiKey,
+      logger: ctx.logger,
+      profileId: profileId || profileMeta?.profileId,
+      runPayload: wrapped,
+      runId,
+      gate: loopGate as "pass" | "fail" | "unknown" | undefined,
+    });
+  }
+
+  return wrapped as unknown as VerifyTaskResult;
 }

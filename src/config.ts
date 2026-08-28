@@ -67,6 +67,9 @@ export function getEnv() {
     controlPlaneJobsUrl:
       process.env.CONTROL_PLANE_JOBS_URL?.replace(/\/$/, "") ||
       `${saasInternalBase}/control-plane/jobs`,
+    verificationProfilesUrl:
+      process.env.VERIFICATION_PROFILES_URL?.replace(/\/$/, "") ||
+      `${saasInternalBase}/verification-profiles`,
     internalSecret: process.env.SAAS_INTERNAL_SECRET || "",
     registryPath:
       process.env.REGISTRY_PATH ||

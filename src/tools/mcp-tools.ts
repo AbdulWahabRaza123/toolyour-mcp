@@ -154,16 +154,30 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "run_playbook",
-    "Run a skill playbook (ship-gate, SEO audit, security audit, …) in one call. Read loop.line first (gate · rank-1 · credits), then loop.remainingFixes. After host-repo fixes, verify_task with this result as baseline. Prefer over load_skill or invoke_tool.",
+    "Run a skill playbook (ship-gate, production-readiness-gate, SEO audit, …). Read verification.evidence + loop.line first. After host fixes, verify_task with this result as baseline (or profileId). Prefer over load_skill or invoke_tool.",
     {
       skillId: z.string().describe("Skill id from list_skills"),
-      input: z.any().optional(),
+      input: z
+        .any()
+        .optional()
+        .describe(
+          "Playbook input. For URL playbooks: { url, profileId?, autoProfile?: true }. profileId auto-created on first https run when omitted."
+        ),
+      profileId: z
+        .string()
+        .optional()
+        .describe("Reuse a verification profile for baseline persistence and regression"),
       responseMode: z.enum(["compact", "full", "dataRef"]).optional(),
       async: z.boolean().optional(),
     },
     async (args) => {
       const skillId = String(args.skillId || "");
-      const input = (args.input || {}) as Record<string, unknown>;
+      const input = {
+        ...((args.input || {}) as Record<string, unknown>),
+        ...(typeof args.profileId === "string" && args.profileId.trim()
+          ? { profileId: args.profileId.trim() }
+          : {}),
+      };
       const mode = parseResponseMode(args.responseMode);
       if (wantsAsync(args.async)) {
         return textResult(
@@ -195,15 +209,23 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "verify_task",
-    "Close the loop only when the prior result has loop.initiate true. Requires a usable baseline jobReport. Read loop.line / loop.gate; apply rank-1 loop.nextActions. Stops when loop.stop is set (max_rounds or same_findings) or loop.initiate is false.",
+    "Close the loop only when the prior result has loop.initiate true. Requires baseline jobReport OR profileId with a prior run_playbook snapshot. Read verification.evidence + loop.line; apply rank-1 loop.nextActions. Stops when loop.stop is set.",
     {
       goal: z.string(),
-      input: z.any().optional(),
+      input: z
+        .any()
+        .optional()
+        .describe("Same input as run (e.g. { url, profileId })"),
       baseline: z
         .any()
+        .optional()
         .describe(
-          "Prior solve_task result, verify_task.after, get_run payload, or raw jobReport"
+          "Prior solve_task/run_playbook/verify_task result. Optional when profileId has lastRunSnapshot."
         ),
+      profileId: z
+        .string()
+        .optional()
+        .describe("Verification profile — auto-loads last run if baseline omitted"),
       responseMode: z.enum(["compact", "full", "dataRef"]).optional(),
       async: z
         .boolean()
@@ -214,11 +236,20 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
     },
     async (args) => {
       const goal = String(args.goal || "");
-      const input = (args.input || {}) as Record<string, unknown>;
+      const input = {
+        ...((args.input || {}) as Record<string, unknown>),
+        ...(typeof args.profileId === "string" && args.profileId.trim()
+          ? { profileId: args.profileId.trim() }
+          : {}),
+      };
       const mode = parseResponseMode(args.responseMode);
       const baseline = args.baseline;
+      const profileId =
+        typeof args.profileId === "string" && args.profileId.trim()
+          ? args.profileId.trim()
+          : undefined;
       const work = () =>
-        executeVerifyTask(goal, input, baseline, ctx, mode);
+        executeVerifyTask(goal, input, baseline, ctx, mode, { profileId });
       if (wantsAsync(args.async)) {
         return textResult(
           await acceptAsyncJob({

@@ -17,6 +17,12 @@ import {
 } from "./payload-intent";
 import { decidePlanLoop, type LoopEligibility } from "./loop-scope";
 import { resolveLocalhostUrl } from "./local-dev";
+import {
+  DEV_VERIFICATION_GOLDEN_PATH,
+  developmentVerificationPlanNext,
+  isDevelopmentVerificationGoal,
+} from "./dev-verification-intent";
+import { extractTargetUrl } from "./verification-loop";
 
 const CREDITS_PER_STEP = 3;
 const CREDITS_PER_TOOL = 2;
@@ -49,6 +55,8 @@ export interface PlanTaskResult {
   }>;
   next: string;
   loop: LoopEligibility;
+  /** Host-agent golden path for development verification jobs */
+  goldenPath?: string[];
 }
 
 function estimateCredits(kind: string, stepCount: number): number {
@@ -158,6 +166,75 @@ export function planTask(
 ): PlanTaskResult {
   const trimmedGoal = goal.trim();
   const tasks = loadTasks();
+
+  if (isDevelopmentVerificationGoal(trimmedGoal)) {
+    const url = extractTargetUrl(input);
+    const localhostUrl = resolveLocalhostUrl(trimmedGoal, input);
+    if (localhostUrl) {
+      const loop = decidePlanLoop({ confidence: "high", recommendedKind: "local" });
+      return {
+        status: "plan",
+        goal: trimmedGoal,
+        free: true,
+        estimatedCredits: estimateCredits("workflow", 5),
+        confidence: "high",
+        recommended: {
+          kind: "playbook",
+          id: "production-readiness-gate",
+          title: "Production Readiness Gate",
+          requiredInput: ["url"],
+          workflowId: "ship-gate-job",
+        },
+        alternatives: [
+          { kind: "playbook", id: "ship-gate", title: "Ship Gate", score: 5 },
+          { kind: "playbook", id: "pr-preview-gate", title: "PR Preview Gate", score: 4 },
+        ],
+        toolHints: [],
+        loop: { ...loop, initiate: false, inScope: true },
+        goldenPath: DEV_VERIFICATION_GOLDEN_PATH,
+        next: `MCP cannot fetch ${localhostUrl}. Deploy or tunnel a public https:// preview URL, then run_playbook("production-readiness-gate", { url }). Or pass workspace HTML via content-ship for local iteration.`,
+      };
+    }
+    const loop = decidePlanLoop({
+      confidence: "high",
+      recommendedKind: "playbook",
+      workflowId: "ship-gate-job",
+    });
+    const estimatedCredits = estimateCredits("workflow", 5);
+    return {
+      status: "plan",
+      goal: trimmedGoal,
+      free: true,
+      estimatedCredits,
+      confidence: url ? "high" : "medium",
+      recommended: {
+        kind: "playbook",
+        id: "production-readiness-gate",
+        title: "Production Readiness Gate",
+        requiredInput: ["url"],
+        steps: [
+          "securityHeadersAnalyzer",
+          "sslTlsCertificateChecker",
+          "mixedContentChecker",
+          "httpStatusChecker",
+          "pageSpeedAnalyzer",
+        ],
+        workflowId: "ship-gate-job",
+      },
+      alternatives: [
+        { kind: "playbook", id: "ship-gate", title: "Ship Gate", score: 5 },
+        { kind: "playbook", id: "pr-preview-gate", title: "PR Preview Gate", score: 4 },
+        { kind: "playbook", id: "web-security-audit", title: "Web Security Audit", score: 3 },
+      ],
+      toolHints: [],
+      loop,
+      goldenPath: DEV_VERIFICATION_GOLDEN_PATH,
+      next: url
+        ? developmentVerificationPlanNext(url)
+        : "Ask for a public https:// preview URL (deploy or tunnel), then run_playbook('production-readiness-gate', { url }). profileId is auto-created on first run.",
+    };
+  }
+
   const match = matchTask(trimmedGoal, tasks);
   const confident = isConfidentMatch(trimmedGoal, tasks, match);
   const ranked = rankTaskSuggestions(trimmedGoal, tasks, 5);

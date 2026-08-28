@@ -46,6 +46,7 @@ export const SKILL_WORKFLOW_MAP: Record<string, string> = {
   "fix-verify-frontend-webp": "frontend-webp-job",
   "content-ship": "content-ship-local",
   "ship-gate": "ship-gate-job",
+  "production-readiness-gate": "ship-gate-job",
   "pr-preview-gate": "ship-gate-job",
   "fix-verify-ship-gate": "ship-gate-job",
   "fix-verify-security-headers": "security-headers-job",

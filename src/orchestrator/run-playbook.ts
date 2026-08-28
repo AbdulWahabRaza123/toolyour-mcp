@@ -19,6 +19,16 @@ import {
   buildLocalhostNeedInput,
   resolveLocalhostUrl,
 } from "./local-dev";
+import { randomUUID } from "crypto";
+import { extractJobReport } from "./job-report";
+import {
+  attachVerificationEnvelope,
+  ensureVerificationProfile,
+  extractProfileId,
+  extractTargetUrl,
+  persistVerificationRun,
+  regressionVsLastPass,
+} from "./verification-loop";
 
 export interface RunPlaybookContext {
   apiKey: string;
@@ -196,16 +206,67 @@ export async function runPlaybook(
     transport: "mcp",
   });
 
-  return shapeAgentResult(
-    {
-      status: result.status === "completed" ? "completed" : "partial",
-      skillId: id,
-      workflowId,
-      playbookExcerpt: content ? content.slice(0, 1200) : undefined,
-      execution: result,
-    },
-    parseResponseMode(responseMode)
-  );
+  const mode = parseResponseMode(responseMode);
+  const profileIdInput = extractProfileId(data);
+  const targetUrl = extractTargetUrl(data);
+  const profileMeta = await ensureVerificationProfile({
+    apiKey: ctx.apiKey,
+    logger: ctx.logger,
+    profileId: profileIdInput,
+    targetUrl,
+    playbook: resolvedId,
+    label: typeof data.label === "string" ? data.label : undefined,
+    autoCreate: data.autoProfile !== false,
+  }).catch(() => ({
+    profileId: profileIdInput,
+    lastPassSnapshot: null as Record<string, unknown> | null,
+    lastRunSnapshot: null as Record<string, unknown> | null,
+    lastPassAt: null as string | null,
+    lastPassGate: null as string | null,
+    lastPassRunId: null as string | null,
+  }));
+
+  const activeProfileId = profileMeta.profileId || profileIdInput;
+  const runId = `run_${randomUUID().replace(/-/g, "").slice(0, 16)}`;
+
+  const payload = {
+    status: result.status === "completed" ? "completed" : "partial",
+    skillId: id,
+    workflowId,
+    playbookExcerpt: content ? content.slice(0, 1200) : undefined,
+    execution: result,
+    ...(activeProfileId ? { profileId: activeProfileId } : {}),
+  };
+
+  const shaped = shapeAgentResult(payload, mode) as Record<string, unknown>;
+  const report = extractJobReport(shaped);
+  const loopGate = (shaped.loop as { gate?: string } | undefined)?.gate;
+  const vsLastPass = regressionVsLastPass(profileMeta.lastPassSnapshot, report);
+
+  attachVerificationEnvelope(shaped, {
+    profileId: activeProfileId,
+    targetUrl: targetUrl || report?.url,
+    playbook: resolvedId,
+    runId,
+    baselineRunId: profileMeta.lastPassRunId,
+    delta: vsLastPass,
+    lastPassAt: profileMeta.lastPassAt,
+    lastPassGate: profileMeta.lastPassGate,
+    phase: "run",
+  });
+
+  if (activeProfileId) {
+    await persistVerificationRun({
+      apiKey: ctx.apiKey,
+      logger: ctx.logger,
+      profileId: activeProfileId,
+      runPayload: shaped,
+      runId,
+      gate: loopGate as "pass" | "fail" | "unknown" | undefined,
+    });
+  }
+
+  return shaped;
 }
 
 function playbookRequiresLiveUrl(skillId: string, workflowId: string): boolean {
