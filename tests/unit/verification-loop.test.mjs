@@ -6,6 +6,7 @@ import {
   baselineFromProfileLastRun,
   regressionVsLastPass,
 } from "../../dist/orchestrator/verification-loop.js";
+import { resolveVerifyRerunGoal } from "../../dist/orchestrator/verify-task.js";
 import { isDevelopmentVerificationGoal } from "../../dist/orchestrator/dev-verification-intent.js";
 
 describe("verification profile helpers", () => {
@@ -64,6 +65,24 @@ describe("verification profile helpers", () => {
     );
     assert.ok(delta);
     assert.ok(["regressed", "unchanged", "improved"].includes(delta.status));
+  });
+});
+
+describe("verify rerun goal", () => {
+  it("maps dev verification baseline to ship gate rerun goal", () => {
+    const goal = resolveVerifyRerunGoal(
+      "verify my preview deploy is production ready",
+      { url: "https://preview.example.com" },
+      { skillId: "production-readiness-gate" },
+      {
+        schemaVersion: "toolyour.jobReport@1",
+        jobId: "ship-gate",
+        workflowId: "ship-gate-job",
+        findings: [],
+        scores: {},
+      }
+    );
+    assert.equal(goal, "ship gate for https://preview.example.com");
   });
 });
 

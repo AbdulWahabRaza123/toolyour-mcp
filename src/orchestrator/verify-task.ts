@@ -29,6 +29,46 @@ import {
 } from "./verification-loop";
 import { randomUUID } from "crypto";
 
+const SHIP_GATE_PLAYBOOKS = new Set([
+  "ship-gate",
+  "production-readiness-gate",
+  "pr-preview-gate",
+]);
+
+/** Align re-run goal with baseline playbook so verify_task compares like-for-like. */
+export function resolveVerifyRerunGoal(
+  goal: string,
+  input: Record<string, unknown>,
+  baseline: unknown,
+  before: JobReport
+): string {
+  const root =
+    baseline && typeof baseline === "object"
+      ? (baseline as Record<string, unknown>)
+      : {};
+  const skillId =
+    typeof root.skillId === "string" ? root.skillId.trim() : undefined;
+  const execution =
+    root.execution && typeof root.execution === "object"
+      ? (root.execution as Record<string, unknown>)
+      : undefined;
+  const url =
+    extractTargetUrl(input) ||
+    before.url ||
+    (typeof execution?.url === "string" ? execution.url : undefined);
+
+  if (
+    before.workflowId === "ship-gate-job" ||
+    (skillId && SHIP_GATE_PLAYBOOKS.has(skillId))
+  ) {
+    return url ? `ship gate for ${url}` : goal;
+  }
+  if (url && !goal.includes(url)) {
+    return `${goal.replace(/\.$/, "")} ${url}`.trim();
+  }
+  return goal;
+}
+
 export type {
   RemainingFix,
   RemainingFixPatchType,
@@ -331,7 +371,13 @@ export async function executeVerifyTask(
     );
   }
 
-  const fresh = await solveTask(goal, input, ctx, "full");
+  const rerunGoal = resolveVerifyRerunGoal(
+    goal,
+    input,
+    effectiveBaseline,
+    before
+  );
+  const fresh = await solveTask(rerunGoal, input, ctx, "full");
   const after = extractJobReport(fresh);
   const { delta, progress } = attachProgress(
     diffJobReports(before, after),
