@@ -91,11 +91,10 @@ export async function matchFeatureMemoryForGoal(opts: {
       limit: 5,
     });
   } catch (e) {
-    if (e instanceof FeatureMemoryStoreError) {
-      opts.logger.warn("feature memory match skipped", { message: e.message });
-      return null;
-    }
-    throw e;
+    opts.logger.warn("feature memory match skipped", {
+      message: e instanceof Error ? e.message : String(e),
+    });
+    return null;
   }
 }
 
@@ -139,50 +138,68 @@ export async function enrichWithFeatureMemory(
 ): Promise<void> {
   const requirements = extractFeatureRequirements(opts.goal, opts.input);
   const inferredDomain = detectFeatureDomain(opts.goal, requirements);
-  const matched = await matchFeatureMemoryForGoal(opts);
 
-  if (
-    !matched ||
-    (!matched.matches.length && !matched.bestInDomain && !matched.communityPatterns?.length)
-  ) {
+  const attachBaseline = () => {
     attachFeatureMemoryEnvelope(root, {
       schemaVersion: "toolyour.featureMemory@1",
-      domain: matched?.domain || inferredDomain,
+      domain: inferredDomain,
       recordKeeping: FEATURE_MEMORY_RECORD_KEEPING,
       goldenPath: FEATURE_MEMORY_GOLDEN_PATH,
       reminder: FEATURE_MEMORY_RECORD_KEEPING.message,
     });
-    return;
-  }
-
-  const best = matched.bestInDomain || matched.matches[0];
-  const topScore = matched.matches[0]?.matchScore ?? 0;
-  const matchConfidence =
-    topScore >= 0.45 ? "high" : topScore >= 0.25 ? "medium" : topScore > 0 ? "low" : "none";
-
-  const matrix = best?.evaluationMatrix as FeatureEvaluationMatrix | undefined;
-  const capabilityGaps = matrix ? matrixToCapabilityGaps(matrix) : undefined;
-
-  const envelope: FeatureMemoryEnvelope = {
-    schemaVersion: "toolyour.featureMemory@1",
-    domain: matched.domain,
-    recordKeeping: FEATURE_MEMORY_RECORD_KEEPING,
-    matchConfidence,
-    matchMethod: matched.matchMethod,
-    priorInstances: matched.matches,
-    bestKnown: best,
-    communityPatterns: matched.communityPatterns,
-    capabilityGaps,
-    goldenPath: FEATURE_MEMORY_GOLDEN_PATH,
-    reminder: buildFeatureMemoryReminder({
-      goal: opts.goal,
-      domain: matched.domain,
-      matches: matched.matches,
-      best,
-    }),
   };
 
-  attachFeatureMemoryEnvelope(root, envelope);
+  try {
+    const matched = await matchFeatureMemoryForGoal(opts);
+
+    if (
+      !matched ||
+      (!matched.matches.length && !matched.bestInDomain && !matched.communityPatterns?.length)
+    ) {
+      attachFeatureMemoryEnvelope(root, {
+        schemaVersion: "toolyour.featureMemory@1",
+        domain: matched?.domain || inferredDomain,
+        recordKeeping: FEATURE_MEMORY_RECORD_KEEPING,
+        goldenPath: FEATURE_MEMORY_GOLDEN_PATH,
+        reminder: FEATURE_MEMORY_RECORD_KEEPING.message,
+      });
+      return;
+    }
+
+    const best = matched.bestInDomain || matched.matches[0];
+    const topScore = matched.matches[0]?.matchScore ?? 0;
+    const matchConfidence =
+      topScore >= 0.45 ? "high" : topScore >= 0.25 ? "medium" : topScore > 0 ? "low" : "none";
+
+    const matrix = best?.evaluationMatrix as FeatureEvaluationMatrix | undefined;
+    const capabilityGaps = matrix ? matrixToCapabilityGaps(matrix) : undefined;
+
+    const envelope: FeatureMemoryEnvelope = {
+      schemaVersion: "toolyour.featureMemory@1",
+      domain: matched.domain,
+      recordKeeping: FEATURE_MEMORY_RECORD_KEEPING,
+      matchConfidence,
+      matchMethod: matched.matchMethod,
+      priorInstances: matched.matches,
+      bestKnown: best,
+      communityPatterns: matched.communityPatterns,
+      capabilityGaps,
+      goldenPath: FEATURE_MEMORY_GOLDEN_PATH,
+      reminder: buildFeatureMemoryReminder({
+        goal: opts.goal,
+        domain: matched.domain,
+        matches: matched.matches,
+        best,
+      }),
+    };
+
+    attachFeatureMemoryEnvelope(root, envelope);
+  } catch (e) {
+    opts.logger.warn("feature memory enrich failed; attaching baseline recordKeeping", {
+      message: e instanceof Error ? e.message : String(e),
+    });
+    attachBaseline();
+  }
 }
 
 function isFeatureBuildGoal(goal: string): boolean {
