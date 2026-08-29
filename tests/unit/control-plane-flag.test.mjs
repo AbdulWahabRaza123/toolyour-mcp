@@ -17,15 +17,20 @@ import { RegistryLoader } from "../../dist/registry/loader.js";
 import { createLogger } from "../../dist/observability/logger.js";
 
 const CORE_TOOLS = [
+  "capture_feature",
+  "compare_feature_memory",
   "discover_tools",
   "fetch_payload",
   "get_run",
   "get_tool_schema",
   "invoke_tool",
   "list_categories",
+  "list_community_patterns",
+  "list_feature_memory",
   "list_skills",
   "load_skill",
   "plan_task",
+  "publish_feature_pattern",
   "run_playbook",
   "run_workflow",
   "solve_task",
@@ -72,7 +77,8 @@ describe("control-plane MCP loops", { concurrency: 1 }, () => {
   it("instructions route two loops without mixing", () => {
     assert.equal(resolveMcpInstructions(), DEFAULT_MCP_INSTRUCTIONS);
     assert.match(resolveMcpInstructions(), /Pick exactly one/);
-    assert.match(resolveMcpInstructions(), /First call plan_task/);
+    assert.match(resolveMcpInstructions(), /institutional record/i);
+    assert.match(resolveMcpInstructions(), /featureMemoryRecord/i);
     assert.match(resolveMcpInstructions(), /Do not invent check_submit/);
     assert.match(resolveMcpInstructions(), /Do not call plan_task, solve_task, or verify_task for that jobId/);
   });

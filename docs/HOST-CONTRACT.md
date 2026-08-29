@@ -22,6 +22,20 @@ For goals like “verify my preview deploy” or “make this production ready�
 
 See [DEVELOPMENT-VERIFICATION-GUIDE.md](./DEVELOPMENT-VERIFICATION-GUIDE.md).
 
+## Feature Memory (hot path)
+
+Cross-project memory so agents do not rebuild the same feature blind. **ToolYour records automatically** — agents must treat ToolYour as institutional memory.
+
+1. `plan_task` — read `featureMemory.recordKeeping` on every goal; prior matches when they exist.
+2. `verify_task` / `run_playbook` / `solve_task` on `loop.gate=pass` — ToolYour writes `featureMemoryRecord` (no agent action required).
+3. `capture_feature` — manual refine only (title, requirements, supersede).
+4. `list_feature_memory` / `compare_feature_memory` — browse and diff your library.
+5. `publish_feature_pattern` / `list_community_patterns` — opt-in community patterns.
+
+Improve a feature: `capture_feature({ supersedesFeatureId, baseline })` → `matrixComparison` (old vs new composite score).
+
+See [FEATURE-MEMORY-GUIDE.md](./FEATURE-MEMORY-GUIDE.md).
+
 ## Credits
 
 Credits buy **evidence and re-checks**. Incomplete / out-of-scope / blocked runs are **not** a pass. Prefer closing the gate over re-running random tools.

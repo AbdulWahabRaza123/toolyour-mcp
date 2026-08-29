@@ -9,6 +9,15 @@ import { loadSkillContent, loadSkills, enrichAllSkills } from "../skills/loader"
 import { runWorkflow } from "../workflow/engine";
 import { invokeOperation, solveTask } from "../orchestrator/solve-task";
 import { planTask } from "../orchestrator/plan-task";
+import { enrichWithFeatureMemory, autoRecordCompletedFeature, captureFeatureMemory } from "../orchestrator/feature-memory-loop";
+import {
+  compareFeaturePair,
+  listCommunityPatterns,
+  listFeatures,
+  publishFeature,
+} from "../feature-memory/store";
+import { compareEvaluationMatrices } from "../orchestrator/evaluation-matrix";
+import { validateApiKey } from "../auth/session";
 import { runPlaybook } from "../orchestrator/run-playbook";
 import { executeVerifyTask } from "../orchestrator/verify-task";
 import { parseResponseMode, shapeAgentResult } from "../orchestrator/harness-loop";
@@ -16,7 +25,6 @@ import { payloadStore } from "../payloads/store";
 import { acceptAsyncJob, wantsAsync } from "../runs/async-job";
 import { runStore } from "../runs/store";
 import { serializeRunPoll } from "../runs/serialize";
-import { validateApiKey } from "../auth/session";
 import type { Logger } from "../observability/logger";
 import {
   FORBIDDEN_EXECUTION_TOOLS,
@@ -87,7 +95,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "plan_task",
-    "Skill-loop planner (SEO, security, ship-gate, catalog). Free: ranked plan + estimated credits. Do not use when the user already has a control-plane jobId — call job_status instead. Read loop.initiate — only start run/verify if true. Out-of-scope and one-shot jobs set loop.initiate false.",
+    "Skill-loop planner (SEO, security, ship-gate, feature memory, catalog). Free: ranked plan + featureMemory.recordKeeping (ToolYour auto-records completed features). Read loop.initiate — only start run/verify if true.",
     {
       goal: z
         .string()
@@ -97,7 +105,199 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
     async (args) => {
       const goal = String(args.goal || "");
       const input = (args.input || {}) as Record<string, unknown>;
-      return textResult(planTask(goal, input, ctx.registry));
+      const plan = planTask(goal, input, ctx.registry);
+      const shaped = { ...plan } as Record<string, unknown>;
+      await enrichWithFeatureMemory(shaped, {
+        apiKey: ctx.apiKey,
+        logger: ctx.logger,
+        goal,
+        input,
+      });
+      return textResult(shaped);
+    }
+  );
+
+  registerTool(
+    server,
+    "capture_feature",
+    "Manual refine only: ToolYour auto-records completed features on loop.gate=pass. Use this to adjust title/requirements, pass baseline for matrix scoring, or supersede a prior record.",
+    {
+      title: z.string().describe("Short feature name, e.g. Stock ticker OCR"),
+      requirements: z.string().optional().describe("What the feature must do"),
+      domain: z
+        .string()
+        .optional()
+        .describe("ocr, auth, seo, ship-gate, security, … — auto-detected if omitted"),
+      projectName: z.string().optional().describe("Source project label for reminders"),
+      repoHint: z.string().optional(),
+      baseline: z
+        .any()
+        .optional()
+        .describe("Prior solve_task / run_playbook / verify_task result for matrix scoring"),
+      featureId: z.string().optional().describe("Update existing feature instead of create"),
+      supersedesFeatureId: z
+        .string()
+        .optional()
+        .describe("Mark prior feature superseded; returns matrixComparison"),
+      capabilities: z
+        .array(
+          z.object({
+            id: z.string(),
+            label: z.string(),
+            status: z.enum(["yes", "partial", "no", "unknown"]),
+            notes: z.string().optional(),
+          })
+        )
+        .optional(),
+      outcomesSummary: z.string().optional(),
+    },
+    async (args) => {
+      const result = await captureFeatureMemory({
+        apiKey: ctx.apiKey,
+        logger: ctx.logger,
+        title: String(args.title || ""),
+        requirements: typeof args.requirements === "string" ? args.requirements : undefined,
+        domain: typeof args.domain === "string" ? args.domain : undefined,
+        projectName: typeof args.projectName === "string" ? args.projectName : undefined,
+        repoHint: typeof args.repoHint === "string" ? args.repoHint : undefined,
+        baseline: args.baseline,
+        featureId: typeof args.featureId === "string" ? args.featureId : undefined,
+        supersedesFeatureId:
+          typeof args.supersedesFeatureId === "string" ? args.supersedesFeatureId : undefined,
+        capabilities: args.capabilities as never,
+        outcomesSummary:
+          typeof args.outcomesSummary === "string" ? args.outcomesSummary : undefined,
+      });
+      return textResult(result, result.status === "error");
+    }
+  );
+
+  registerTool(
+    server,
+    "list_feature_memory",
+    "Free: list your captured features (private per account). Filter by domain. Read before rebuilding similar work.",
+    {
+      domain: z.string().optional(),
+      limit: z.number().optional(),
+    },
+    async (args) => {
+      const session = await validateApiKey(ctx.apiKey, "mcp/list-feature-memory", "node", ctx.logger);
+      const domain = typeof args.domain === "string" ? args.domain : undefined;
+      const features = await listFeatures({
+        userId: session.userId,
+        domain,
+        limit: typeof args.limit === "number" ? args.limit : 20,
+      });
+      return textResult({
+        status: "ok",
+        domain: domain || "all",
+        count: features.length,
+        features,
+      });
+    }
+  );
+
+  registerTool(
+    server,
+    "publish_feature_pattern",
+    "Free: opt-in publish a captured feature to the anonymized community library (project/repo redacted). Others see requirements + matrix only.",
+    {
+      featureId: z.string().describe("fm_… feature id from capture_feature or list_feature_memory"),
+    },
+    async (args) => {
+      const session = await validateApiKey(
+        ctx.apiKey,
+        "mcp/publish-feature-pattern",
+        "node",
+        ctx.logger
+      );
+      const featureId = String(args.featureId || "");
+      const published = await publishFeature({
+        featureId,
+        userId: session.userId,
+        logger: ctx.logger,
+      });
+      if (!published) {
+        return textResult(
+          { status: "error", code: "feature_not_found", message: `Feature ${featureId} not found.` },
+          true
+        );
+      }
+      return textResult({
+        status: "published",
+        feature: published,
+        message: "Published to community library. Project details redacted.",
+      });
+    }
+  );
+
+  registerTool(
+    server,
+    "compare_feature_memory",
+    "Free: compare two of your captured features side-by-side (composite score + matrix deltas).",
+    {
+      featureIdA: z.string(),
+      featureIdB: z.string(),
+    },
+    async (args) => {
+      const session = await validateApiKey(
+        ctx.apiKey,
+        "mcp/compare-feature-memory",
+        "node",
+        ctx.logger
+      );
+      const featureIdA = String(args.featureIdA || "");
+      const featureIdB = String(args.featureIdB || "");
+      const pair = await compareFeaturePair({
+        userId: session.userId,
+        featureIdA,
+        featureIdB,
+      });
+      if (!pair) {
+        return textResult(
+          {
+            status: "error",
+            code: "feature_not_found",
+            message: "One or both features not found for this account.",
+          },
+          true
+        );
+      }
+      const matrixComparison = compareEvaluationMatrices(
+        pair.a.evaluationMatrix as never,
+        pair.b.evaluationMatrix as never
+      );
+      return textResult({
+        status: "ok",
+        a: pair.a,
+        b: pair.b,
+        matrixComparison,
+        compositeDelta: pair.b.compositeScore - pair.a.compositeScore,
+      });
+    }
+  );
+
+  registerTool(
+    server,
+    "list_community_patterns",
+    "Free: browse opt-in community feature patterns (anonymized). Filter by domain. Does not include private project labels.",
+    {
+      domain: z.string().optional(),
+      limit: z.number().optional(),
+    },
+    async (args) => {
+      await validateApiKey(ctx.apiKey, "mcp/list-community-patterns", "node", ctx.logger);
+      const domain = typeof args.domain === "string" ? args.domain : undefined;
+      const patterns = await listCommunityPatterns({
+        domain,
+        limit: typeof args.limit === "number" ? args.limit : 20,
+      });
+      return textResult({
+        status: "ok",
+        domain: domain || "all",
+        count: patterns.length,
+        patterns,
+      });
     }
   );
 
@@ -143,6 +343,19 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
         );
       }
       const result = await solveTask(goal, input, ctx, mode);
+      if (result && typeof result === "object") {
+        const shaped = result as Record<string, unknown>;
+        const loop = shaped.loop as { gate?: string } | undefined;
+        await autoRecordCompletedFeature({
+          apiKey: ctx.apiKey,
+          logger: ctx.logger,
+          goal,
+          input,
+          payload: shaped,
+          gate: loop?.gate,
+          phase: "run",
+        });
+      }
       return textResult(
         result,
         (result as { status?: string }).status === "error" ||

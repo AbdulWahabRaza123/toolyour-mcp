@@ -396,6 +396,67 @@ let devRun;
   );
 }
 
+{
+  const { sessionId, result } = await callTool(
+    sid,
+    "plan_task",
+    { goal: "build OCR for invoice PDFs in another project" },
+    30
+  );
+  sid = sessionId;
+  note(
+    "feature_memory_record_keeping",
+    result?.featureMemory?.recordKeeping?.policy === "toolyour_auto_record",
+    "policy=" +
+      (result?.featureMemory?.recordKeeping?.policy || "missing") +
+      " domain=" +
+      (result?.featureMemory?.domain || "n/a")
+  );
+}
+
+{
+  const { sessionId, result } = await callTool(sid, "list_feature_memory", { limit: 5 }, 31);
+  sid = sessionId;
+  note(
+    "list_feature_memory_ok",
+    result?.status === "ok" && Array.isArray(result?.features),
+    "status=" + result?.status + " count=" + (result?.features?.length ?? "n/a")
+  );
+}
+
+{
+  const { sessionId, result } = await callTool(
+    sid,
+    "list_community_patterns",
+    { domain: "ocr", limit: 5 },
+    32
+  );
+  sid = sessionId;
+  note(
+    "list_community_patterns_ok",
+    result?.status === "ok" && Array.isArray(result?.patterns),
+    "status=" + result?.status + " count=" + (result?.patterns?.length ?? "n/a")
+  );
+}
+
+{
+  const tools = await rpc(sid, "tools/list", {}, 33);
+  sid = tools.sessionId;
+  const names = (tools.payload?.result?.tools || []).map((t) => t.name).sort();
+  const required = [
+    "capture_feature",
+    "compare_feature_memory",
+    "list_community_patterns",
+    "publish_feature_pattern",
+  ];
+  const missing = required.filter((t) => !names.includes(t));
+  note(
+    "feature_memory_tools_registered",
+    missing.length === 0,
+    missing.length ? "missing=" + missing.join(",") : "all_present"
+  );
+}
+
 const failed = findings.filter((f) => !f.ok);
 console.log("\nSUMMARY pass=" + (findings.length - failed.length) + "/" + findings.length);
 if (failed.length) {

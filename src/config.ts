@@ -70,6 +70,9 @@ export function getEnv() {
     verificationProfilesUrl:
       process.env.VERIFICATION_PROFILES_URL?.replace(/\/$/, "") ||
       `${saasInternalBase}/verification-profiles`,
+    featureMemoryUrl:
+      process.env.FEATURE_MEMORY_URL?.replace(/\/$/, "") ||
+      `${saasInternalBase}/feature-memory`,
     internalSecret: process.env.SAAS_INTERNAL_SECRET || "",
     registryPath:
       process.env.REGISTRY_PATH ||

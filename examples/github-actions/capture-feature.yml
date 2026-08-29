@@ -1,0 +1,65 @@
+# Example: capture a shipped feature into ToolYour Feature Memory after CI verify
+#
+# Copy into *your app repo* (this file is a template).
+# Requires:
+#   secrets.TOOLYOUR_API_KEY
+#
+# Optional workflow inputs / env:
+#   FEATURE_TITLE, FEATURE_REQUIREMENTS, FEATURE_DOMAIN, PROJECT_NAME
+#   BASELINE_FILE — path to verify_task JSON artifact from a prior step
+#
+# Docs: toolyour-mcp/docs/FEATURE-MEMORY-GUIDE.md
+
+name: ToolYour capture feature memory
+
+on:
+  workflow_dispatch:
+    inputs:
+      feature_title:
+        description: "Short feature name"
+        required: true
+        type: string
+      feature_requirements:
+        description: "What the feature must do"
+        required: false
+        type: string
+
+jobs:
+  capture-feature:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout ToolYour MCP (for ci-capture-feature script)
+        uses: actions/checkout@v4
+        with:
+          repository: AbdulWahabRaza123/toolyour-mcp
+          path: toolyour-mcp
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: toolyour-mcp/package-lock.json
+
+      - name: Install + build MCP
+        working-directory: toolyour-mcp
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+          npm run build
+
+      - name: Capture feature memory
+        working-directory: toolyour-mcp
+        env:
+          TOOLYOUR_API_KEY: ${{ secrets.TOOLYOUR_API_KEY }}
+          FEATURE_TITLE: ${{ inputs.feature_title }}
+          FEATURE_REQUIREMENTS: ${{ inputs.feature_requirements }}
+          PROJECT_NAME: ${{ github.repository }}
+          # BASELINE_FILE: ../baseline/verify-result.json
+        run: |
+          if [ -z "$TOOLYOUR_API_KEY" ]; then
+            echo "FAIL: set secrets.TOOLYOUR_API_KEY"
+            exit 1
+          fi
+          npm run ci:capture-feature

@@ -27,6 +27,7 @@ import {
   extractTargetUrl,
   persistVerificationRun,
 } from "./verification-loop";
+import { maybeCaptureFromVerifyPass } from "./feature-memory-loop";
 import { randomUUID } from "crypto";
 
 const SHIP_GATE_PLAYBOOKS = new Set([
@@ -439,6 +440,15 @@ export async function executeVerifyTask(
       gate: loopGate as "pass" | "fail" | "unknown" | undefined,
     });
   }
+
+  await maybeCaptureFromVerifyPass({
+    apiKey: ctx.apiKey,
+    logger: ctx.logger,
+    goal,
+    input,
+    payload: wrapped,
+    gate: loopGate,
+  });
 
   return wrapped as unknown as VerifyTaskResult;
 }

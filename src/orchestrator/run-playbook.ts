@@ -29,6 +29,7 @@ import {
   persistVerificationRun,
   regressionVsLastPass,
 } from "./verification-loop";
+import { autoRecordCompletedFeature } from "./feature-memory-loop";
 
 export interface RunPlaybookContext {
   apiKey: string;
@@ -265,6 +266,16 @@ export async function runPlaybook(
       gate: loopGate as "pass" | "fail" | "unknown" | undefined,
     });
   }
+
+  await autoRecordCompletedFeature({
+    apiKey: ctx.apiKey,
+    logger: ctx.logger,
+    goal: `run_playbook(${id})`,
+    input: data,
+    payload: shaped,
+    gate: loopGate,
+    phase: "run",
+  });
 
   return shaped;
 }

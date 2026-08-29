@@ -26,6 +26,8 @@
     "smoke:tier1:live": "node scripts/smoke-tier1-live.mjs",
     "smoke:staging": "node scripts/smoke-staging.mjs",
     "ci:ship-gate": "node scripts/ci-ship-gate.mjs",
+    "ci:capture-feature": "node scripts/ci-capture-feature.mjs",
+    "probe:live": "node scripts/probe-live-post-deploy.mjs",
     "eval:control-plane": "node scripts/eval-control-plane.mjs",
     "job:start": "node scripts/control-plane-start-job.mjs",
     "fixture:reset": "node scripts/control-plane-reset-fixture.mjs",

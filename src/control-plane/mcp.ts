@@ -104,14 +104,17 @@ export const ALLOWED_COMMANDS = new Set([
 ]);
 
 export const DEFAULT_MCP_INSTRUCTIONS =
+  "ToolYour maintains cross-project Feature Memory (institutional record). Every completed feature is recorded automatically when loop.gate=pass on verify_task, run_playbook, or solve_task — agents do not own persistence; consult plan_task.featureMemory.recordKeeping before rebuilding similar work. Opt out only with input.featureMemory.capture=false. Manual refine: capture_feature (title/requirements/supersedes). " +
   "ToolYour has two loops. Pick exactly one per user goal — never both. " +
   "Skill loop (SEO, security, ship-gate, production-readiness, secrets, catalog): " +
-  "First call plan_task — if loop.initiate is false, stop; do not verify_task. For dev goals (preview deploy, production-ready), read goldenPath. " +
-  "(2) solve_task or run_playbook — read verification.evidence + loop.line (gate · rank-1 · credits), then loop.nextActions (rank-1 only) and loop.remainingFixes (patchType + acceptance + roleHint). profileId auto-created on first https run_playbook when omitted. " +
-  "(3) Host applies ONLY the rank-1 nextActions item in the workspace (editor/git/config) — do not invent tools or call invoke_tool for the same job. " +
-  "(4) verify_task with the prior result as baseline (or profileId with stored lastRunSnapshot) until loop.gate is pass, or stop when loop.stop / loop.initiate is false (maxRounds=5, sameFindingsLimit=2). Read verification.regressionAlert when present. " +
-  "Never pass localhost URLs. Credits buy evidence and re-checks — incomplete/OOS runs are not a pass. " +
-  "Completion loop (frozen coding jobId): job_status only; edit on the host; run toolyour-check-run or control-plane-host.mjs. Do not invent check_submit. Do not call plan_task, solve_task, or verify_task for that jobId. " +
+  "First call plan_task — free; read featureMemory.reminder + recordKeeping. " +
+  "If loop.initiate is false, stop; do not verify_task. For dev goals (preview deploy), read goldenPath + verification.evidence. " +
+  "(2) solve_task or run_playbook — read verification.evidence + loop.line, then loop.nextActions (rank-1 only; patchType + acceptance + roleHint). " +
+  "(3) Host applies ONLY rank-1 nextActions in the workspace — do not invent tools or invoke_tool for the same job. " +
+  "(4) verify_task with baseline (or profileId) until loop.gate is pass — ToolYour records featureMemoryRecord on pass. " +
+  "list_feature_memory · compare_feature_memory · publish_feature_pattern · list_community_patterns are free. " +
+  "Never pass localhost URLs. Credits buy evidence and re-checks. " +
+  "Completion loop (frozen jobId): job_status only; Do not invent check_submit. Do not call plan_task, solve_task, or verify_task for that jobId. " +
   "Host keeps editor, git, and terminal. This server does not replace Cursor, Claude, or any host agent.";
 
 export function resolveMcpInstructions(): string {
