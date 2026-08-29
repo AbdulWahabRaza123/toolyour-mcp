@@ -9,6 +9,9 @@ import {
 import { detectFeatureDomain } from "../../dist/orchestrator/feature-domain.js";
 import {
   FEATURE_MEMORY_RECORD_KEEPING,
+  attachFeatureMemoryEnvelope,
+  buildFeatureMemoryReminder,
+  enrichWithFeatureMemory,
   shouldAutoRecordCompletedFeature,
 } from "../../dist/orchestrator/feature-memory-loop.js";
 
@@ -106,6 +109,65 @@ describe("feature memory record keeping", () => {
         gate: "pass",
       }),
       true
+    );
+  });
+});
+
+describe("feature memory envelope", () => {
+  it("attachFeatureMemoryEnvelope merges reminder into next", () => {
+    const root = { next: "Start with plan_task." };
+    attachFeatureMemoryEnvelope(root, {
+      schemaVersion: "toolyour.featureMemory@1",
+      domain: "ocr",
+      recordKeeping: FEATURE_MEMORY_RECORD_KEEPING,
+      reminder: "Prior OCR work exists.",
+    });
+    assert.match(String(root.next), /Prior OCR work exists/);
+    assert.equal(root.featureMemory?.domain, "ocr");
+  });
+
+  it("buildFeatureMemoryReminder surfaces prior title", () => {
+    const reminder = buildFeatureMemoryReminder({
+      goal: "add OCR for invoices",
+      domain: "ocr",
+      matches: [
+        {
+          featureId: "fm_test",
+          title: "Invoice OCR",
+          domain: "ocr",
+          compositeScore: 80,
+          projectName: "billing-app",
+        },
+      ],
+    });
+    assert.match(reminder || "", /Invoice OCR/);
+    assert.match(reminder || "", /billing-app/);
+  });
+
+  it("enrichWithFeatureMemory attaches baseline when match is unavailable", async () => {
+    const root = {};
+    const logger = { warn() {}, info() {}, error() {}, debug() {} };
+    await enrichWithFeatureMemory(root, {
+      apiKey: "ty_invalid_unit_test_key",
+      logger,
+      goal: "build OCR for invoice PDFs",
+    });
+    assert.equal(root.featureMemory?.recordKeeping?.policy, "toolyour_auto_record");
+    assert.equal(root.featureMemory?.schemaVersion, "toolyour.featureMemory@1");
+    assert.ok(root.featureMemory?.goldenPath?.length >= 1);
+  });
+
+  it("skips auto-record when featureMemoryRecord already present", () => {
+    assert.equal(
+      shouldAutoRecordCompletedFeature({
+        goal: "ship gate for https://example.com",
+        payload: {
+          loop: { initiate: true, gate: "pass" },
+          featureMemoryRecord: { featureId: "fm_existing" },
+        },
+        gate: "pass",
+      }),
+      false
     );
   });
 });

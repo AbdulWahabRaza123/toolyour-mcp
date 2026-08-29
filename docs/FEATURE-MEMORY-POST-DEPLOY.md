@@ -14,7 +14,10 @@ Expect `FeatureMemory` and `FeatureMemoryNotification` indexes in sync.
 
 ```bash
 cd toolyour-mcp && npm run probe:live
+cd toolyour-mcp && npm run test:feature-memory:live
 ```
+
+`test:feature-memory:live` uses your `.cursor/mcp.json` API key. Community publish is **off** by default; set `FM_TEST_PUBLISH=true` to include publish checks.
 
 New checks (4):
 

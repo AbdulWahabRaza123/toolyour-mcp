@@ -52,7 +52,7 @@ Host agents (Cursor, Claude, …) are **tab- and repo-siloed**. Users rebuild si
 
 | Tool | When |
 |------|------|
-| `capture_feature` | Feature shipped / refined |
+| `capture_feature` | Manual refine only (adjust title/requirements or supersede) |
 | `list_feature_memory` | Browse library |
 | `compare_feature_memory` | A/B matrix diff |
 | `publish_feature_pattern` | Opt-in community share |
