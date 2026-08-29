@@ -17,7 +17,9 @@ cd toolyour-mcp && npm run probe:live
 cd toolyour-mcp && npm run test:feature-memory:live
 ```
 
-`test:feature-memory:live` uses your `.cursor/mcp.json` API key. Community publish is **off** by default; set `FM_TEST_PUBLISH=true` to include publish checks.
+`test:feature-memory:live` uses your `.cursor/mcp.json` API key. Community publish is **off** by default (`FM_TEST_PUBLISH=true`). Set `FM_TEST_CLEANUP=true` to delete probe captures after the run.
+
+Integration (auto-record on gate pass, requires API key): `npm run test:mcp:integration` after `npm run build`.
 
 New checks (4):
 

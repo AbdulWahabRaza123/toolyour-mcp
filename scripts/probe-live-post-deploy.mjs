@@ -446,8 +446,10 @@ let devRun;
   const required = [
     "capture_feature",
     "compare_feature_memory",
+    "delete_feature",
     "list_community_patterns",
     "publish_feature_pattern",
+    "unpublish_feature_pattern",
   ];
   const missing = required.filter((t) => !names.includes(t));
   note(

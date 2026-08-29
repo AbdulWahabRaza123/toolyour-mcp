@@ -19,6 +19,7 @@ import { createLogger } from "../../dist/observability/logger.js";
 const CORE_TOOLS = [
   "capture_feature",
   "compare_feature_memory",
+  "delete_feature",
   "discover_tools",
   "fetch_payload",
   "get_run",
@@ -34,6 +35,7 @@ const CORE_TOOLS = [
   "run_playbook",
   "run_workflow",
   "solve_task",
+  "unpublish_feature_pattern",
   "verify_task",
 ];
 

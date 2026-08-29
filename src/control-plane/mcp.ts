@@ -112,7 +112,7 @@ export const DEFAULT_MCP_INSTRUCTIONS =
   "(2) solve_task or run_playbook — read verification.evidence + loop.line, then loop.nextActions (rank-1 only; patchType + acceptance + roleHint). " +
   "(3) Host applies ONLY rank-1 nextActions in the workspace — do not invent tools or invoke_tool for the same job. " +
   "(4) verify_task with baseline (or profileId) until loop.gate is pass — ToolYour records featureMemoryRecord on pass. " +
-  "list_feature_memory · compare_feature_memory · publish_feature_pattern · list_community_patterns are free. " +
+  "list_feature_memory · compare_feature_memory · publish_feature_pattern · unpublish_feature_pattern · delete_feature · list_community_patterns are free. " +
   "Never pass localhost URLs. Credits buy evidence and re-checks. " +
   "Completion loop (frozen jobId): job_status only; Do not invent check_submit. Do not call plan_task, solve_task, or verify_task for that jobId. " +
   "Host keeps editor, git, and terminal. This server does not replace Cursor, Claude, or any host agent.";

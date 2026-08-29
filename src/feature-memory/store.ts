@@ -37,8 +37,15 @@ class FeatureMemoryStoreError extends Error {
   }
 }
 
+const FETCH_TIMEOUT_MS = 15_000;
+const FETCH_MAX_ATTEMPTS = 3;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function internalFetch(
-  method: "GET" | "POST" | "PATCH",
+  method: "GET" | "POST" | "PATCH" | "DELETE",
   path: string,
   body?: Record<string, unknown>
 ): Promise<Response> {
@@ -48,18 +55,41 @@ async function internalFetch(
   }
   const base = getEnv().featureMemoryUrl.replace(/\/$/, "");
   const url = path.startsWith("http") ? path : `${base}${path.startsWith("/") ? "" : "/"}${path}`;
-  try {
-    return await fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        "X-SaaS-Secret": secret,
-      },
-      body: body ? JSON.stringify(body) : undefined,
-    });
-  } catch {
-    throw new FeatureMemoryStoreError("unavailable", "Feature memory store unavailable");
+
+  let lastError: Error | undefined;
+  for (let attempt = 0; attempt < FETCH_MAX_ATTEMPTS; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          "X-SaaS-Secret": secret,
+        },
+        body: body ? JSON.stringify(body) : undefined,
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      if (res.ok || res.status === 404) return res;
+      if (res.status >= 500 && attempt < FETCH_MAX_ATTEMPTS - 1) {
+        await sleep(400 * (attempt + 1));
+        continue;
+      }
+      return res;
+    } catch (e) {
+      clearTimeout(timer);
+      lastError = e instanceof Error ? e : new Error(String(e));
+      if (attempt < FETCH_MAX_ATTEMPTS - 1) {
+        await sleep(400 * (attempt + 1));
+        continue;
+      }
+    }
   }
+  throw new FeatureMemoryStoreError(
+    "unavailable",
+    lastError?.message || "Feature memory store unavailable"
+  );
 }
 
 export async function matchFeatures(opts: {
@@ -183,6 +213,39 @@ export async function publishFeature(opts: {
   }
   const parsed = (await res.json()) as { feature: FeatureMemoryRecord };
   return parsed.feature;
+}
+
+export async function unpublishFeature(opts: {
+  featureId: string;
+  userId: string;
+  logger?: Logger;
+}): Promise<FeatureMemoryRecord | null> {
+  const res = await internalFetch("POST", `/${encodeURIComponent(opts.featureId)}/unpublish`, {
+    userId: opts.userId,
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    opts.logger?.warn("feature memory unpublish failed", { status: res.status });
+    throw new FeatureMemoryStoreError("unavailable", `feature unpublish failed (${res.status})`);
+  }
+  const parsed = (await res.json()) as { feature: FeatureMemoryRecord };
+  return parsed.feature;
+}
+
+export async function deleteFeature(opts: {
+  featureId: string;
+  userId: string;
+  logger?: Logger;
+}): Promise<boolean> {
+  const res = await internalFetch("DELETE", `/${encodeURIComponent(opts.featureId)}`, {
+    userId: opts.userId,
+  });
+  if (res.status === 404) return false;
+  if (!res.ok) {
+    opts.logger?.warn("feature memory delete failed", { status: res.status });
+    throw new FeatureMemoryStoreError("unavailable", `feature delete failed (${res.status})`);
+  }
+  return true;
 }
 
 export async function compareFeaturePair(opts: {

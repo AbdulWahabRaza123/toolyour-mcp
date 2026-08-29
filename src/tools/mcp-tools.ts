@@ -12,9 +12,11 @@ import { planTask } from "../orchestrator/plan-task";
 import { enrichWithFeatureMemory, autoRecordCompletedFeature, captureFeatureMemory } from "../orchestrator/feature-memory-loop";
 import {
   compareFeaturePair,
+  deleteFeature,
   listCommunityPatterns,
   listFeatures,
   publishFeature,
+  unpublishFeature,
 } from "../feature-memory/store";
 import { compareEvaluationMatrices } from "../orchestrator/evaluation-matrix";
 import { validateApiKey } from "../auth/session";
@@ -297,6 +299,73 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
         domain: domain || "all",
         count: patterns.length,
         patterns,
+      });
+    }
+  );
+
+  registerTool(
+    server,
+    "delete_feature",
+    "Free: delete a captured feature from your private library (and community if published). Use to remove mistaken captures or probe data.",
+    {
+      featureId: z.string().describe("fm_… feature id from list_feature_memory"),
+    },
+    async (args) => {
+      const session = await validateApiKey(ctx.apiKey, "mcp/delete-feature", "node", ctx.logger);
+      const featureId = String(args.featureId || "");
+      const deleted = await deleteFeature({
+        featureId,
+        userId: session.userId,
+        logger: ctx.logger,
+      });
+      if (!deleted) {
+        return textResult(
+          { status: "error", code: "feature_not_found", message: `Feature ${featureId} not found.` },
+          true
+        );
+      }
+      return textResult({
+        status: "deleted",
+        featureId,
+        message: "Feature removed from your library.",
+      });
+    }
+  );
+
+  registerTool(
+    server,
+    "unpublish_feature_pattern",
+    "Free: remove a feature from the community library while keeping it in your private memory.",
+    {
+      featureId: z.string().describe("fm_… community feature id"),
+    },
+    async (args) => {
+      const session = await validateApiKey(
+        ctx.apiKey,
+        "mcp/unpublish-feature-pattern",
+        "node",
+        ctx.logger
+      );
+      const featureId = String(args.featureId || "");
+      const feature = await unpublishFeature({
+        featureId,
+        userId: session.userId,
+        logger: ctx.logger,
+      });
+      if (!feature) {
+        return textResult(
+          {
+            status: "error",
+            code: "feature_not_found",
+            message: `Community feature ${featureId} not found.`,
+          },
+          true
+        );
+      }
+      return textResult({
+        status: "unpublished",
+        feature,
+        message: "Removed from community library (still in your private memory).",
       });
     }
   );

@@ -6,12 +6,14 @@
  * Env:
  *   FM_TEST_PUBLISH=true   — publish probe feature to community (default: false)
  *   FM_PROBE_PREFIX=...    — title prefix for probe captures (default: "FM probe OCR invoices")
+ *   FM_TEST_CLEANUP=true   — delete probe captures matching FM_PROBE_PREFIX after run
  */
 import fs from "fs";
 import path from "path";
 
 const probePrefix = process.env.FM_PROBE_PREFIX || "FM probe OCR invoices";
 const testPublish = (process.env.FM_TEST_PUBLISH || "false").toLowerCase() === "true";
+const testCleanup = (process.env.FM_TEST_CLEANUP || "false").toLowerCase() === "true";
 
 function findKey() {
   const files = [
@@ -101,7 +103,8 @@ async function callToolRetry(sessionId, name, args, id, attempts = 3) {
       (name === "list_feature_memory" && last.result?.status === "ok") ||
       (name === "list_community_patterns" && last.result?.status === "ok") ||
       (name === "capture_feature" &&
-        (last.result?.status === "captured" || last.result?.status === "recorded"));
+        (last.result?.status === "captured" || last.result?.status === "recorded")) ||
+      (name === "delete_feature" && last.result?.status === "deleted");
     if (ok) return last;
     await new Promise((r) => setTimeout(r, 2000));
   }
@@ -307,9 +310,11 @@ if (featureId && testPublish) {
   const names = (tools.payload?.result?.tools || []).map((t) => t.name);
   const required = [
     "capture_feature",
+    "delete_feature",
     "list_feature_memory",
     "compare_feature_memory",
     "publish_feature_pattern",
+    "unpublish_feature_pattern",
     "list_community_patterns",
   ];
   const missing = required.filter((t) => !names.includes(t));
@@ -374,6 +379,26 @@ if (featureId && testPublish) {
       `skipped (gate=${verifyGate}) — auto-record only fires on loop.gate=pass`
     );
   }
+}
+
+// 11. optional cleanup of probe captures
+if (testCleanup) {
+  const { sessionId, result } = await callToolRetry(sid, "list_feature_memory", { limit: 100 }, 22);
+  sid = sessionId;
+  const probes = (result?.features || []).filter((f) =>
+    String(f.title || "").startsWith(probePrefix)
+  );
+  let removed = 0;
+  for (const f of probes) {
+    const del = await callToolRetry(sid, "delete_feature", { featureId: f.featureId }, 23 + removed);
+    sid = del.sessionId;
+    if (del.result?.status === "deleted") removed += 1;
+  }
+  note(
+    "cleanup_probe_features",
+    true,
+    `prefix="${probePrefix}" removed=${removed} matched=${probes.length}`
+  );
 }
 
 const failed = findings.filter((f) => !f.ok);
