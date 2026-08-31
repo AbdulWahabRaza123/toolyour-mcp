@@ -18,6 +18,10 @@
         "type": "string",
         "description": "Instructions for the AI analysis",
         "example": "Summarize the key points and list action items."
+      },
+      "geminiApiKey": {
+        "type": "string",
+        "description": "Optional. Your Google Gemini API key (BYOK). When set, ToolYour does not use platform Gemini keys and does not charge ToolYour credits for the Gemini call. Prefer also sending header X-Gemini-Api-Key (works before multipart parse). Never logged or stored."
       }
     }
   },

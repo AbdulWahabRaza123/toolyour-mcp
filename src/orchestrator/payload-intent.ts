@@ -97,6 +97,17 @@ export const LOCAL_EQUIVALENT_TASK_ID: Record<string, string> = {
   "landing-conversion-check": "content-ship-local",
   "fix-verify-landing-conversion-check": "content-ship-local",
   "ai-overview-readiness": "seo-audit-local",
+  "site-agent-readiness": "seo-audit-local",
+  "fix-verify-site-agent-readiness": "seo-audit-local",
+  "accessibility-audit": "seo-audit-local",
+  "website-health-check": "seo-audit-local",
+  "indexability-audit": "seo-audit-local",
+  "local-seo-audit": "seo-audit-local",
+  "fix-verify-indexability": "seo-audit-local",
+  "mcp-discovery-audit": "seo-audit-local",
+  "soft-404-audit": "seo-audit-local",
+  "pagination-seo-audit": "seo-audit-local",
+  "eeat-signals-audit": "seo-audit-local",
   "site-icons-audit": "seo-audit-local",
 };
 

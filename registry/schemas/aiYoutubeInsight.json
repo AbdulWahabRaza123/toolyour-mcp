@@ -18,6 +18,10 @@
           "prompt": {
             "type": "string",
             "example": "What are the main themes discussed?"
+          },
+          "geminiApiKey": {
+            "type": "string",
+            "description": "Optional. Your Google Gemini API key (BYOK). When set, ToolYour does not use platform Gemini keys and does not charge ToolYour credits for the Gemini call. Prefer also sending header X-Gemini-Api-Key. Never logged or stored."
           }
         }
       },
@@ -41,6 +45,10 @@
               "prompt": {
                 "type": "string",
                 "example": "What are the main themes discussed?"
+              },
+              "geminiApiKey": {
+                "type": "string",
+                "description": "Optional. Your Google Gemini API key (BYOK). When set, ToolYour does not use platform Gemini keys and does not charge ToolYour credits for the Gemini call. Prefer also sending header X-Gemini-Api-Key. Never logged or stored."
               }
             }
           }
@@ -63,6 +71,10 @@
       "prompt": {
         "type": "string",
         "example": "What are the main themes discussed?"
+      },
+      "geminiApiKey": {
+        "type": "string",
+        "description": "Optional. Your Google Gemini API key (BYOK). When set, ToolYour does not use platform Gemini keys and does not charge ToolYour credits for the Gemini call. Prefer also sending header X-Gemini-Api-Key. Never logged or stored."
       }
     }
   },

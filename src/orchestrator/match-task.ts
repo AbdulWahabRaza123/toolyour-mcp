@@ -159,16 +159,17 @@ function significantTokens(text: string): string[] {
 /** Multi-word keywords must appear in order (pdf→word ≠ word→pdf). */
 function orderedKeywordWordsPresent(goal: string, words: string[]): boolean {
   let from = 0;
-  let hit = false;
+  let nonStopHits = 0;
   for (const raw of words) {
     const w = raw.toLowerCase().trim();
     if (!w || STOP_TOKENS.has(w)) continue;
     const found = goal.indexOf(w, from);
     if (found < 0) return false;
     from = found + w.length;
-    hit = true;
+    nonStopHits += 1;
   }
-  return hit;
+  // Require at least two meaningful tokens so "site audit" does not match any goal with "audit".
+  return nonStopHits >= 2;
 }
 
 export function scoreTask(goal: string, task: McpTaskDef): number {
@@ -178,11 +179,15 @@ export function scoreTask(goal: string, task: McpTaskDef): number {
   for (const keyword of task.keywords) {
     const k = keyword.toLowerCase().trim();
     if (!k) continue;
+    const words = k.split(/\s+/).filter(Boolean);
+    const nonStopWords = words.filter((w) => !STOP_TOKENS.has(w.toLowerCase()));
+    // Do not let "site audit" / "lighthouse audit" collapse to a lone "audit" token.
+    if (words.length > 1 && nonStopWords.length < 2) continue;
+
     if (g.includes(k)) {
       // Exact phrase / keyword hit — primary signal
       score += k.split(/\s+/).length + 3;
     } else {
-      const words = k.split(/\s+/).filter(Boolean);
       if (words.length > 1 && orderedKeywordWordsPresent(g, words)) {
         score += words.length + 1;
       } else {
@@ -196,7 +201,11 @@ export function scoreTask(goal: string, task: McpTaskDef): number {
         }
         if (fuzzyHits === keyTokens.length) {
           score += Math.max(2, keyTokens.length + 1);
-        } else if (fuzzyHits > 0 && fuzzyHits >= Math.ceil(keyTokens.length / 2)) {
+        } else if (
+          words.length === 1 &&
+          fuzzyHits > 0 &&
+          fuzzyHits >= Math.ceil(keyTokens.length / 2)
+        ) {
           score += 1;
         }
       }

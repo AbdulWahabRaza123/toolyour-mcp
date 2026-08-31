@@ -15,7 +15,6 @@
         "is this page seo ready",
         "lighthouse audit",
         "full seo audit",
-        "local",
         "my code",
         "before deploy",
         "dev server",
@@ -993,6 +992,154 @@
       ],
       "type": "workflow",
       "target": "ai-overview-readiness-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "site-agent-readiness",
+      "title": "Site agent readiness",
+      "description": "GEO SEO origin audit plus site-wide AI SEO sample and homepage structure for AI crawlers.",
+      "keywords": [
+        "site agent readiness",
+        "ai seo audit site",
+        "geo seo audit",
+        "agent readiness check",
+        "ai crawler readiness",
+        "generative engine optimization audit",
+        "llms txt and ai bots"
+      ],
+      "type": "workflow",
+      "target": "site-agent-readiness-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "fix-verify-site-agent-readiness",
+      "title": "Fix-verify site agent readiness",
+      "description": "Re-run GEO + AI SEO site audit after fixes (pair with verify_task).",
+      "keywords": [
+        "fix verify site agent readiness",
+        "verify geo seo after fix",
+        "recheck ai seo site audit",
+        "confirm agent readiness fixed"
+      ],
+      "type": "workflow",
+      "target": "site-agent-readiness-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "accessibility-audit",
+      "title": "Accessibility audit",
+      "description": "Image alt, heading structure, and WCAG HTML heuristics.",
+      "keywords": [
+        "accessibility audit",
+        "wcag audit",
+        "a11y check",
+        "accessibility checker site",
+        "alt text and headings audit"
+      ],
+      "type": "workflow",
+      "target": "accessibility-audit-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "website-health-check",
+      "title": "Website health check",
+      "description": "HTTP, robots, sitemap, TLS, and security headers site diagnostic.",
+      "keywords": [
+        "website health check",
+        "site health audit",
+        "website diagnostic",
+        "ssl robots sitemap check"
+      ],
+      "type": "workflow",
+      "target": "website-health-check-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "eeat-signals-audit",
+      "title": "E-E-A-T signals audit",
+      "description": "Author, trust pages, schema, and meta signals for accountability.",
+      "keywords": [
+        "eeat audit",
+        "e-e-a-t checker",
+        "trust signals seo",
+        "author schema audit"
+      ],
+      "type": "workflow",
+      "target": "eeat-signals-audit-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "indexability-audit",
+      "title": "Indexability audit",
+      "description": "noindex, canonical, X-Robots-Tag, HTTP status, and robots.txt path audit.",
+      "keywords": [
+        "indexability audit",
+        "noindex checker",
+        "robots meta audit",
+        "canonical indexability",
+        "google index check"
+      ],
+      "type": "workflow",
+      "target": "indexability-audit-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "local-seo-audit",
+      "title": "Local SEO audit",
+      "description": "LocalBusiness schema, NAP, maps links, hours, and geo signals.",
+      "keywords": [
+        "local seo audit",
+        "local seo checker",
+        "nap checker",
+        "localbusiness schema audit"
+      ],
+      "type": "workflow",
+      "target": "local-seo-audit-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "fix-verify-indexability",
+      "title": "Fix-verify indexability",
+      "description": "Re-run indexability audit after removing noindex or robots.txt blockers.",
+      "keywords": [
+        "fix verify indexability",
+        "recheck noindex",
+        "verify indexable after fix"
+      ],
+      "type": "workflow",
+      "target": "indexability-audit-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "mcp-discovery-audit",
+      "title": "MCP discovery audit",
+      "description": "Probe well-known MCP, OpenAPI, and llms.txt paths at site origin.",
+      "keywords": [
+        "mcp discovery audit",
+        "well-known mcp",
+        "openapi discovery",
+        "agent discovery endpoints"
+      ],
+      "type": "workflow",
+      "target": "mcp-discovery-audit-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "soft-404-audit",
+      "title": "Soft 404 audit",
+      "description": "Detect 200 OK pages with error-like or thin placeholder content.",
+      "keywords": ["soft 404 audit", "thin content 200", "error page soft 404"],
+      "type": "workflow",
+      "target": "soft-404-audit-job",
+      "requiredInput": ["url"]
+    },
+    {
+      "id": "pagination-seo-audit",
+      "title": "Pagination SEO audit",
+      "description": "rel next/prev and canonical audit for paginated listing URLs.",
+      "keywords": ["pagination seo audit", "rel next prev", "paginated canonical"],
+      "type": "workflow",
+      "target": "pagination-seo-audit-job",
       "requiredInput": ["url"]
     },
     {

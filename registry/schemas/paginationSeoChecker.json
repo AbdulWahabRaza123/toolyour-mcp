@@ -1,0 +1,12 @@
+{
+  "operationId": "paginationSeoChecker",
+  "gatewayPath": "/api/v1/seo-apis/pagination-seo-checker",
+  "method": "GET",
+  "request": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Tool-specific input fields."
+  },
+  "response": null,
+  "responseHint": "Returns JSON response"
+}

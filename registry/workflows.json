@@ -232,6 +232,97 @@
       "steps": [{ "id": "aio", "operationId": "aiOverviewReadinessChecker" }]
     },
     {
+      "id": "site-agent-readiness-job",
+      "title": "Site Agent Readiness",
+      "description": "GEO origin audit, site-wide AI SEO sample, and homepage structural readiness for AI crawlers.",
+      "synthesizer": "site-agent-readiness",
+      "steps": [
+        { "id": "geo", "operationId": "geoSeoAuditor" },
+        { "id": "aiSeo", "operationId": "aiSeoChecker" },
+        { "id": "homepageAio", "operationId": "aiOverviewReadinessChecker", "continueOnError": true }
+      ]
+    },
+    {
+      "id": "accessibility-audit-job",
+      "title": "Accessibility Audit",
+      "description": "Image alt, heading structure, and WCAG HTML heuristics (not axe/Lighthouse).",
+      "synthesizer": "accessibility-audit",
+      "steps": [
+        { "id": "imageAlt", "operationId": "imageAltTextChecker" },
+        { "id": "headings", "operationId": "headingStructureAnalyzer" },
+        { "id": "a11y", "operationId": "accessibilityAuditor" }
+      ]
+    },
+    {
+      "id": "website-health-check-job",
+      "title": "Website Health Check",
+      "description": "HTTP, robots, sitemap, TLS, and security headers composite diagnostic.",
+      "synthesizer": "website-health-check",
+      "steps": [{ "id": "health", "operationId": "websiteHealthChecker" }]
+    },
+    {
+      "id": "eeat-signals-audit-job",
+      "title": "E-E-A-T Signals Audit",
+      "description": "Trust signals, schema markup, and meta tags for author/entity accountability.",
+      "synthesizer": "eeat-signals-audit",
+      "steps": [
+        { "id": "eeat", "operationId": "eeatSignalsChecker" },
+        { "id": "schema", "operationId": "schemaMarkupValidator", "continueOnError": true },
+        { "id": "meta", "operationId": "metaTagsAnalyzer", "continueOnError": true }
+      ]
+    },
+    {
+      "id": "indexability-audit-job",
+      "title": "Indexability Audit",
+      "description": "noindex, X-Robots-Tag, canonical, HTTP status, and robots.txt path rules.",
+      "synthesizer": "indexability-audit",
+      "steps": [
+        { "id": "indexability", "operationId": "indexabilityChecker" },
+        { "id": "canonical", "operationId": "canonicalUrlChecker", "continueOnError": true },
+        { "id": "robots", "operationId": "robotsTxtChecker", "continueOnError": true }
+      ]
+    },
+    {
+      "id": "local-seo-audit-job",
+      "title": "Local SEO Audit",
+      "description": "LocalBusiness schema, NAP signals, maps links, hours, and geo coordinates.",
+      "synthesizer": "local-seo-audit",
+      "steps": [
+        { "id": "local", "operationId": "localSeoAuditor" },
+        { "id": "schema", "operationId": "schemaMarkupValidator", "continueOnError": true }
+      ]
+    },
+    {
+      "id": "mcp-discovery-audit-job",
+      "title": "MCP Discovery Audit",
+      "description": "Well-known MCP/OpenAPI/llms.txt discovery probes plus GEO origin context.",
+      "synthesizer": "mcp-discovery-audit",
+      "steps": [
+        { "id": "discovery", "operationId": "mcpDiscoveryChecker" },
+        { "id": "geo", "operationId": "geoSeoAuditor", "continueOnError": true }
+      ]
+    },
+    {
+      "id": "soft-404-audit-job",
+      "title": "Soft 404 Audit",
+      "description": "200 OK pages with error/thin content plus HTTP status context.",
+      "synthesizer": "soft-404-audit",
+      "steps": [
+        { "id": "soft404", "operationId": "soft404Checker" },
+        { "id": "http", "operationId": "httpStatusChecker", "continueOnError": true }
+      ]
+    },
+    {
+      "id": "pagination-seo-audit-job",
+      "title": "Pagination SEO Audit",
+      "description": "rel next/prev and canonical on paginated URLs.",
+      "synthesizer": "pagination-seo-audit",
+      "steps": [
+        { "id": "pagination", "operationId": "paginationSeoChecker" },
+        { "id": "canonical", "operationId": "canonicalUrlChecker", "continueOnError": true }
+      ]
+    },
+    {
       "id": "site-icons-audit-job",
       "title": "Site Icons Audit",
       "description": "Favicon, apple-touch, and common icon fallback reachability.",

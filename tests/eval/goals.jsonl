@@ -35,6 +35,14 @@
 {"goal":"fix verify growth unit economics after spend update","expectedJobId":"fix-verify-growth-unit-economics","category":"verify"}
 {"goal":"fix verify email campaign qa after subject rewrite","expectedJobId":"fix-verify-email-campaign-qa","category":"verify"}
 {"goal":"fix verify crawl readiness for https://example.com","expectedJobId":"fix-verify-crawl-readiness","category":"verify"}
+{"goal":"site agent readiness for https://example.com","expectedJobId":"site-agent-readiness","category":"seo"}
+{"goal":"fix verify site agent readiness for https://example.com","expectedJobId":"fix-verify-site-agent-readiness","category":"verify"}
+{"goal":"accessibility audit for https://example.com","expectedJobId":"accessibility-audit","category":"seo"}
+{"goal":"website health check for https://example.com","expectedJobId":"website-health-check","category":"seo"}
+{"goal":"indexability audit for https://example.com","expectedJobId":"indexability-audit","category":"seo"}
+{"goal":"local seo audit for https://example.com","expectedJobId":"local-seo-audit","category":"seo"}
+{"goal":"mcp discovery audit for https://example.com","expectedJobId":"mcp-discovery-audit","category":"seo"}
+{"goal":"fix verify indexability for https://example.com","expectedJobId":"fix-verify-indexability","category":"verify"}
 {"goal":"fix verify structured data for https://example.com","expectedJobId":"fix-verify-structured-data","category":"verify"}
 {"goal":"fix verify seo deploy regression after deploy","expectedJobId":"fix-verify-seo-deploy-regression","requiredInput":{"urls":["https://example.com/"]},"category":"verify"}
 {"goal":"fix verify technical seo for https://example.com","expectedJobId":"fix-verify-technical-seo","category":"verify"}

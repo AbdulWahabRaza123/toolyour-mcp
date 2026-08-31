@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-08-18T15:01:29.043Z",
+  "generatedAt": "2026-08-31T19:09:43.204Z",
   "stats": {
-    "totalOpenApiRoutes": 344,
-    "hasApiIncluded": 341,
+    "totalOpenApiRoutes": 356,
+    "hasApiIncluded": 353,
     "excluded": 3
   },
   "categories": [
@@ -1536,6 +1536,102 @@
       "name": "AI Overview readiness checker (structural heuristics)",
       "category": "SEO APIs",
       "description": "AI Overview readiness checker (structural heuristics)",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "aiSeoChecker",
+      "name": "AI SEO checker — site-wide citation structure sample",
+      "category": "SEO APIs",
+      "description": "AI SEO checker — site-wide citation structure sample",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "geoSeoAuditor",
+      "name": "GEO SEO auditor — origin crawl policy and discovery",
+      "category": "SEO APIs",
+      "description": "GEO SEO auditor — origin crawl policy and discovery",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "accessibilityAuditor",
+      "name": "Accessibility auditor — WCAG HTML heuristics",
+      "category": "SEO APIs",
+      "description": "Accessibility auditor — WCAG HTML heuristics",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "eeatSignalsChecker",
+      "name": "E-E-A-T trust signals checker",
+      "category": "SEO APIs",
+      "description": "E-E-A-T trust signals checker",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "websiteHealthChecker",
+      "name": "Website health checker — HTTP, robots, sitemap, TLS, headers",
+      "category": "SEO APIs",
+      "description": "Website health checker — HTTP, robots, sitemap, TLS, headers",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "indexabilityChecker",
+      "name": "Indexability checker — noindex, canonical, robots.txt path",
+      "category": "SEO APIs",
+      "description": "Indexability checker — noindex, canonical, robots.txt path",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "localSeoAuditor",
+      "name": "Local SEO auditor — NAP and LocalBusiness schema",
+      "category": "SEO APIs",
+      "description": "Local SEO auditor — NAP and LocalBusiness schema",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "soft404Checker",
+      "name": "Soft 404 checker — 200 OK with error/thin content",
+      "category": "SEO APIs",
+      "description": "Soft 404 checker — 200 OK with error/thin content",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "paginationSeoChecker",
+      "name": "Pagination SEO — rel next/prev and canonical",
+      "category": "SEO APIs",
+      "description": "Pagination SEO — rel next/prev and canonical",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "linkRelAuditor",
+      "name": "Link rel auditor — nofollow sponsored ugc",
+      "category": "SEO APIs",
+      "description": "Link rel auditor — nofollow sponsored ugc",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "cookiePrivacyAuditor",
+      "name": "Cookie privacy auditor — consent and policy links",
+      "category": "SEO APIs",
+      "description": "Cookie privacy auditor — consent and policy links",
+      "inputShape": "query",
+      "backend": "node"
+    },
+    {
+      "operationId": "mcpDiscoveryChecker",
+      "name": "MCP discovery probes — well-known and OpenAPI",
+      "category": "SEO APIs",
+      "description": "MCP discovery probes — well-known and OpenAPI",
       "inputShape": "query",
       "backend": "node"
     },
@@ -5715,6 +5811,186 @@
       "responseHint": "Returns JSON response",
       "validatePaths": [
         "seo-apis/ai-overview-readiness-checker"
+      ]
+    },
+    "aiSeoChecker": {
+      "operationId": "aiSeoChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/ai-seo-checker",
+      "category": "SEO APIs",
+      "name": "AI SEO checker — site-wide citation structure sample",
+      "description": "AI SEO checker — site-wide citation structure sample",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/ai-seo-checker"
+      ]
+    },
+    "geoSeoAuditor": {
+      "operationId": "geoSeoAuditor",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/geo-seo-auditor",
+      "category": "SEO APIs",
+      "name": "GEO SEO auditor — origin crawl policy and discovery",
+      "description": "GEO SEO auditor — origin crawl policy and discovery",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/geo-seo-auditor"
+      ]
+    },
+    "accessibilityAuditor": {
+      "operationId": "accessibilityAuditor",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/accessibility-auditor",
+      "category": "SEO APIs",
+      "name": "Accessibility auditor — WCAG HTML heuristics",
+      "description": "Accessibility auditor — WCAG HTML heuristics",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/accessibility-auditor"
+      ]
+    },
+    "eeatSignalsChecker": {
+      "operationId": "eeatSignalsChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/eeat-signals-checker",
+      "category": "SEO APIs",
+      "name": "E-E-A-T trust signals checker",
+      "description": "E-E-A-T trust signals checker",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/eeat-signals-checker"
+      ]
+    },
+    "websiteHealthChecker": {
+      "operationId": "websiteHealthChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/website-health-checker",
+      "category": "SEO APIs",
+      "name": "Website health checker — HTTP, robots, sitemap, TLS, headers",
+      "description": "Website health checker — HTTP, robots, sitemap, TLS, headers",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/website-health-checker"
+      ]
+    },
+    "indexabilityChecker": {
+      "operationId": "indexabilityChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/indexability-checker",
+      "category": "SEO APIs",
+      "name": "Indexability checker — noindex, canonical, robots.txt path",
+      "description": "Indexability checker — noindex, canonical, robots.txt path",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/indexability-checker"
+      ]
+    },
+    "localSeoAuditor": {
+      "operationId": "localSeoAuditor",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/local-seo-auditor",
+      "category": "SEO APIs",
+      "name": "Local SEO auditor — NAP and LocalBusiness schema",
+      "description": "Local SEO auditor — NAP and LocalBusiness schema",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/local-seo-auditor"
+      ]
+    },
+    "soft404Checker": {
+      "operationId": "soft404Checker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/soft-404-checker",
+      "category": "SEO APIs",
+      "name": "Soft 404 checker — 200 OK with error/thin content",
+      "description": "Soft 404 checker — 200 OK with error/thin content",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/soft-404-checker"
+      ]
+    },
+    "paginationSeoChecker": {
+      "operationId": "paginationSeoChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/pagination-seo-checker",
+      "category": "SEO APIs",
+      "name": "Pagination SEO — rel next/prev and canonical",
+      "description": "Pagination SEO — rel next/prev and canonical",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/pagination-seo-checker"
+      ]
+    },
+    "linkRelAuditor": {
+      "operationId": "linkRelAuditor",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/link-rel-auditor",
+      "category": "SEO APIs",
+      "name": "Link rel auditor — nofollow sponsored ugc",
+      "description": "Link rel auditor — nofollow sponsored ugc",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/link-rel-auditor"
+      ]
+    },
+    "cookiePrivacyAuditor": {
+      "operationId": "cookiePrivacyAuditor",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/cookie-privacy-auditor",
+      "category": "SEO APIs",
+      "name": "Cookie privacy auditor — consent and policy links",
+      "description": "Cookie privacy auditor — consent and policy links",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/cookie-privacy-auditor"
+      ]
+    },
+    "mcpDiscoveryChecker": {
+      "operationId": "mcpDiscoveryChecker",
+      "method": "GET",
+      "gatewayPath": "/api/v1/seo-apis/mcp-discovery-checker",
+      "category": "SEO APIs",
+      "name": "MCP discovery probes — well-known and OpenAPI",
+      "description": "MCP discovery probes — well-known and OpenAPI",
+      "backend": "node",
+      "multipart": false,
+      "jsonBody": false,
+      "responseHint": "Returns JSON response",
+      "validatePaths": [
+        "seo-apis/mcp-discovery-checker"
       ]
     },
     "siteIconsChecker": {

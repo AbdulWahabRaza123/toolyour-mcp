@@ -5,16 +5,7 @@
   "request": {
     "type": "object",
     "additionalProperties": true,
-    "description": "Tool-specific input fields.",
-    "required": [
-      "url"
-    ],
-    "properties": {
-      "url": {
-        "type": "string",
-        "description": "Required input: url"
-      }
-    }
+    "description": "Tool-specific input fields."
   },
   "response": null,
   "responseHint": "Returns JSON response"
