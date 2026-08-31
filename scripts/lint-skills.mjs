@@ -14,7 +14,7 @@ const workflows = JSON.parse(
   fs.readFileSync(path.join(root, "registry", "workflows.json"), "utf8")
 );
 const workflowIds = new Set((workflows.workflows || []).map((w) => w.id));
-const localWorkflowIds = new Set(["content-ship-local"]);
+const localWorkflowIds = new Set(["content-ship-local", "feature-memory-capture-local"]);
 
 function loadSkillWorkflowMap() {
   const src = fs.readFileSync(
