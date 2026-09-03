@@ -7,7 +7,8 @@
       {
         "type": "object",
         "required": [
-          "prompt"
+          "prompt",
+          "geminiApiKey"
         ],
         "properties": {
           "prompt": {
@@ -16,7 +17,7 @@
           },
           "geminiApiKey": {
             "type": "string",
-            "description": "Optional. Your Google Gemini API key (BYOK). When set, ToolYour does not use platform Gemini keys and does not charge ToolYour credits for the Gemini call. Prefer also sending header X-Gemini-Api-Key. Never logged or stored."
+            "description": "Required. Your Google Gemini API key (BYOK). ToolYour does not use a platform Gemini key. Prefer also sending header X-Gemini-Api-Key. Never logged or stored. ToolYour credits are not charged for the Gemini call."
           }
         }
       },
@@ -29,7 +30,8 @@
           "inputs": {
             "type": "object",
             "required": [
-              "prompt"
+              "prompt",
+              "geminiApiKey"
             ],
             "properties": {
               "prompt": {
@@ -38,7 +40,7 @@
               },
               "geminiApiKey": {
                 "type": "string",
-                "description": "Optional. Your Google Gemini API key (BYOK). When set, ToolYour does not use platform Gemini keys and does not charge ToolYour credits for the Gemini call. Prefer also sending header X-Gemini-Api-Key. Never logged or stored."
+                "description": "Required. Your Google Gemini API key (BYOK). ToolYour does not use a platform Gemini key. Prefer also sending header X-Gemini-Api-Key. Never logged or stored. ToolYour credits are not charged for the Gemini call."
               }
             }
           }
@@ -50,7 +52,8 @@
   "response": {
     "type": "object",
     "required": [
-      "prompt"
+      "prompt",
+      "geminiApiKey"
     ],
     "properties": {
       "prompt": {
@@ -59,7 +62,7 @@
       },
       "geminiApiKey": {
         "type": "string",
-        "description": "Optional. Your Google Gemini API key (BYOK). When set, ToolYour does not use platform Gemini keys and does not charge ToolYour credits for the Gemini call. Prefer also sending header X-Gemini-Api-Key. Never logged or stored."
+        "description": "Required. Your Google Gemini API key (BYOK). ToolYour does not use a platform Gemini key. Prefer also sending header X-Gemini-Api-Key. Never logged or stored. ToolYour credits are not charged for the Gemini call."
       }
     }
   },

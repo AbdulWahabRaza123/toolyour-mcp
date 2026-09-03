@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-08-31T19:09:43.204Z",
+  "generatedAt": "2026-09-03T19:28:08.454Z",
   "stats": {
     "totalOpenApiRoutes": 356,
     "hasApiIncluded": 353,
@@ -2829,25 +2829,25 @@
     },
     {
       "operationId": "aiFileInsights",
-      "name": "Analyze uploaded file with AI",
+      "name": "Analyze uploaded file with AI (requires user Gemini API key)",
       "category": "AI Models",
-      "description": "Analyze uploaded file with AI",
+      "description": "Analyze uploaded file with AI (requires user Gemini API key)",
       "inputShape": "multipart",
       "backend": "node"
     },
     {
       "operationId": "aiTextAi",
-      "name": "Text generation and analysis",
+      "name": "Text generation and analysis (requires user Gemini API key)",
       "category": "AI Models",
-      "description": "Text generation and analysis",
+      "description": "Text generation and analysis (requires user Gemini API key)",
       "inputShape": "json",
       "backend": "node"
     },
     {
       "operationId": "aiYoutubeInsight",
-      "name": "YouTube video insights",
+      "name": "YouTube video insights (requires user Gemini API key)",
       "category": "AI Models",
-      "description": "YouTube video insights",
+      "description": "YouTube video insights (requires user Gemini API key)",
       "inputShape": "json",
       "backend": "node"
     }
@@ -8235,8 +8235,8 @@
       "method": "POST",
       "gatewayPath": "/api/v1/ai-models/file-insights",
       "category": "AI Models",
-      "name": "Analyze uploaded file with AI",
-      "description": "Analyze uploaded file with AI",
+      "name": "Analyze uploaded file with AI (requires user Gemini API key)",
+      "description": "Analyze uploaded file with AI (requires user Gemini API key)",
       "backend": "node",
       "multipart": true,
       "jsonBody": false,
@@ -8250,8 +8250,8 @@
       "method": "POST",
       "gatewayPath": "/api/v1/ai-models/text-ai",
       "category": "AI Models",
-      "name": "Text generation and analysis",
-      "description": "Text generation and analysis",
+      "name": "Text generation and analysis (requires user Gemini API key)",
+      "description": "Text generation and analysis (requires user Gemini API key)",
       "backend": "node",
       "multipart": false,
       "jsonBody": true,
@@ -8265,8 +8265,8 @@
       "method": "POST",
       "gatewayPath": "/api/v1/ai-models/youtube-insight",
       "category": "AI Models",
-      "name": "YouTube video insights",
-      "description": "YouTube video insights",
+      "name": "YouTube video insights (requires user Gemini API key)",
+      "description": "YouTube video insights (requires user Gemini API key)",
       "backend": "node",
       "multipart": false,
       "jsonBody": true,

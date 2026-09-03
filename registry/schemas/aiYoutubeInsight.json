@@ -8,7 +8,8 @@
         "type": "object",
         "required": [
           "youtubeUrl",
-          "prompt"
+          "prompt",
+          "geminiApiKey"
         ],
         "properties": {
           "youtubeUrl": {
@@ -21,7 +22,7 @@
           },
           "geminiApiKey": {
             "type": "string",
-            "description": "Optional. Your Google Gemini API key (BYOK). When set, ToolYour does not use platform Gemini keys and does not charge ToolYour credits for the Gemini call. Prefer also sending header X-Gemini-Api-Key. Never logged or stored."
+            "description": "Required. Your Google Gemini API key (BYOK). Prefer header X-Gemini-Api-Key. Never logged or stored."
           }
         }
       },
@@ -35,7 +36,8 @@
             "type": "object",
             "required": [
               "youtubeUrl",
-              "prompt"
+              "prompt",
+              "geminiApiKey"
             ],
             "properties": {
               "youtubeUrl": {
@@ -48,7 +50,7 @@
               },
               "geminiApiKey": {
                 "type": "string",
-                "description": "Optional. Your Google Gemini API key (BYOK). When set, ToolYour does not use platform Gemini keys and does not charge ToolYour credits for the Gemini call. Prefer also sending header X-Gemini-Api-Key. Never logged or stored."
+                "description": "Required. Your Google Gemini API key (BYOK). Prefer header X-Gemini-Api-Key. Never logged or stored."
               }
             }
           }
@@ -61,7 +63,8 @@
     "type": "object",
     "required": [
       "youtubeUrl",
-      "prompt"
+      "prompt",
+      "geminiApiKey"
     ],
     "properties": {
       "youtubeUrl": {
@@ -74,7 +77,7 @@
       },
       "geminiApiKey": {
         "type": "string",
-        "description": "Optional. Your Google Gemini API key (BYOK). When set, ToolYour does not use platform Gemini keys and does not charge ToolYour credits for the Gemini call. Prefer also sending header X-Gemini-Api-Key. Never logged or stored."
+        "description": "Required. Your Google Gemini API key (BYOK). Prefer header X-Gemini-Api-Key. Never logged or stored."
       }
     }
   },
