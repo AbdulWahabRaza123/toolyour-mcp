@@ -1,0 +1,38 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.toolyour/mcp",
+  "title": "ToolYour",
+  "description": "Remote MCP: plan, run, verify for SEO/security/ship-gate. Same REST API key; 500 free credits/month.",
+  "version": "1.0.0",
+  "websiteUrl": "https://www.toolyour.com/developers/mcp",
+  "repository": {
+    "url": "https://github.com/ToolYour/toolyour-mcp",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://api.toolyour.com/mcp/http",
+      "headers": [
+        {
+          "name": "X-Api-Key",
+          "description": "ToolYour API key from the dashboard (prefix ty_). Same key as REST.",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    },
+    {
+      "type": "sse",
+      "url": "https://api.toolyour.com/mcp",
+      "headers": [
+        {
+          "name": "X-Api-Key",
+          "description": "ToolYour API key from the dashboard (prefix ty_). Same key as REST.",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
