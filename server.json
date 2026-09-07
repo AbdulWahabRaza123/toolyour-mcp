@@ -3,10 +3,10 @@
   "name": "com.toolyour/mcp",
   "title": "ToolYour",
   "description": "Remote MCP: plan, run, verify for SEO/security/ship-gate. Same REST API key; 500 free credits/month.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "websiteUrl": "https://www.toolyour.com/developers/mcp",
   "repository": {
-    "url": "https://github.com/ToolYour/toolyour-mcp",
+    "url": "https://github.com/AbdulWahabRaza123/toolyour-mcp",
     "source": "github"
   },
   "remotes": [

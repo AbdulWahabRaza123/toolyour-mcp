@@ -11,43 +11,30 @@ Use this pack to get **editorial / directory mentions** of ToolYour as a remote 
 
 **Facts that must stay true:** 500 credits/month free (tools 1–10 credits); MCP = API-backed tools only (`hasApi`); plan → run → verify; does **not** replace Cursor/Claude host harness.
 
-**Canonical registry file (shipped in repo):** [`toolyour-mcp/server.json`](../toolyour-mcp/server.json) — namespace `com.toolyour/mcp`, remotes `https://api.toolyour.com/mcp/http` (streamable-http) + SSE `/mcp`.
+**Canonical registry file:** [`toolyour-mcp/server.json`](../toolyour-mcp/server.json) — namespace `com.toolyour/mcp` **v1.0.1** (live on Official Registry since 2026-09-07).
 
 ---
 
-## 0) Official MCP Registry (do this first — 2026 path)
+## 0) Official MCP Registry — DONE
 
-Directories (PulseMCP, many clients) ingest `registry.modelcontextprotocol.io`. ToolYour was **not** listed as of 2026-09-07 (`search=toolyour` → empty).
+Live: https://registry.modelcontextprotocol.io/v0/servers?search=toolyour
 
-### Windows (one-time)
-
-1. Download `mcp-publisher` from https://github.com/modelcontextprotocol/registry/releases (latest `mcp-publisher_*_windows_amd64.zip`).
-2. Prove domain ownership for namespace `com.toolyour/*` (DNS login — preferred for product brand):
+DNS auth keypair lives locally at `toolyour-mcp/.tools/dns-auth/` (gitignored). To republish after `server.json` edits:
 
 ```powershell
-# From a machine with mcp-publisher on PATH
 cd d:\Jourey\Products\toolyour\toolyour-mcp
-mcp-publisher login dns --domain toolyour.com
-# Follow prompt: add the TXT record it prints at _mcp-publisher.toolyour.com (or as instructed)
-mcp-publisher publish
+$pk = (Get-Content .\.tools\dns-auth\private.hex -Raw).Trim()
+.\.tools\mcp-publisher.exe login dns --domain toolyour.com --private-key $pk
+.\.tools\mcp-publisher.exe publish
 ```
 
-Alternate: `mcp-publisher login github` only if you publish under `io.github.ToolYour/...` and change `name` in `server.json` to match.
+### Aggregators (after registry)
 
-3. Verify:
-
-```text
-https://registry.modelcontextprotocol.io/v0/servers?search=toolyour
-```
-
-4. Expedite aggregators after registry is live:
-   - PulseMCP: email hello@pulsemcp.com with server name `com.toolyour/mcp`
-   - Smithery: claim/manual submit at https://smithery.ai (login)
-   - Glama: claim listing via GitHub when it appears
-
-### Copy for registry (already in server.json description)
-
-> Remote MCP: plan, run, verify for SEO/security/ship-gate. Same REST API key; 500 free credits/month.
+| Channel | Action | Status |
+|---------|--------|--------|
+| PulseMCP | Auto-ingest (~days). Expedite: send [`docs/PULSEMCP-EXPEDITE-EMAIL.md`](./PULSEMCP-EXPEDITE-EMAIL.md) to hello@pulsemcp.com | [ ] email |
+| Smithery | Sign in → https://smithery.ai/servers/new (or claim when crawled) | [ ] manual login |
+| Glama | Wait for crawl / claim via GitHub when listed | [ ] wait |
 
 ---
 
@@ -74,59 +61,40 @@ Docs: https://www.toolyour.com/developers/mcp
 
 ---
 
-## Submission checklist (manual)
-
-Mark done when live with a dofollow or at least indexed mention + correct URL.
+## Submission checklist
 
 | Channel | Target URL | Status | Notes |
 |---------|------------|--------|-------|
-| **Official MCP Registry** | `com.toolyour/mcp` via `server.json` | [ ] | **Do first** — see section 0 |
-| Smithery | `/developers/mcp` | [ ] | Claim after registry or manual submit |
-| Glama | `/developers/mcp` | [ ] | Claim when crawled |
-| PulseMCP | auto from registry | [ ] | Optional expedite email |
-| GitHub ToolYour org README / awesome-mcp lists | `/developers/mcp` | [ ] | PR only where lists accept quality servers |
-| Product Hunt / Indie Hackers (launch or update) | `/` or `/developers/mcp` | [ ] | Lead with MCP, not “200 tools” |
-| Cursor forum / Claude community (honest how-to) | setup blogs + MCP | [ ] | Link `mcp-server-for-cursor-setup` / Claude setup |
-| Niche SEO blog roundup (1–2) | `/digital-tools/internal-linking` | [ ] | “Internal link checker” phrasing |
-| LinkedIn / X founder posts | `/developers/mcp` | [ ] | Same one-liner; not spammy threads |
+| **Official MCP Registry** | `com.toolyour/mcp` | [x] | v1.0.1 published 2026-09-07 |
+| PulseMCP | auto from registry | [ ] | Send expedite email |
+| Smithery | `/developers/mcp` | [ ] | Login required at smithery.ai/servers/new |
+| Glama | `/developers/mcp` | [ ] | Wait / claim |
+| GitHub README / awesome-mcp lists | `/developers/mcp` | [ ] | Optional PR |
+| Product Hunt / Indie Hackers | `/` or `/developers/mcp` | [ ] | Lead with MCP |
+| Cursor / Claude community how-to | setup blogs + MCP | [ ] | Already have Cursor/Claude setup blogs |
+| Niche SEO roundup (1–2) | `/digital-tools/internal-linking` | [ ] | Couple with ILC blog |
+| LinkedIn / X founder posts | `/developers/mcp` | [ ] | Same one-liner |
 
 **Avoid:** paid link networks, spun articles, claiming “all tools on MCP,” “500 requests,” or “replaces Cursor.”
 
 ---
 
-## Suggested outreach email (short)
-
-Subject: Remote MCP server for SEO / ship-gate agents
-
-Hi {name},
-
-ToolYour is a remote MCP endpoint agents use for plan → run → verify (SEO audits, security, ship-gate). Same key as our REST API; 500 free credits/month.
-
-Setup: https://www.toolyour.com/developers/mcp  
-If you maintain an MCP directory or tools list, happy to send a short factual blurb.
-
-Thanks,  
-{your name}
-
----
-
 ## Couple with Internal Link Checker
-
-When a listing allows a **second** product URL (SEO tools, free tools roundups), use:
 
 - Anchor: **Internal Link Checker**  
 - URL: https://www.toolyour.com/digital-tools/internal-linking  
-- One line: Bounded crawl for internal link graph, orphan signals, and broken destinations — browser free; agents via MCP SEO playbooks.
+- Blog: https://www.toolyour.com/blogs/internal-link-checker-tool (Request indexing — unknown to Google as of 2026-09-07)
 
 ---
 
 ## Measure
 
-After 2–4 weeks of listings:
+After 2–4 weeks:
 
 ```powershell
 cd toolyour-apis
 npm run export:ranking-gsc-baseline -- --days=28
+npm run inspect:tier0-gsc-urls
 ```
 
-Watch: homepage + `/developers/mcp` clicks; query `internal link checker` position.
+Watch: homepage + `/developers/mcp` clicks; query `internal link checker` position; ILC blog indexation.
