@@ -27,6 +27,32 @@ export function registerHealthRoutes(
     });
   });
 
+  /** Prometheus text exposition (open metrics format; no vendor lock-in). */
+  app.get("/health/mcp/metrics", (_req: Request, res: Response) => {
+    const c = getCounters();
+    const lines = [
+      "# HELP toolyour_mcp_invokes Gateway tool invokes",
+      "# TYPE toolyour_mcp_invokes counter",
+      `toolyour_mcp_invokes ${c.invokes}`,
+      "# HELP toolyour_mcp_workflow_completed Completed workflows",
+      "# TYPE toolyour_mcp_workflow_completed counter",
+      `toolyour_mcp_workflow_completed ${c.workflowCompleted}`,
+      "# HELP toolyour_mcp_workflow_partial Partial workflows",
+      "# TYPE toolyour_mcp_workflow_partial counter",
+      `toolyour_mcp_workflow_partial ${c.workflowPartial}`,
+      "# HELP toolyour_mcp_circuit_opens Circuit breaker opens",
+      "# TYPE toolyour_mcp_circuit_opens counter",
+      `toolyour_mcp_circuit_opens ${c.circuitOpens}`,
+      "# HELP toolyour_mcp_gateway_retries Gateway retries",
+      "# TYPE toolyour_mcp_gateway_retries counter",
+      `toolyour_mcp_gateway_retries ${c.gatewayRetries}`,
+      "# HELP toolyour_mcp_suggest_returns suggest_task returns",
+      "# TYPE toolyour_mcp_suggest_returns counter",
+      `toolyour_mcp_suggest_returns ${c.suggestReturns}`,
+    ];
+    res.type("text/plain; version=0.0.4; charset=utf-8").send(lines.join("\n") + "\n");
+  });
+
   app.get("/health/mcp/ready", async (_req: Request, res: Response) => {
     const env = getEnv();
     const gatewayOk = await checkGatewayHealth();

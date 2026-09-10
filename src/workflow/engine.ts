@@ -17,6 +17,7 @@ import { synthesizeJobReport } from "../jobs/synthesize";
 import type { WorkflowStepMeta } from "../jobs/types";
 import { markIncompleteJobReport } from "../jobs/utils";
 import { incr } from "../observability/counters";
+import { withSpan } from "../observability/tracing";
 
 export function loadWorkflows(): McpWorkflowDef[] {
   return defsCache.getWorkflows();
@@ -47,6 +48,30 @@ export interface WorkflowRunResult {
 }
 
 export async function runWorkflow(
+  workflowId: string,
+  input: Record<string, unknown>,
+  ctx: WorkflowRunContext
+): Promise<WorkflowRunResult> {
+  return withSpan(
+    "mcp.run_workflow",
+    {
+      "mcp.workflow_id": workflowId,
+      "mcp.skill_id": ctx.skillId,
+      "mcp.tool": ctx.mcpTool,
+    },
+    async (span) => {
+      const result = await runWorkflowInner(workflowId, input, ctx);
+      span.setAttribute("mcp.workflow_status", result.status);
+      span.setAttribute(
+        "mcp.completed_steps",
+        result.completedSteps.length
+      );
+      return result;
+    }
+  );
+}
+
+async function runWorkflowInner(
   workflowId: string,
   input: Record<string, unknown>,
   ctx: WorkflowRunContext

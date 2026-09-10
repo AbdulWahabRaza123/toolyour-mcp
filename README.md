@@ -1,68 +1,73 @@
-# ToolYour MCP
+# Open-source ToolYour MCP
 
-Agent-native MCP gateway exposing **only API-backed tools** (`hasApi: true`).
+Remote MCP gateway for AI agents: **plan → run playbook/solve → verify until pass**.
+
+MIT licensed. Hosted API/SaaS backends are optional — offline evals and local file control-plane run without them.
+
+**Product docs:** https://www.toolyour.com/developers/mcp  
+**Official registry:** `com.toolyour/mcp`  
+**npm client (separate):** [@toolyour/sdk](https://github.com/ToolYour/toolyour-sdk) (MIT)
 
 ## Quick start
 
 ```bash
 cp .env.example .env
 npm install
-npm run build:registry   # from docs/
+npm run build:registry   # from monorepo docs/ when regenerating
+npm run build
 npm run dev
 ```
 
-Endpoint: `http://localhost:3090/mcp` (SSE)
+Endpoint: `http://localhost:3090/mcp` (SSE) · Streamable HTTP: `/mcp/http`
 
-Health: `GET /health/mcp`, `GET /health/mcp/ready`
+Health: `GET /health/mcp` · Ready: `GET /health/mcp/ready` · Metrics: `GET /health/mcp/metrics` (Prometheus text)
 
 ## Auth
-
-Pass API key via MCP client config header:
 
 ```
 X-Api-Key: ty_...
 ```
 
-## Registry
+Same key as ToolYour REST. Free tier: 500 credits/month (tools cost 1–10 credits). MCP exposes **API-backed catalog tools only** (`hasApi`).
 
-Regenerate after OpenAPI changes:
+## Host contract
+
+ToolYour does **not** replace Cursor/Claude. The host keeps editor, git, and terminal. Agents should:
+
+1. `plan_task` (free)
+2. `run_playbook` or `solve_task`
+3. Apply **only** rank-1 `loop.nextActions` in the workspace
+4. `verify_task` with prior result as baseline until `loop.gate` is `pass` (or stop)
+
+## Offline evals (no API key)
 
 ```bash
-npm run build:registry
-# With Mongo hasApi filter:
-TOOLS_MONGO_URI=mongodb://... npm run build:registry --prefix ../docs
+npm run ci                 # build + lint + unit/contract/integration + evals
+npm run eval:golden        # routing + jobReport fields + verify gate
+npm run eval:playbooks     # skill → workflow → synthesizer matrix + fixture coverage
+npm run golden:tier1       # host work-package shapes
 ```
 
-## Tests
+Fixtures: `tests/eval/synth-fixtures.json` · Goals: `tests/eval/goals.jsonl`
 
-```bash
-npm run validate:jobs    # build + lint + unit + offline job parity
-npm run smoke:jobs:live  # requires MCP_API_KEY + gateway at :8888
-npm run smoke:live:agent # plan → solve → verify (+ async get_run); needs MCP_API_KEY
-npm run test:mcp         # unit + contract + integration
-```
+## Observability (open protocols)
 
-See [`docs/DEPLOY-CHECKLIST.md`](docs/DEPLOY-CHECKLIST.md) for deploy order and live smoke steps.
+| Signal | How |
+|--------|-----|
+| JSON logs | Always (`LOG_LEVEL`) |
+| In-process counters | `/health/mcp` + `/health/mcp/metrics` |
+| Spans | Set `OTEL_LOG_SPANS=1` and/or `OTEL_EXPORTER_OTLP_ENDPOINT` (OTLP/HTTP JSON → Collector / Jaeger / Tempo) |
 
-### Async runs (multi-replica)
+No proprietary APM required.
 
-Set `REDIS_URL` on the Railway MCP service when running more than one replica. Without Redis, `get_run` only works on the instance that accepted `async:true`. Webhooks stay optional — poll `get_run` and read **`resultStatus`**.
+## What stays hosted (optional)
 
-## Job workflows (`solve_task`)
+- Live tool execution via gateway + API key
+- Feature Memory / verification profiles (SaaS Mongo)
+- Redis for multi-replica async `get_run`
 
-Shipped synthesizer workflows (return `toolyour.jobReport@1` when matched):
+Local defaults use file-backed control-plane jobs.
 
-| Workflow ID | Purpose |
-|-------------|---------|
-| `full-seo-audit` | SEO + page speed |
-| `core-web-vitals-job` | CWV diagnosis |
-| `full-seo-optimization-job` | Full on-page optimization (6 tools) |
-| `internal-link-architecture-job` | Orphans, broken links, hub pages |
-| `technical-seo-audit-job` | Lite technical audit |
-| `social-preview-audit-job` | Open Graph / Twitter Card |
-| `content-quality-audit-job` | Content + keyword signals |
-| `keyword-opportunity-review-job` | Keyword gaps + opportunities |
-| `document-convert-pipeline` | DOCX → PDF |
-| `frontend-webp-job` | Page images → WebP zip + img/srcset remainingFixes |
+## License
 
-Registry: `registry/workflows.json`, `registry/tasks.json`. Roadmap: [`docs/MCP-JOBS-ROADMAP.md`](docs/MCP-JOBS-ROADMAP.md).
+MIT — see [LICENSE](./LICENSE).
