@@ -30,6 +30,7 @@ import {
   regressionVsLastPass,
 } from "./verification-loop";
 import { autoRecordCompletedFeature } from "./feature-memory-loop";
+import { withSpan } from "../observability/tracing";
 
 export interface RunPlaybookContext {
   apiKey: string;
@@ -42,6 +43,25 @@ export interface RunPlaybookContext {
  * Execute a skill's backing workflow (or local content bridge) in one call.
  */
 export async function runPlaybook(
+  skillId: string,
+  input: Record<string, unknown> | undefined,
+  ctx: RunPlaybookContext,
+  responseMode: ResponseMode = "compact"
+) {
+  return withSpan(
+    "mcp.run_playbook",
+    { "mcp.skill_id": skillId.trim(), "mcp.response_mode": String(responseMode) },
+    async (span) => {
+      const result = await runPlaybookInner(skillId, input, ctx, responseMode);
+      if (result && typeof result === "object" && "status" in result) {
+        span.setAttribute("mcp.result_status", String((result as { status: string }).status));
+      }
+      return result;
+    }
+  );
+}
+
+async function runPlaybookInner(
   skillId: string,
   input: Record<string, unknown> | undefined,
   ctx: RunPlaybookContext,

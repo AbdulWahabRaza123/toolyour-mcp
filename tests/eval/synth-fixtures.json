@@ -1,9 +1,17 @@
 {
   "core-web-vitals": {
-    "input": { "url": "https://example.com" },
+    "input": {
+      "url": "https://example.com"
+    },
     "steps": [
-      { "id": "speed", "operationId": "pageSpeedAnalyzer" },
-      { "id": "seo", "operationId": "seoAnalyze" }
+      {
+        "id": "speed",
+        "operationId": "pageSpeedAnalyzer"
+      },
+      {
+        "id": "seo",
+        "operationId": "seoAnalyze"
+      }
     ],
     "stepResults": {
       "speed": {
@@ -13,12 +21,27 @@
           "schemaVersion": "toolyour.toolResult@1",
           "toolId": "page-speed-analyzer",
           "url": "https://example.com",
-          "data": { "url": "https://example.com", "loadTime": 840, "suggestions": [] },
+          "data": {
+            "url": "https://example.com",
+            "loadTime": 840,
+            "suggestions": []
+          },
           "report": {
-            "summary": { "totalScore": 58, "grade": "D", "topPriorities": ["Likely LCP contributor"] },
+            "summary": {
+              "totalScore": 58,
+              "grade": "D",
+              "topPriorities": [
+                "Likely LCP contributor"
+              ]
+            },
             "metrics": {
               "totalScore": 58,
-              "proxies": { "lcpScore": 45, "tbtScore": 60, "fcpScore": 55, "clsScore": 70 },
+              "proxies": {
+                "lcpScore": 45,
+                "tbtScore": 60,
+                "fcpScore": 55,
+                "clsScore": 70
+              },
               "ttfbMs": 840
             },
             "evidence": {
@@ -40,7 +63,9 @@
                 "title": "Likely LCP contributor: large image asset",
                 "severity": "high",
                 "whyItMatters": "LCP delay",
-                "howToFix": ["Compress hero image to WebP"]
+                "howToFix": [
+                  "Compress hero image to WebP"
+                ]
               }
             ]
           }
@@ -53,15 +78,26 @@
           "schemaVersion": "toolyour.toolResult@1",
           "toolId": "seo-audit",
           "url": "https://example.com",
-          "data": { "url": "https://example.com", "overallScore": 72 },
+          "data": {
+            "url": "https://example.com",
+            "overallScore": 72
+          },
           "report": {
-            "summary": { "totalScore": 72, "grade": "C", "topPriorities": ["Fix meta description"] },
+            "summary": {
+              "totalScore": 72,
+              "grade": "C",
+              "topPriorities": [
+                "Fix meta description"
+              ]
+            },
             "findings": [
               {
                 "title": "Meta description missing",
                 "severity": "high",
                 "whyItMatters": "CTR suffers",
-                "howToFix": ["Add a 120–160 character meta description"]
+                "howToFix": [
+                  "Add a 120–160 character meta description"
+                ]
               }
             ]
           }
@@ -70,10 +106,18 @@
     }
   },
   "full-seo-audit": {
-    "input": { "url": "https://example.com" },
+    "input": {
+      "url": "https://example.com"
+    },
     "steps": [
-      { "id": "seo", "operationId": "seoAnalyze" },
-      { "id": "speed", "operationId": "pageSpeedAnalyzer" }
+      {
+        "id": "seo",
+        "operationId": "seoAnalyze"
+      },
+      {
+        "id": "speed",
+        "operationId": "pageSpeedAnalyzer"
+      }
     ],
     "stepResults": {
       "seo": {
@@ -83,15 +127,26 @@
           "schemaVersion": "toolyour.toolResult@1",
           "toolId": "seo-audit",
           "url": "https://example.com",
-          "data": { "url": "https://example.com", "overallScore": 72 },
+          "data": {
+            "url": "https://example.com",
+            "overallScore": 72
+          },
           "report": {
-            "summary": { "totalScore": 72, "grade": "C", "topPriorities": ["Fix meta"] },
+            "summary": {
+              "totalScore": 72,
+              "grade": "C",
+              "topPriorities": [
+                "Fix meta"
+              ]
+            },
             "findings": [
               {
                 "title": "Meta description missing",
                 "severity": "high",
                 "whyItMatters": "CTR",
-                "howToFix": ["Add meta description"]
+                "howToFix": [
+                  "Add meta description"
+                ]
               }
             ]
           }
@@ -104,18 +159,36 @@
           "schemaVersion": "toolyour.toolResult@1",
           "toolId": "page-speed-analyzer",
           "url": "https://example.com",
-          "data": { "url": "https://example.com", "loadTime": 840 },
+          "data": {
+            "url": "https://example.com",
+            "loadTime": 840
+          },
           "report": {
-            "summary": { "totalScore": 58, "grade": "D", "topPriorities": ["LCP"] },
+            "summary": {
+              "totalScore": 58,
+              "grade": "D",
+              "topPriorities": [
+                "LCP"
+              ]
+            },
             "metrics": {
               "totalScore": 58,
-              "proxies": { "lcpScore": 45, "tbtScore": 60, "fcpScore": 55, "clsScore": 70 },
+              "proxies": {
+                "lcpScore": 45,
+                "tbtScore": 60,
+                "fcpScore": 55,
+                "clsScore": 70
+              },
               "ttfbMs": 840
             },
             "evidence": {
               "assetOptimizer": {
                 "compressImages": [
-                  { "src": "https://example.com/hero.jpg", "bytes": 450000, "reason": "LCP" }
+                  {
+                    "src": "https://example.com/hero.jpg",
+                    "bytes": 450000,
+                    "reason": "LCP"
+                  }
                 ],
                 "deferScripts": [],
                 "fixDimensions": [],
@@ -127,7 +200,9 @@
                 "title": "Likely LCP contributor: large image asset",
                 "severity": "high",
                 "whyItMatters": "LCP",
-                "howToFix": ["Compress hero"]
+                "howToFix": [
+                  "Compress hero"
+                ]
               }
             ]
           }
@@ -136,11 +211,22 @@
     }
   },
   "full-seo-optimization": {
-    "input": { "url": "https://example.com" },
+    "input": {
+      "url": "https://example.com"
+    },
     "steps": [
-      { "id": "seo", "operationId": "seoAnalyze" },
-      { "id": "content", "operationId": "contentOptimization" },
-      { "id": "speed", "operationId": "pageSpeedAnalyzer" }
+      {
+        "id": "seo",
+        "operationId": "seoAnalyze"
+      },
+      {
+        "id": "content",
+        "operationId": "contentOptimization"
+      },
+      {
+        "id": "speed",
+        "operationId": "pageSpeedAnalyzer"
+      }
     ],
     "stepResults": {
       "seo": {
@@ -150,15 +236,25 @@
           "schemaVersion": "toolyour.toolResult@1",
           "toolId": "seo-audit",
           "url": "https://example.com",
-          "data": { "overallScore": 70 },
+          "data": {
+            "overallScore": 70
+          },
           "report": {
-            "summary": { "totalScore": 70, "grade": "C", "topPriorities": ["Meta"] },
+            "summary": {
+              "totalScore": 70,
+              "grade": "C",
+              "topPriorities": [
+                "Meta"
+              ]
+            },
             "findings": [
               {
                 "title": "Meta description missing",
                 "severity": "medium",
                 "whyItMatters": "CTR",
-                "howToFix": ["Add meta"]
+                "howToFix": [
+                  "Add meta"
+                ]
               }
             ]
           }
@@ -171,15 +267,25 @@
           "schemaVersion": "toolyour.toolResult@1",
           "toolId": "content-optimization",
           "url": "https://example.com",
-          "data": { "wordCount": 120 },
+          "data": {
+            "wordCount": 120
+          },
           "report": {
-            "summary": { "totalScore": 55, "grade": "F", "topPriorities": ["H1"] },
+            "summary": {
+              "totalScore": 55,
+              "grade": "F",
+              "topPriorities": [
+                "H1"
+              ]
+            },
             "findings": [
               {
                 "title": "Missing H1 heading",
                 "severity": "high",
                 "whyItMatters": "Structure",
-                "howToFix": ["Add one H1"]
+                "howToFix": [
+                  "Add one H1"
+                ]
               }
             ]
           }
@@ -192,11 +298,24 @@
           "schemaVersion": "toolyour.toolResult@1",
           "toolId": "page-speed-analyzer",
           "url": "https://example.com",
-          "data": { "loadTime": 900 },
+          "data": {
+            "loadTime": 900
+          },
           "report": {
-            "summary": { "totalScore": 60, "grade": "D", "topPriorities": ["Speed"] },
+            "summary": {
+              "totalScore": 60,
+              "grade": "D",
+              "topPriorities": [
+                "Speed"
+              ]
+            },
             "metrics": {
-              "proxies": { "lcpScore": 50, "tbtScore": 50, "fcpScore": 50, "clsScore": 50 },
+              "proxies": {
+                "lcpScore": 50,
+                "tbtScore": 50,
+                "fcpScore": 50,
+                "clsScore": 50
+              },
               "ttfbMs": 900
             },
             "findings": []
@@ -206,25 +325,122 @@
     }
   },
   "internal-link-architecture": {
-    "input": { "url": "https://example.com" },
-    "steps": [{ "id": "links", "operationId": "internalLinking" }],
+    "input": {
+      "url": "https://example.com"
+    },
+    "steps": [
+      {
+        "id": "graph",
+        "operationId": "internalLinking"
+      },
+      {
+        "id": "hub",
+        "operationId": "linkExtractor"
+      },
+      {
+        "id": "seo",
+        "operationId": "seoAnalyze"
+      }
+    ],
     "stepResults": {
-      "links": {
+      "graph": {
         "status": 200,
         "operationId": "internalLinking",
         "data": {
           "schemaVersion": "toolyour.toolResult@1",
           "toolId": "internal-linking",
           "url": "https://example.com",
-          "data": {},
+          "data": {
+            "url": "https://example.com",
+            "orphanPages": [
+              "https://example.com/orphan"
+            ],
+            "brokenLinks": [
+              {
+                "from": "https://example.com/",
+                "to": "https://example.com/gone",
+                "status": 404
+              }
+            ]
+          },
           "report": {
-            "summary": { "totalScore": 50, "grade": "D", "topPriorities": ["Orphans"] },
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Orphan and broken edges"
+              ]
+            },
             "findings": [
               {
-                "title": "Orphan page detected",
+                "title": "Orphan and broken edges",
                 "severity": "high",
-                "whyItMatters": "Crawl",
-                "howToFix": ["Add internal links"]
+                "whyItMatters": "Orphan and broken edges",
+                "howToFix": [
+                  "Add inbound links; fix broken destinations"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "hub": {
+        "status": 200,
+        "operationId": "linkExtractor",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "link-extractor",
+          "url": "https://example.com",
+          "data": {
+            "links": []
+          },
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Thin hub outbound links"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Thin hub outbound links",
+                "severity": "high",
+                "whyItMatters": "Thin hub outbound links",
+                "howToFix": [
+                  "Fix it"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "seo": {
+        "status": 200,
+        "operationId": "seoAnalyze",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "seo-audit",
+          "url": "https://example.com",
+          "data": {
+            "overallScore": 55
+          },
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Hub title weak"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Hub title weak",
+                "severity": "high",
+                "whyItMatters": "Hub title weak",
+                "howToFix": [
+                  "Strengthen title tag"
+                ]
               }
             ]
           }
@@ -233,10 +449,18 @@
     }
   },
   "technical-seo-audit": {
-    "input": { "url": "https://example.com" },
+    "input": {
+      "url": "https://example.com"
+    },
     "steps": [
-      { "id": "seo", "operationId": "seoAnalyze" },
-      { "id": "speed", "operationId": "pageSpeedAnalyzer" }
+      {
+        "id": "seo",
+        "operationId": "seoAnalyze"
+      },
+      {
+        "id": "speed",
+        "operationId": "pageSpeedAnalyzer"
+      }
     ],
     "stepResults": {
       "seo": {
@@ -246,15 +470,25 @@
           "schemaVersion": "toolyour.toolResult@1",
           "toolId": "seo-audit",
           "url": "https://example.com",
-          "data": { "overallScore": 65 },
+          "data": {
+            "overallScore": 65
+          },
           "report": {
-            "summary": { "totalScore": 65, "grade": "C", "topPriorities": ["Robots"] },
+            "summary": {
+              "totalScore": 65,
+              "grade": "C",
+              "topPriorities": [
+                "Robots"
+              ]
+            },
             "findings": [
               {
                 "title": "Robots directives review",
                 "severity": "medium",
                 "whyItMatters": "Indexation",
-                "howToFix": ["Review robots.txt"]
+                "howToFix": [
+                  "Review robots.txt"
+                ]
               }
             ]
           }
@@ -267,11 +501,22 @@
           "schemaVersion": "toolyour.toolResult@1",
           "toolId": "page-speed-analyzer",
           "url": "https://example.com",
-          "data": { "loadTime": 700 },
+          "data": {
+            "loadTime": 700
+          },
           "report": {
-            "summary": { "totalScore": 70, "grade": "C", "topPriorities": [] },
+            "summary": {
+              "totalScore": 70,
+              "grade": "C",
+              "topPriorities": []
+            },
             "metrics": {
-              "proxies": { "lcpScore": 60, "tbtScore": 60, "fcpScore": 60, "clsScore": 60 },
+              "proxies": {
+                "lcpScore": 60,
+                "tbtScore": 60,
+                "fcpScore": 60,
+                "clsScore": 60
+              },
               "ttfbMs": 700
             },
             "findings": []
@@ -281,8 +526,15 @@
     }
   },
   "social-preview-audit": {
-    "input": { "url": "https://example.com" },
-    "steps": [{ "id": "social", "operationId": "socialMediaIntegration" }],
+    "input": {
+      "url": "https://example.com"
+    },
+    "steps": [
+      {
+        "id": "social",
+        "operationId": "socialMediaIntegration"
+      }
+    ],
     "stepResults": {
       "social": {
         "status": 200,
@@ -293,13 +545,21 @@
           "url": "https://example.com",
           "data": {},
           "report": {
-            "summary": { "totalScore": 40, "grade": "F", "topPriorities": ["OG image"] },
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "OG image"
+              ]
+            },
             "findings": [
               {
                 "title": "Missing og:image",
                 "severity": "high",
                 "whyItMatters": "Previews",
-                "howToFix": ["Add og:image"]
+                "howToFix": [
+                  "Add og:image"
+                ]
               }
             ]
           }
@@ -308,8 +568,15 @@
     }
   },
   "content-quality-audit": {
-    "input": { "url": "https://example.com" },
-    "steps": [{ "id": "content", "operationId": "contentOptimization" }],
+    "input": {
+      "url": "https://example.com"
+    },
+    "steps": [
+      {
+        "id": "content",
+        "operationId": "contentOptimization"
+      }
+    ],
     "stepResults": {
       "content": {
         "status": 200,
@@ -318,15 +585,25 @@
           "schemaVersion": "toolyour.toolResult@1",
           "toolId": "content-optimization",
           "url": "https://example.com",
-          "data": { "wordCount": 80 },
+          "data": {
+            "wordCount": 80
+          },
           "report": {
-            "summary": { "totalScore": 45, "grade": "F", "topPriorities": ["Thin content"] },
+            "summary": {
+              "totalScore": 45,
+              "grade": "F",
+              "topPriorities": [
+                "Thin content"
+              ]
+            },
             "findings": [
               {
                 "title": "Thin content",
                 "severity": "medium",
                 "whyItMatters": "Quality",
-                "howToFix": ["Expand body copy"]
+                "howToFix": [
+                  "Expand body copy"
+                ]
               }
             ]
           }
@@ -335,8 +612,15 @@
     }
   },
   "keyword-opportunity-review": {
-    "input": { "url": "https://example.com" },
-    "steps": [{ "id": "keywords", "operationId": "keywordChecker" }],
+    "input": {
+      "url": "https://example.com"
+    },
+    "steps": [
+      {
+        "id": "keywords",
+        "operationId": "keywordChecker"
+      }
+    ],
     "stepResults": {
       "keywords": {
         "status": 200,
@@ -347,13 +631,21 @@
           "url": "https://example.com",
           "data": {},
           "report": {
-            "summary": { "totalScore": 55, "grade": "D", "topPriorities": ["Primary keyword"] },
+            "summary": {
+              "totalScore": 55,
+              "grade": "D",
+              "topPriorities": [
+                "Primary keyword"
+              ]
+            },
             "findings": [
               {
                 "title": "Primary keyword underused",
                 "severity": "medium",
                 "whyItMatters": "Relevance",
-                "howToFix": ["Use primary keyword in H1"]
+                "howToFix": [
+                  "Use primary keyword in H1"
+                ]
               }
             ]
           }
@@ -362,10 +654,18 @@
     }
   },
   "frontend-webp": {
-    "input": { "url": "https://example.com" },
+    "input": {
+      "url": "https://example.com"
+    },
     "steps": [
-      { "id": "speed", "operationId": "pageSpeedAnalyzer" },
-      { "id": "convert", "operationId": "convertToWebp" }
+      {
+        "id": "speed",
+        "operationId": "pageSpeedAnalyzer"
+      },
+      {
+        "id": "convert",
+        "operationId": "convertToWebp"
+      }
     ],
     "stepResults": {
       "speed": {
@@ -375,9 +675,17 @@
           "schemaVersion": "toolyour.toolResult@1",
           "toolId": "page-speed-analyzer",
           "url": "https://example.com",
-          "data": { "url": "https://example.com" },
+          "data": {
+            "url": "https://example.com"
+          },
           "report": {
-            "summary": { "totalScore": 58, "grade": "D", "topPriorities": ["Convert hero image"] },
+            "summary": {
+              "totalScore": 58,
+              "grade": "D",
+              "topPriorities": [
+                "Convert hero image"
+              ]
+            },
             "evidence": {
               "assetOptimizer": {
                 "compressImages": [
@@ -412,13 +720,30 @@
     }
   },
   "developer-ship-checklist": {
-    "input": { "url": "https://example.com" },
+    "input": {
+      "url": "https://example.com"
+    },
     "steps": [
-      { "id": "headers", "operationId": "securityHeadersAnalyzer" },
-      { "id": "tls", "operationId": "sslTlsCertificateChecker" },
-      { "id": "mixed", "operationId": "mixedContentChecker" },
-      { "id": "status", "operationId": "httpStatusChecker" },
-      { "id": "speed", "operationId": "pageSpeedAnalyzer" }
+      {
+        "id": "headers",
+        "operationId": "securityHeadersAnalyzer"
+      },
+      {
+        "id": "tls",
+        "operationId": "sslTlsCertificateChecker"
+      },
+      {
+        "id": "mixed",
+        "operationId": "mixedContentChecker"
+      },
+      {
+        "id": "status",
+        "operationId": "httpStatusChecker"
+      },
+      {
+        "id": "speed",
+        "operationId": "pageSpeedAnalyzer"
+      }
     ],
     "stepResults": {
       "headers": {
@@ -438,7 +763,11 @@
                 "advice": "Add a CSP"
               }
             ],
-            "summary": { "pass": 0, "warn": 0, "fail": 1 }
+            "summary": {
+              "pass": 0,
+              "warn": 0,
+              "fail": 1
+            }
           }
         }
       },
@@ -451,7 +780,11 @@
             "severity": "warn",
             "daysRemaining": 20,
             "checks": [],
-            "summary": { "pass": 0, "warn": 1, "fail": 0 }
+            "summary": {
+              "pass": 0,
+              "warn": 1,
+              "fail": 0
+            }
           }
         }
       },
@@ -460,9 +793,13 @@
         "operationId": "mixedContentChecker",
         "data": {
           "schemaVersion": "toolyour.toolResult@1",
-          "data": { "url": "https://example.com" },
+          "data": {
+            "url": "https://example.com"
+          },
           "report": {
-            "summary": { "totalScore": 90 },
+            "summary": {
+              "totalScore": 90
+            },
             "findings": []
           }
         }
@@ -472,9 +809,13 @@
         "operationId": "httpStatusChecker",
         "data": {
           "schemaVersion": "toolyour.toolResult@1",
-          "data": { "url": "https://example.com" },
+          "data": {
+            "url": "https://example.com"
+          },
           "report": {
-            "summary": { "totalScore": 95 },
+            "summary": {
+              "totalScore": 95
+            },
             "findings": []
           }
         }
@@ -484,10 +825,1038 @@
         "operationId": "pageSpeedAnalyzer",
         "data": {
           "schemaVersion": "toolyour.toolResult@1",
-          "data": { "url": "https://example.com", "loadTime": 400 },
+          "data": {
+            "url": "https://example.com",
+            "loadTime": 400
+          },
           "report": {
-            "summary": { "totalScore": 72 },
+            "summary": {
+              "totalScore": 72
+            },
             "findings": []
+          }
+        }
+      }
+    }
+  },
+  "full-security-audit": {
+    "input": {
+      "url": "https://example.com"
+    },
+    "steps": [
+      {
+        "id": "headers",
+        "operationId": "securityHeadersAnalyzer"
+      },
+      {
+        "id": "tls",
+        "operationId": "sslTlsCertificateChecker"
+      },
+      {
+        "id": "cookies",
+        "operationId": "cookieSecurityAnalyzer"
+      }
+    ],
+    "stepResults": {
+      "headers": {
+        "status": 200,
+        "operationId": "securityHeadersAnalyzer",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "security-headers-analyzer",
+          "url": "https://example.com",
+          "data": {
+            "score": 40,
+            "checks": [
+              {
+                "name": "Content-Security-Policy",
+                "severity": "fail",
+                "present": false,
+                "advice": "Add a Content-Security-Policy header"
+              }
+            ]
+          },
+          "report": {
+            "summary": {
+              "totalScore": 45,
+              "grade": "D",
+              "topPriorities": [
+                "Fix high issues"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Example finding",
+                "severity": "high",
+                "whyItMatters": "Blocks pass gate",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "tls": {
+        "status": 200,
+        "operationId": "sslTlsCertificateChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "ssl-tls-certificate-checker",
+          "url": "https://example.com",
+          "data": {
+            "score": 70,
+            "checks": [
+              {
+                "name": "TLS version",
+                "severity": "warn",
+                "present": true,
+                "advice": "Prefer TLS 1.2+"
+              }
+            ]
+          },
+          "report": {
+            "summary": {
+              "totalScore": 45,
+              "grade": "D",
+              "topPriorities": [
+                "Fix high issues"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Example finding",
+                "severity": "high",
+                "whyItMatters": "Blocks pass gate",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "cookies": {
+        "status": 200,
+        "operationId": "cookieSecurityAnalyzer",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "cookie-security-analyzer",
+          "url": "https://example.com",
+          "data": {
+            "score": 50,
+            "cookies": [
+              {
+                "name": "session",
+                "severity": "fail",
+                "issues": [
+                  "Missing Secure flag"
+                ]
+              }
+            ]
+          },
+          "report": {
+            "summary": {
+              "totalScore": 45,
+              "grade": "D",
+              "topPriorities": [
+                "Fix high issues"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Example finding",
+                "severity": "high",
+                "whyItMatters": "Blocks pass gate",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "security-headers": {
+    "input": {
+      "url": "https://example.com"
+    },
+    "steps": [
+      {
+        "id": "headers",
+        "operationId": "securityHeadersAnalyzer"
+      }
+    ],
+    "stepResults": {
+      "headers": {
+        "status": 200,
+        "operationId": "securityHeadersAnalyzer",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "security-headers-analyzer",
+          "url": "https://example.com",
+          "data": {
+            "score": 35,
+            "checks": [
+              {
+                "name": "Strict-Transport-Security",
+                "severity": "fail",
+                "present": false,
+                "advice": "Add HSTS"
+              },
+              {
+                "name": "X-Content-Type-Options",
+                "severity": "fail",
+                "present": false,
+                "advice": "Add nosniff"
+              }
+            ]
+          },
+          "report": {
+            "summary": {
+              "totalScore": 45,
+              "grade": "D",
+              "topPriorities": [
+                "Fix high issues"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Example finding",
+                "severity": "high",
+                "whyItMatters": "Blocks pass gate",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "secrets-hygiene": {
+    "input": {
+      "text": "API_KEY=sk_test_example"
+    },
+    "steps": [
+      {
+        "id": "leak",
+        "operationId": "secretLeakScanner"
+      },
+      {
+        "id": "jwt",
+        "operationId": "jwtDecoder"
+      }
+    ],
+    "stepResults": {
+      "leak": {
+        "status": 200,
+        "operationId": "secretLeakScanner",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "secret-leak-scanner",
+          "url": "https://example.com",
+          "data": {
+            "matchCount": 1,
+            "matches": [
+              {
+                "type": "api_key",
+                "message": "Looks like an API key",
+                "preview": "sk_test_***"
+              }
+            ]
+          },
+          "report": {
+            "summary": {
+              "totalScore": 45,
+              "grade": "D",
+              "topPriorities": [
+                "Fix high issues"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Example finding",
+                "severity": "high",
+                "whyItMatters": "Blocks pass gate",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "jwt": {
+        "status": 200,
+        "operationId": "jwtDecoder",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "jwt-decoder",
+          "url": "https://example.com",
+          "data": {
+            "skipped": true
+          },
+          "report": {
+            "summary": {
+              "totalScore": 45,
+              "grade": "D",
+              "topPriorities": [
+                "Fix high issues"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Example finding",
+                "severity": "high",
+                "whyItMatters": "Blocks pass gate",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "crawl-readiness": {
+    "input": {
+      "url": "https://example.com"
+    },
+    "steps": [
+      {
+        "id": "robots",
+        "operationId": "robotsTxtChecker"
+      },
+      {
+        "id": "sitemap",
+        "operationId": "sitemapXmlValidator"
+      },
+      {
+        "id": "redirects",
+        "operationId": "redirectChainAnalyzer"
+      }
+    ],
+    "stepResults": {
+      "robots": {
+        "status": 200,
+        "operationId": "robotsTxtChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "robots-txt-checker",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Disallow may block key paths"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Disallow may block key paths",
+                "severity": "high",
+                "whyItMatters": "Disallow may block key paths",
+                "howToFix": [
+                  "Review robots.txt Disallow rules"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "sitemap": {
+        "status": 200,
+        "operationId": "sitemapXmlValidator",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "sitemap-xml-validator",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Sitemap missing lastmod"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Sitemap missing lastmod",
+                "severity": "high",
+                "whyItMatters": "Sitemap missing lastmod",
+                "howToFix": [
+                  "Add lastmod where accurate"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "redirects": {
+        "status": 200,
+        "operationId": "redirectChainAnalyzer",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "redirect-chain-analyzer",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Long redirect chain"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Long redirect chain",
+                "severity": "high",
+                "whyItMatters": "Long redirect chain",
+                "howToFix": [
+                  "Collapse redirects to one hop"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "structured-data-audit": {
+    "input": {
+      "url": "https://example.com"
+    },
+    "steps": [
+      {
+        "id": "schema",
+        "operationId": "schemaMarkupValidator"
+      },
+      {
+        "id": "meta",
+        "operationId": "metaTagsAnalyzer"
+      },
+      {
+        "id": "social",
+        "operationId": "socialMediaIntegration"
+      }
+    ],
+    "stepResults": {
+      "schema": {
+        "status": 200,
+        "operationId": "schemaMarkupValidator",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "schema-markup-validator",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Missing Organization schema"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Missing Organization schema",
+                "severity": "high",
+                "whyItMatters": "Missing Organization schema",
+                "howToFix": [
+                  "Add Organization JSON-LD"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "meta": {
+        "status": 200,
+        "operationId": "metaTagsAnalyzer",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "meta-tags-analyzer",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Meta description missing"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Meta description missing",
+                "severity": "high",
+                "whyItMatters": "Meta description missing",
+                "howToFix": [
+                  "Add meta description"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "social": {
+        "status": 200,
+        "operationId": "socialMediaIntegration",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "social-media-integration",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "og:image missing"
+              ]
+            },
+            "findings": [
+              {
+                "title": "og:image missing",
+                "severity": "high",
+                "whyItMatters": "og:image missing",
+                "howToFix": [
+                  "Add Open Graph image"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "seo-deploy-regression": {
+    "input": {
+      "urls": [
+        "https://example.com",
+        "https://staging.example.com"
+      ]
+    },
+    "steps": [
+      {
+        "id": "bulk",
+        "operationId": "bulkUrlSeoAuditor"
+      },
+      {
+        "id": "diff",
+        "operationId": "seoChangeDiff"
+      }
+    ],
+    "stepResults": {
+      "bulk": {
+        "status": 200,
+        "operationId": "bulkUrlSeoAuditor",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "bulk-url-seo-auditor",
+          "url": "https://example.com",
+          "data": {
+            "url": "https://example.com",
+            "worstUrls": [
+              {
+                "url": "https://example.com/a",
+                "score": 40,
+                "issues": [
+                  "Missing H1"
+                ]
+              }
+            ]
+          },
+          "report": {
+            "summary": {
+              "totalScore": 48,
+              "grade": "D",
+              "topPriorities": [
+                "Missing H1"
+              ]
+            },
+            "metrics": {
+              "avgScore": 48
+            },
+            "findings": [
+              {
+                "title": "Missing H1 on /a",
+                "severity": "high",
+                "whyItMatters": "On-page",
+                "howToFix": [
+                  "Add a single H1"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "diff": {
+        "status": 200,
+        "operationId": "seoChangeDiff",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "seo-change-diff",
+          "url": "https://example.com",
+          "data": {
+            "changed": true
+          },
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Title drifted vs baseline"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Title drifted vs baseline",
+                "severity": "high",
+                "whyItMatters": "Title drifted vs baseline",
+                "howToFix": [
+                  "Confirm intentional title change"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "frontend-supply-chain": {
+    "input": {
+      "url": "https://example.com"
+    },
+    "steps": [
+      {
+        "id": "sri",
+        "operationId": "subresourceIntegrityChecker"
+      },
+      {
+        "id": "mixed",
+        "operationId": "mixedContentChecker"
+      },
+      {
+        "id": "cors",
+        "operationId": "corsPolicyChecker"
+      }
+    ],
+    "stepResults": {
+      "sri": {
+        "status": 200,
+        "operationId": "subresourceIntegrityChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "subresource-integrity-checker",
+          "url": "https://example.com",
+          "data": {
+            "score": 40,
+            "checks": [
+              {
+                "name": "Script without integrity",
+                "severity": "fail",
+                "present": false,
+                "advice": "Add integrity= on third-party scripts"
+              }
+            ]
+          },
+          "report": {
+            "summary": {
+              "totalScore": 45,
+              "grade": "D",
+              "topPriorities": [
+                "Fix high issues"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Example finding",
+                "severity": "high",
+                "whyItMatters": "Blocks pass gate",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "mixed": {
+        "status": 200,
+        "operationId": "mixedContentChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "mixed-content-checker",
+          "url": "https://example.com",
+          "data": {
+            "score": 50,
+            "checks": [
+              {
+                "name": "HTTP asset on HTTPS page",
+                "severity": "fail",
+                "present": true,
+                "advice": "Upgrade asset URLs to https"
+              }
+            ]
+          },
+          "report": {
+            "summary": {
+              "totalScore": 45,
+              "grade": "D",
+              "topPriorities": [
+                "Fix high issues"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Example finding",
+                "severity": "high",
+                "whyItMatters": "Blocks pass gate",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "cors": {
+        "status": 200,
+        "operationId": "corsPolicyChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "cors-policy-checker",
+          "url": "https://example.com",
+          "data": {
+            "score": 80,
+            "checks": []
+          },
+          "report": {
+            "summary": {
+              "totalScore": 45,
+              "grade": "D",
+              "topPriorities": [
+                "Fix high issues"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Example finding",
+                "severity": "high",
+                "whyItMatters": "Blocks pass gate",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "email-auth-security": {
+    "input": {
+      "url": "https://example.com",
+      "domain": "example.com"
+    },
+    "steps": [
+      {
+        "id": "spf",
+        "operationId": "spfDkimDmarcChecker"
+      },
+      {
+        "id": "dns",
+        "operationId": "dnsLookup"
+      },
+      {
+        "id": "securityTxt",
+        "operationId": "securityTxtChecker"
+      }
+    ],
+    "stepResults": {
+      "spf": {
+        "status": 200,
+        "operationId": "spfDkimDmarcChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "spf-dkim-dmarc-checker",
+          "url": "https://example.com",
+          "data": {
+            "score": 35,
+            "checks": [
+              {
+                "name": "DMARC",
+                "severity": "fail",
+                "present": false,
+                "advice": "Publish _dmarc with p=none then enforce"
+              }
+            ]
+          },
+          "report": {
+            "summary": {
+              "totalScore": 45,
+              "grade": "D",
+              "topPriorities": [
+                "Fix high issues"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Example finding",
+                "severity": "high",
+                "whyItMatters": "Blocks pass gate",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "dns": {
+        "status": 200,
+        "operationId": "dnsLookup",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "dns-lookup",
+          "url": "https://example.com",
+          "data": {
+            "records": {
+              "A": [
+                "1.2.3.4"
+              ]
+            }
+          },
+          "report": {
+            "summary": {
+              "totalScore": 45,
+              "grade": "D",
+              "topPriorities": [
+                "Fix high issues"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Example finding",
+                "severity": "high",
+                "whyItMatters": "Blocks pass gate",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "securityTxt": {
+        "status": 200,
+        "operationId": "securityTxtChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "security-txt-checker",
+          "url": "https://example.com",
+          "data": {
+            "score": 40,
+            "checks": [
+              {
+                "name": "security.txt",
+                "severity": "fail",
+                "present": false,
+                "advice": "Publish /.well-known/security.txt"
+              }
+            ]
+          },
+          "report": {
+            "summary": {
+              "totalScore": 45,
+              "grade": "D",
+              "topPriorities": [
+                "Fix high issues"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Example finding",
+                "severity": "high",
+                "whyItMatters": "Blocks pass gate",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "indexability-audit": {
+    "input": {
+      "url": "https://example.com"
+    },
+    "steps": [
+      {
+        "id": "indexability",
+        "operationId": "indexabilityChecker"
+      },
+      {
+        "id": "canonical",
+        "operationId": "canonicalUrlChecker"
+      },
+      {
+        "id": "robots",
+        "operationId": "robotsTxtChecker"
+      }
+    ],
+    "stepResults": {
+      "indexability": {
+        "status": 200,
+        "operationId": "indexabilityChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "indexability-checker",
+          "url": "https://example.com",
+          "data": {
+            "indexable": false,
+            "totalScore": 35,
+            "dimensions": [
+              {
+                "id": "directives",
+                "label": "Directives",
+                "score": 30
+              }
+            ]
+          },
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "noindex blocks indexing"
+              ]
+            },
+            "findings": [
+              {
+                "title": "noindex blocks indexing",
+                "severity": "high",
+                "whyItMatters": "noindex blocks indexing",
+                "howToFix": [
+                  "Remove noindex if the URL should rank"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "canonical": {
+        "status": 200,
+        "operationId": "canonicalUrlChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "canonical-url-checker",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Canonical points off-host"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Canonical points off-host",
+                "severity": "high",
+                "whyItMatters": "Canonical points off-host",
+                "howToFix": [
+                  "Align canonical to the preferred host"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "robots": {
+        "status": 200,
+        "operationId": "robotsTxtChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "robots-txt-checker",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Path disallowed"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Path disallowed",
+                "severity": "high",
+                "whyItMatters": "Path disallowed",
+                "howToFix": [
+                  "Allow crawl of this path"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "ai-overview-readiness": {
+    "input": {
+      "url": "https://example.com"
+    },
+    "steps": [
+      {
+        "id": "aio",
+        "operationId": "aiOverviewReadinessChecker"
+      }
+    ],
+    "stepResults": {
+      "aio": {
+        "status": 200,
+        "operationId": "aiOverviewReadinessChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "ai-overview-readiness-checker",
+          "url": "https://example.com",
+          "data": {
+            "metrics": {
+              "extractability": 40
+            }
+          },
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Weak answer-first structure"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Weak answer-first structure",
+                "severity": "high",
+                "whyItMatters": "Weak answer-first structure",
+                "howToFix": [
+                  "Add a clear question-and-answer section"
+                ]
+              }
+            ]
           }
         }
       }

@@ -22,6 +22,7 @@ import {
   resolveLocalhostUrl,
 } from "./local-dev";
 import { incr } from "../observability/counters";
+import { withSpan } from "../observability/tracing";
 import { constants } from "../config";
 import {
   shapeAgentResult,
@@ -118,6 +119,28 @@ function suggestResponse(
 }
 
 export async function solveTask(
+  goal: string,
+  input: Record<string, unknown> | undefined,
+  ctx: SolveTaskContext,
+  responseMode: ResponseMode = "compact"
+) {
+  return withSpan(
+    "mcp.solve_task",
+    {
+      "mcp.goal_chars": goal.trim().length,
+      "mcp.response_mode": String(responseMode),
+    },
+    async (span) => {
+      const result = await solveTaskInner(goal, input, ctx, responseMode);
+      if (result && typeof result === "object" && "status" in result) {
+        span.setAttribute("mcp.result_status", String((result as { status: string }).status));
+      }
+      return result;
+    }
+  );
+}
+
+async function solveTaskInner(
   goal: string,
   input: Record<string, unknown> | undefined,
   ctx: SolveTaskContext,

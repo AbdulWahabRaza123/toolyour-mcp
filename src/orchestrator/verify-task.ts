@@ -19,6 +19,7 @@ import {
   type VerifyNextAction,
 } from "./job-report";
 import type { LoopStop } from "./loop-stop";
+import { withSpan } from "../observability/tracing";
 import {
   attachVerificationEnvelope,
   baselineFromProfileLastRun,
@@ -306,6 +307,39 @@ export interface VerifyTaskResult {
  * Propagates fresh-run terminals (error/partial/suggest/…) instead of always saying verified.
  */
 export async function executeVerifyTask(
+  goal: string,
+  input: Record<string, unknown>,
+  baseline: unknown,
+  ctx: SolveTaskContext,
+  mode: ResponseMode,
+  opts?: { profileId?: string }
+): Promise<VerifyTaskResult> {
+  return withSpan(
+    "mcp.verify_task",
+    {
+      "mcp.goal_chars": goal.trim().length,
+      "mcp.has_baseline": Boolean(baseline),
+      "mcp.profile_id": opts?.profileId || extractProfileId(input) || undefined,
+    },
+    async (span) => {
+      const result = await executeVerifyTaskInner(
+        goal,
+        input,
+        baseline,
+        ctx,
+        mode,
+        opts
+      );
+      span.setAttribute("mcp.verify_status", result.status);
+      if (result.delta?.gate) {
+        span.setAttribute("mcp.verify_gate", result.delta.gate);
+      }
+      return result;
+    }
+  );
+}
+
+async function executeVerifyTaskInner(
   goal: string,
   input: Record<string, unknown>,
   baseline: unknown,
