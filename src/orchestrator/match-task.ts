@@ -172,6 +172,12 @@ function orderedKeywordWordsPresent(goal: string, words: string[]): boolean {
   return nonStopHits >= 2;
 }
 
+/** A→B convert phrases — bag-of-tokens fuzzy would reverse direction. */
+function isDirectionalKeyword(words: string[]): boolean {
+  const lower = words.map((w) => w.toLowerCase());
+  return lower.includes("to") || lower.includes("into") || lower.includes("2");
+}
+
 export function scoreTask(goal: string, task: McpTaskDef): number {
   const g = expandGoalWithSynonyms(goal);
   let score = 0;
@@ -187,27 +193,28 @@ export function scoreTask(goal: string, task: McpTaskDef): number {
     if (g.includes(k)) {
       // Exact phrase / keyword hit — primary signal
       score += k.split(/\s+/).length + 3;
+    } else if (words.length > 1 && orderedKeywordWordsPresent(g, words)) {
+      score += words.length + 1;
+    } else if (isDirectionalKeyword(words)) {
+      // Never bag-of-tokens fuzzy "pdf to word" ↔ "word to pdf" / "document to pdf".
+      continue;
     } else {
-      if (words.length > 1 && orderedKeywordWordsPresent(g, words)) {
-        score += words.length + 1;
-      } else {
-        // Fuzzy token match for typos (e.g. "vitlas" → "vitals")
-        const goalTokens = significantTokens(g);
-        const keyTokens = significantTokens(k);
-        if (keyTokens.length === 0) continue;
-        let fuzzyHits = 0;
-        for (const kt of keyTokens) {
-          if (goalTokens.some((gt) => fuzzyTokenMatch(kt, gt))) fuzzyHits++;
-        }
-        if (fuzzyHits === keyTokens.length) {
-          score += Math.max(2, keyTokens.length + 1);
-        } else if (
-          words.length === 1 &&
-          fuzzyHits > 0 &&
-          fuzzyHits >= Math.ceil(keyTokens.length / 2)
-        ) {
-          score += 1;
-        }
+      // Fuzzy token match for typos (e.g. "vitlas" → "vitals")
+      const goalTokens = significantTokens(g);
+      const keyTokens = significantTokens(k);
+      if (keyTokens.length === 0) continue;
+      let fuzzyHits = 0;
+      for (const kt of keyTokens) {
+        if (goalTokens.some((gt) => fuzzyTokenMatch(kt, gt))) fuzzyHits++;
+      }
+      if (fuzzyHits === keyTokens.length) {
+        score += Math.max(2, keyTokens.length + 1);
+      } else if (
+        words.length === 1 &&
+        fuzzyHits > 0 &&
+        fuzzyHits >= Math.ceil(keyTokens.length / 2)
+      ) {
+        score += 1;
       }
     }
   }
@@ -223,12 +230,22 @@ export function scoreTask(goal: string, task: McpTaskDef): number {
 
   // Payload-first: without a live URL, prefer local/PR tasks over fetch jobs.
   // Only boost local tasks that already matched keywords (avoid joke goals).
+  // Do NOT tank clear live-site goals ("SEO audit this site") — plan_task asks
+  // for https:// via needsLiveUrlClarification instead of declaring out-of-scope.
   const live = explicitLiveUrlIntent(goal);
   const wantsPayload = payloadFirstIntent(goal);
   const requiresUrl = Boolean(task.requiredInput?.includes("url"));
+  const siteish =
+    /\b(site|website|webpage|domain|deployed|staging|production)\b/i.test(goal) ||
+    /\b(this|my|our)\s+(page|url|link)\b/i.test(goal);
   if (!live) {
     if (requiresUrl) {
-      score = Math.max(0, score - 8);
+      if (wantsPayload) {
+        score = Math.max(0, score - 8);
+      } else if (!siteish) {
+        // Mild demotion so ambiguous goals can still lose to strong local matches
+        score = Math.max(0, score - 3);
+      }
     }
     if (
       wantsPayload &&

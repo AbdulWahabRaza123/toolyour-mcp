@@ -9,6 +9,12 @@ import { incr } from "../observability/counters";
 /** Shared across invokes in this process — free backpressure, no paid queue. */
 export const gatewaySemaphore = new Semaphore(constants.gatewayMaxConcurrent);
 
+/** Fail fast when waiters pile up under burst (scale). Override via GATEWAY_ACQUIRE_TIMEOUT_MS. */
+const ACQUIRE_TIMEOUT_MS = Math.max(
+  1_000,
+  Number(process.env.GATEWAY_ACQUIRE_TIMEOUT_MS || 30_000) || 30_000
+);
+
 export interface GatewayInvokeOptions {
   apiKey: string;
   sessionToken?: string;
@@ -90,6 +96,10 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/**
+ * Scale-critical: acquire a slot only for the network attempt, then release
+ * before sleeping on retry — never hold the semaphore during backoff.
+ */
 export async function invokeGatewayRoute(
   route: McpToolRoute,
   opts: GatewayInvokeOptions
@@ -105,20 +115,91 @@ export async function invokeGatewayRoute(
     });
   }
 
-  const release = await gatewaySemaphore.acquire();
-  try {
-    return await invokeGatewayRouteUnlocked(route, opts, env, backend);
-  } finally {
-    release();
+  const maxAttempts = 1 + Math.max(0, constants.gatewayRetryCount);
+  let lastError: unknown;
+  let rateLimitRetries = 0;
+
+  for (let attempt = 1; attempt <= maxAttempts + RATE_LIMIT_RETRIES; attempt++) {
+    if (circuitBreaker.isOpen(backend)) {
+      throw Object.assign(new Error("Backend circuit open"), {
+        code: "circuit_open",
+        retryable: true,
+        retryAfterMs: circuitBreaker.retryAfterMs(backend),
+      });
+    }
+
+    const release = await gatewaySemaphore.acquire(ACQUIRE_TIMEOUT_MS);
+    let retryWaitMs = 0;
+    try {
+      const outcome = await invokeGatewayOnce(route, opts, env, backend, attempt);
+      if (outcome.kind === "result") {
+        return outcome.result;
+      }
+      if (outcome.kind === "rate_limit_retry") {
+        if (rateLimitRetries >= RATE_LIMIT_RETRIES) {
+          incr("invokes");
+          return outcome.result;
+        }
+        rateLimitRetries += 1;
+        retryWaitMs = outcome.waitMs;
+        incr("gatewayRetries");
+        opts.logger.warn("gateway rate limit, retrying", {
+          status: outcome.result.status,
+          waitMs: retryWaitMs,
+          operationId: opts.operationId,
+        });
+      } else if (outcome.kind === "transient_retry") {
+        retryWaitMs = constants.gatewayRetryBackoffMs;
+        incr("gatewayRetries");
+        opts.logger.warn("gateway transient status, retrying", {
+          status: outcome.status,
+          attempt,
+          operationId: opts.operationId,
+        });
+      } else if (outcome.kind === "network_retry") {
+        retryWaitMs = constants.gatewayRetryBackoffMs;
+        lastError = outcome.error;
+        incr("gatewayRetries");
+        opts.logger.warn("gateway network error, retrying", {
+          attempt,
+          error:
+            outcome.error instanceof Error
+              ? outcome.error.message
+              : String(outcome.error),
+          operationId: opts.operationId,
+        });
+      } else {
+        throw outcome.error;
+      }
+    } finally {
+      release();
+    }
+
+    if (retryWaitMs > 0) {
+      await sleep(retryWaitMs);
+      continue;
+    }
   }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("Gateway invoke failed after retries");
 }
 
-async function invokeGatewayRouteUnlocked(
+type OnceOutcome =
+  | { kind: "result"; result: GatewayInvokeResult }
+  | { kind: "rate_limit_retry"; result: GatewayInvokeResult; waitMs: number }
+  | { kind: "transient_retry"; status: number }
+  | { kind: "network_retry"; error: unknown }
+  | { kind: "network_fail"; error: unknown };
+
+async function invokeGatewayOnce(
   route: McpToolRoute,
   opts: GatewayInvokeOptions,
   env: ReturnType<typeof getEnv>,
-  backend: McpToolRoute["backend"]
-): Promise<GatewayInvokeResult> {
+  backend: McpToolRoute["backend"],
+  attempt: number
+): Promise<OnceOutcome> {
   const requestId = opts.requestId || randomUUID();
   const url = new URL(`${env.gatewayUrl}${route.gatewayPath}`);
   if (opts.query) {
@@ -152,96 +233,69 @@ async function invokeGatewayRouteUnlocked(
   }
 
   const maxAttempts = 1 + Math.max(0, constants.gatewayRetryCount);
-  let lastError: unknown;
-  let rateLimitRetries = 0;
+  const controller = new AbortController();
+  const timer = setTimeout(
+    () => controller.abort(),
+    constants.gatewayTimeoutMs
+  );
 
-  for (let attempt = 1; attempt <= maxAttempts + RATE_LIMIT_RETRIES; attempt++) {
-    const controller = new AbortController();
-    const timer = setTimeout(
-      () => controller.abort(),
-      constants.gatewayTimeoutMs
-    );
+  try {
+    const res = await fetch(url.toString(), {
+      method: route.method,
+      headers,
+      body,
+      signal: controller.signal,
+    });
 
-    try {
-      const res = await fetch(url.toString(), {
-        method: route.method,
-        headers,
-        body,
-        signal: controller.signal,
-      });
-
-      const text = await res.text();
-      let data: unknown = text;
-      const ct = res.headers.get("content-type") || "";
-      if (ct.includes("application/json") && text) {
-        try {
-          data = JSON.parse(text);
-        } catch {
-          data = text;
-        }
+    const text = await res.text();
+    let data: unknown = text;
+    const ct = res.headers.get("content-type") || "";
+    if (ct.includes("application/json") && text) {
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = text;
       }
+    }
 
-      if (isRetryableRateLimit(res.status, data, text) && rateLimitRetries < RATE_LIMIT_RETRIES) {
-        rateLimitRetries += 1;
-        const waitMs = rateLimitWaitMs(res.headers, data);
-        incr("gatewayRetries");
-        opts.logger.warn("gateway rate limit, retrying", {
-          status: res.status,
-          waitMs,
-          operationId: opts.operationId,
-        });
-        await sleep(waitMs);
-        continue;
-      }
+    const result: GatewayInvokeResult = {
+      status: res.status,
+      headers: headersToRecord(res.headers),
+      data,
+      text,
+    };
 
-      if (isTransientStatus(res.status) && attempt < maxAttempts) {
-        incr("gatewayRetries");
-        opts.logger.warn("gateway transient status, retrying", {
-          status: res.status,
-          attempt,
-          operationId: opts.operationId,
-        });
-        await sleep(constants.gatewayRetryBackoffMs);
-        continue;
-      }
-
-      if (res.status >= 500) {
-        const opened = circuitBreaker.recordFailure(backend);
-        if (opened) incr("circuitOpens");
-      } else if (res.ok) {
-        circuitBreaker.recordSuccess(backend);
-      }
-
-      incr("invokes");
+    if (isRetryableRateLimit(res.status, data, text)) {
       return {
-        status: res.status,
-        headers: headersToRecord(res.headers),
-        data,
-        text,
+        kind: "rate_limit_retry",
+        result,
+        waitMs: rateLimitWaitMs(res.headers, data),
       };
-    } catch (e) {
-      lastError = e;
-      if (attempt < maxAttempts) {
-        incr("gatewayRetries");
-        opts.logger.warn("gateway network error, retrying", {
-          attempt,
-          error: e instanceof Error ? e.message : String(e),
-          operationId: opts.operationId,
-        });
-        await sleep(constants.gatewayRetryBackoffMs);
-        continue;
-      }
+    }
+
+    if (isTransientStatus(res.status) && attempt < maxAttempts) {
+      return { kind: "transient_retry", status: res.status };
+    }
+
+    if (res.status >= 500) {
       const opened = circuitBreaker.recordFailure(backend);
       if (opened) incr("circuitOpens");
-      throw e;
-    } finally {
-      clearTimeout(timer);
+    } else if (res.ok) {
+      circuitBreaker.recordSuccess(backend);
     }
-  }
 
-  throw lastError instanceof Error
-    ? lastError
-    : new Error("Gateway invoke failed after retries");
+    incr("invokes");
+    return { kind: "result", result };
+  } catch (e) {
+    if (attempt < maxAttempts) {
+      return { kind: "network_retry", error: e };
+    }
+    const opened = circuitBreaker.recordFailure(backend);
+    if (opened) incr("circuitOpens");
+    return { kind: "network_fail", error: e };
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export async function checkGatewayHealth(): Promise<boolean> {

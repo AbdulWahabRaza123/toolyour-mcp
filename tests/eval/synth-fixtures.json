@@ -1861,5 +1861,1510 @@
         }
       }
     }
+  },
+  "accessibility-audit": {
+    "input": {
+      "url": "https://example.com"
+    },
+    "steps": [
+      {
+        "id": "imageAlt",
+        "operationId": "imageAltTextChecker"
+      },
+      {
+        "id": "headings",
+        "operationId": "headingStructureAnalyzer"
+      },
+      {
+        "id": "a11y",
+        "operationId": "accessibilityAuditor"
+      }
+    ],
+    "stepResults": {
+      "imageAlt": {
+        "status": 200,
+        "operationId": "imageAltTextChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "image-alt-text-checker",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Missing alt on hero image"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Missing alt on hero image",
+                "severity": "high",
+                "whyItMatters": "Missing alt on hero image",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "headings": {
+        "status": 200,
+        "operationId": "headingStructureAnalyzer",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "heading-structure-analyzer",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Skipped heading level"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Skipped heading level",
+                "severity": "high",
+                "whyItMatters": "Skipped heading level",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "a11y": {
+        "status": 200,
+        "operationId": "accessibilityAuditor",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "accessibility-auditor",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Low contrast text"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Low contrast text",
+                "severity": "high",
+                "whyItMatters": "Low contrast text",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "website-health-check": {
+    "input": {
+      "url": "https://example.com"
+    },
+    "steps": [
+      {
+        "id": "health",
+        "operationId": "websiteHealthChecker"
+      }
+    ],
+    "stepResults": {
+      "health": {
+        "status": 200,
+        "operationId": "websiteHealthChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "website-health-checker",
+          "url": "https://example.com",
+          "data": {
+            "score": 55
+          },
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "TLS or headers weak"
+              ]
+            },
+            "findings": [
+              {
+                "title": "TLS or headers weak",
+                "severity": "high",
+                "whyItMatters": "TLS or headers weak",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "eeat-signals-audit": {
+    "input": {
+      "url": "https://example.com"
+    },
+    "steps": [
+      {
+        "id": "eeat",
+        "operationId": "eeatSignalsChecker"
+      },
+      {
+        "id": "schema",
+        "operationId": "schemaMarkupValidator"
+      },
+      {
+        "id": "meta",
+        "operationId": "metaTagsAnalyzer"
+      }
+    ],
+    "stepResults": {
+      "eeat": {
+        "status": 200,
+        "operationId": "eeatSignalsChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "eeat-signals-checker",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Author byline missing"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Author byline missing",
+                "severity": "high",
+                "whyItMatters": "Author byline missing",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "schema": {
+        "status": 200,
+        "operationId": "schemaMarkupValidator",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "schema-markup-validator",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Person schema missing"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Person schema missing",
+                "severity": "high",
+                "whyItMatters": "Person schema missing",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "meta": {
+        "status": 200,
+        "operationId": "metaTagsAnalyzer",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "meta-tags-analyzer",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Publisher meta thin"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Publisher meta thin",
+                "severity": "high",
+                "whyItMatters": "Publisher meta thin",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "local-seo-audit": {
+    "input": {
+      "url": "https://example.com"
+    },
+    "steps": [
+      {
+        "id": "local",
+        "operationId": "localSeoAuditor"
+      },
+      {
+        "id": "schema",
+        "operationId": "schemaMarkupValidator"
+      }
+    ],
+    "stepResults": {
+      "local": {
+        "status": 200,
+        "operationId": "localSeoAuditor",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "local-seo-auditor",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "NAP inconsistent"
+              ]
+            },
+            "findings": [
+              {
+                "title": "NAP inconsistent",
+                "severity": "high",
+                "whyItMatters": "NAP inconsistent",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "schema": {
+        "status": 200,
+        "operationId": "schemaMarkupValidator",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "schema-markup-validator",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "LocalBusiness schema incomplete"
+              ]
+            },
+            "findings": [
+              {
+                "title": "LocalBusiness schema incomplete",
+                "severity": "high",
+                "whyItMatters": "LocalBusiness schema incomplete",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "mcp-discovery-audit": {
+    "input": {
+      "url": "https://example.com"
+    },
+    "steps": [
+      {
+        "id": "discovery",
+        "operationId": "mcpDiscoveryChecker"
+      },
+      {
+        "id": "geo",
+        "operationId": "geoSeoAuditor"
+      }
+    ],
+    "stepResults": {
+      "discovery": {
+        "status": 200,
+        "operationId": "mcpDiscoveryChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "mcp-discovery-checker",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Missing well-known MCP discovery"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Missing well-known MCP discovery",
+                "severity": "high",
+                "whyItMatters": "Missing well-known MCP discovery",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "geo": {
+        "status": 200,
+        "operationId": "geoSeoAuditor",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "geo-seo-auditor",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "llms.txt missing"
+              ]
+            },
+            "findings": [
+              {
+                "title": "llms.txt missing",
+                "severity": "high",
+                "whyItMatters": "llms.txt missing",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "soft-404-audit": {
+    "input": {
+      "url": "https://example.com/gone"
+    },
+    "steps": [
+      {
+        "id": "soft404",
+        "operationId": "soft404Checker"
+      },
+      {
+        "id": "http",
+        "operationId": "httpStatusChecker"
+      }
+    ],
+    "stepResults": {
+      "soft404": {
+        "status": 200,
+        "operationId": "soft404Checker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "soft-404-checker",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Soft 404 content on 200"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Soft 404 content on 200",
+                "severity": "high",
+                "whyItMatters": "Soft 404 content on 200",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "http": {
+        "status": 200,
+        "operationId": "httpStatusChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "http-status-checker",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Status 200 for empty page"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Status 200 for empty page",
+                "severity": "high",
+                "whyItMatters": "Status 200 for empty page",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "pagination-seo-audit": {
+    "input": {
+      "url": "https://example.com/blog?page=2"
+    },
+    "steps": [
+      {
+        "id": "pagination",
+        "operationId": "paginationSeoChecker"
+      },
+      {
+        "id": "canonical",
+        "operationId": "canonicalUrlChecker"
+      }
+    ],
+    "stepResults": {
+      "pagination": {
+        "status": 200,
+        "operationId": "paginationSeoChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "pagination-seo-checker",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Missing rel next/prev"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Missing rel next/prev",
+                "severity": "high",
+                "whyItMatters": "Missing rel next/prev",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "canonical": {
+        "status": 200,
+        "operationId": "canonicalUrlChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "canonical-url-checker",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Canonical collapses all pages"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Canonical collapses all pages",
+                "severity": "high",
+                "whyItMatters": "Canonical collapses all pages",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "site-icons-audit": {
+    "input": {
+      "url": "https://example.com"
+    },
+    "steps": [
+      {
+        "id": "icons",
+        "operationId": "siteIconsChecker"
+      }
+    ],
+    "stepResults": {
+      "icons": {
+        "status": 200,
+        "operationId": "siteIconsChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "site-icons-checker",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Favicon 404"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Favicon 404",
+                "severity": "high",
+                "whyItMatters": "Favicon 404",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "site-agent-readiness": {
+    "input": {
+      "url": "https://example.com"
+    },
+    "steps": [
+      {
+        "id": "geo",
+        "operationId": "geoSeoAuditor"
+      },
+      {
+        "id": "aiSeo",
+        "operationId": "aiSeoChecker"
+      },
+      {
+        "id": "homepageAio",
+        "operationId": "aiOverviewReadinessChecker"
+      }
+    ],
+    "stepResults": {
+      "geo": {
+        "status": 200,
+        "operationId": "geoSeoAuditor",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "geo-seo-auditor",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "robots blocks AI bots"
+              ]
+            },
+            "findings": [
+              {
+                "title": "robots blocks AI bots",
+                "severity": "high",
+                "whyItMatters": "robots blocks AI bots",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "aiSeo": {
+        "status": 200,
+        "operationId": "aiSeoChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "ai-seo-checker",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Thin entity markup"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Thin entity markup",
+                "severity": "high",
+                "whyItMatters": "Thin entity markup",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "homepageAio": {
+        "status": 200,
+        "operationId": "aiOverviewReadinessChecker",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "ai-overview-readiness-checker",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Homepage lacks answer blocks"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Homepage lacks answer blocks",
+                "severity": "high",
+                "whyItMatters": "Homepage lacks answer blocks",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "campaign-tracking": {
+    "input": {
+      "url": "https://example.com",
+      "utm_source": "newsletter",
+      "utm_medium": "email",
+      "utm_campaign": "launch"
+    },
+    "steps": [
+      {
+        "id": "utm",
+        "operationId": "utmBuilder"
+      },
+      {
+        "id": "adsUtm",
+        "operationId": "adsUtmBuilder"
+      },
+      {
+        "id": "parse",
+        "operationId": "utmParser"
+      }
+    ],
+    "stepResults": {
+      "utm": {
+        "status": 200,
+        "operationId": "utmBuilder",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "utm-builder",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Missing utm_campaign"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Missing utm_campaign",
+                "severity": "high",
+                "whyItMatters": "Missing utm_campaign",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "adsUtm": {
+        "status": 200,
+        "operationId": "adsUtmBuilder",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "ads-utm-builder",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Macro not expanded in preview"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Macro not expanded in preview",
+                "severity": "high",
+                "whyItMatters": "Macro not expanded in preview",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "parse": {
+        "status": 200,
+        "operationId": "utmParser",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "utm-parser",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Invalid UTM charset"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Invalid UTM charset",
+                "severity": "high",
+                "whyItMatters": "Invalid UTM charset",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "paid-ads-copy-gate": {
+    "input": {
+      "platform": "google-rsa",
+      "headlines": [
+        "Too long"
+      ],
+      "descriptions": [
+        "Short"
+      ]
+    },
+    "steps": [
+      {
+        "id": "counter",
+        "operationId": "adsCopyCounter"
+      },
+      {
+        "id": "rsa",
+        "operationId": "googleAdsRsaPreview"
+      }
+    ],
+    "stepResults": {
+      "counter": {
+        "status": 200,
+        "operationId": "adsCopyCounter",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "ads-copy-counter",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Headline over character limit"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Headline over character limit",
+                "severity": "high",
+                "whyItMatters": "Headline over character limit",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "rsa": {
+        "status": 200,
+        "operationId": "googleAdsRsaPreview",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "google-ads-rsa-preview",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Too few unique headlines"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Too few unique headlines",
+                "severity": "high",
+                "whyItMatters": "Too few unique headlines",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "growth-unit-economics": {
+    "input": {
+      "spend": 1000,
+      "revenue": 2500,
+      "clicks": 400,
+      "impressions": 20000,
+      "conversions": 50
+    },
+    "steps": [
+      {
+        "id": "roas",
+        "operationId": "roasCalculator"
+      },
+      {
+        "id": "cpc",
+        "operationId": "cpcCalculator"
+      },
+      {
+        "id": "ctr",
+        "operationId": "ctrCalculator"
+      }
+    ],
+    "stepResults": {
+      "roas": {
+        "status": 200,
+        "operationId": "roasCalculator",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "roas-calculator",
+          "url": "https://example.com",
+          "data": {
+            "roas": 2.5
+          },
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "ROAS below target"
+              ]
+            },
+            "findings": [
+              {
+                "title": "ROAS below target",
+                "severity": "high",
+                "whyItMatters": "ROAS below target",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "cpc": {
+        "status": 200,
+        "operationId": "cpcCalculator",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "cpc-calculator",
+          "url": "https://example.com",
+          "data": {
+            "cpc": 2.5
+          },
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "CPC elevated"
+              ]
+            },
+            "findings": [
+              {
+                "title": "CPC elevated",
+                "severity": "high",
+                "whyItMatters": "CPC elevated",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "ctr": {
+        "status": 200,
+        "operationId": "ctrCalculator",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "ctr-calculator",
+          "url": "https://example.com",
+          "data": {
+            "ctr": 2
+          },
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "CTR soft"
+              ]
+            },
+            "findings": [
+              {
+                "title": "CTR soft",
+                "severity": "high",
+                "whyItMatters": "CTR soft",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "landing-conversion-check": {
+    "input": {
+      "url": "https://example.com/pricing"
+    },
+    "steps": [
+      {
+        "id": "cta",
+        "operationId": "landingPageCtaFinder"
+      },
+      {
+        "id": "forms",
+        "operationId": "formFieldInventory"
+      },
+      {
+        "id": "tags",
+        "operationId": "marketingTagExtractor"
+      }
+    ],
+    "stepResults": {
+      "cta": {
+        "status": 200,
+        "operationId": "landingPageCtaFinder",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "landing-page-cta-finder",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Primary CTA unclear"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Primary CTA unclear",
+                "severity": "high",
+                "whyItMatters": "Primary CTA unclear",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "forms": {
+        "status": 200,
+        "operationId": "formFieldInventory",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "form-field-inventory",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Form asks for too many fields"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Form asks for too many fields",
+                "severity": "high",
+                "whyItMatters": "Form asks for too many fields",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "tags": {
+        "status": 200,
+        "operationId": "marketingTagExtractor",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "marketing-tag-extractor",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "No conversion pixel found"
+              ]
+            },
+            "findings": [
+              {
+                "title": "No conversion pixel found",
+                "severity": "high",
+                "whyItMatters": "No conversion pixel found",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "email-campaign-qa": {
+    "input": {
+      "subject": "!!!",
+      "preheader": "",
+      "bodyHtml": "<p>hi</p>"
+    },
+    "steps": [
+      {
+        "id": "subject",
+        "operationId": "emailSubjectLineTester"
+      },
+      {
+        "id": "spam",
+        "operationId": "emailSpamScore"
+      }
+    ],
+    "stepResults": {
+      "subject": {
+        "status": 200,
+        "operationId": "emailSubjectLineTester",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "email-subject-line-tester",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Subject looks spammy"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Subject looks spammy",
+                "severity": "high",
+                "whyItMatters": "Subject looks spammy",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "spam": {
+        "status": 200,
+        "operationId": "emailSpamScore",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "email-spam-score",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "HTTP links in email"
+              ]
+            },
+            "findings": [
+              {
+                "title": "HTTP links in email",
+                "severity": "high",
+                "whyItMatters": "HTTP links in email",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "dev-json-pipeline": {
+    "input": {
+      "json": "{ bad"
+    },
+    "steps": [
+      {
+        "id": "validate",
+        "operationId": "jsonValidator"
+      },
+      {
+        "id": "format",
+        "operationId": "jsonFormatter"
+      },
+      {
+        "id": "zod",
+        "operationId": "jsonToZod"
+      }
+    ],
+    "stepResults": {
+      "validate": {
+        "status": 200,
+        "operationId": "jsonValidator",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "json-validator",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Invalid JSON"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Invalid JSON",
+                "severity": "high",
+                "whyItMatters": "Invalid JSON",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "status": 200,
+        "operationId": "jsonFormatter",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "json-formatter",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Cannot format invalid JSON"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Cannot format invalid JSON",
+                "severity": "high",
+                "whyItMatters": "Cannot format invalid JSON",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "zod": {
+        "status": 200,
+        "operationId": "jsonToZod",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "json-to-zod",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Schema inference skipped"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Schema inference skipped",
+                "severity": "high",
+                "whyItMatters": "Schema inference skipped",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "dev-auth-debug": {
+    "input": {
+      "claims": {
+        "sub": "user-1"
+      }
+    },
+    "steps": [
+      {
+        "id": "generate",
+        "operationId": "jwtGenerator"
+      },
+      {
+        "id": "decode",
+        "operationId": "jwtDecoder"
+      }
+    ],
+    "stepResults": {
+      "generate": {
+        "status": 200,
+        "operationId": "jwtGenerator",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "jwt-generator",
+          "url": "https://example.com",
+          "data": {
+            "token": "aaa.bbb.ccc"
+          },
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "Unsigned test token"
+              ]
+            },
+            "findings": [
+              {
+                "title": "Unsigned test token",
+                "severity": "high",
+                "whyItMatters": "Unsigned test token",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "decode": {
+        "status": 200,
+        "operationId": "jwtDecoder",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "jwt-decoder",
+          "url": "https://example.com",
+          "data": {
+            "warnings": [
+              "alg none"
+            ]
+          },
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "alg none warning"
+              ]
+            },
+            "findings": [
+              {
+                "title": "alg none warning",
+                "severity": "high",
+                "whyItMatters": "alg none warning",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "dev-format-transform": {
+    "input": {
+      "yaml": "a: 1",
+      "xml": "<root/>"
+    },
+    "steps": [
+      {
+        "id": "yaml",
+        "operationId": "yamlToJson"
+      },
+      {
+        "id": "json",
+        "operationId": "jsonFormatter"
+      },
+      {
+        "id": "xml",
+        "operationId": "xmlFormatter"
+      }
+    ],
+    "stepResults": {
+      "yaml": {
+        "status": 200,
+        "operationId": "yamlToJson",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "yaml-to-json",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "YAML parse warning"
+              ]
+            },
+            "findings": [
+              {
+                "title": "YAML parse warning",
+                "severity": "high",
+                "whyItMatters": "YAML parse warning",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "json": {
+        "status": 200,
+        "operationId": "jsonFormatter",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "json-formatter",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "JSON format ok"
+              ]
+            },
+            "findings": [
+              {
+                "title": "JSON format ok",
+                "severity": "high",
+                "whyItMatters": "JSON format ok",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "xml": {
+        "status": 200,
+        "operationId": "xmlFormatter",
+        "data": {
+          "schemaVersion": "toolyour.toolResult@1",
+          "toolId": "xml-formatter",
+          "url": "https://example.com",
+          "data": {},
+          "report": {
+            "summary": {
+              "totalScore": 40,
+              "grade": "F",
+              "topPriorities": [
+                "XML not well-formed"
+              ]
+            },
+            "findings": [
+              {
+                "title": "XML not well-formed",
+                "severity": "high",
+                "whyItMatters": "XML not well-formed",
+                "howToFix": [
+                  "Apply the documented fix"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
   }
 }

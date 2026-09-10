@@ -229,17 +229,21 @@ async function runWorkflowInner(
         res.text
       );
       stepResults[step.id] = shaped;
-      completedSteps.push(step.id);
-      lastOutput = shaped;
 
       if (res.status < 200 || res.status >= 300) {
         if (step.continueOnError) {
+          // Soft-fail: keep prior lastOutput so the next step is not poisoned.
           stepErrors[step.id] = shaped;
           continue;
         }
+        completedSteps.push(step.id);
+        lastOutput = shaped;
         hardFail = { failedStep: step.id, error: shaped };
         break;
       }
+
+      completedSteps.push(step.id);
+      lastOutput = shaped;
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       if (

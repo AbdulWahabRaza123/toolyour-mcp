@@ -32,8 +32,8 @@ $pk = (Get-Content .\.tools\dns-auth\private.hex -Raw).Trim()
 
 | Channel | Action | Status |
 |---------|--------|--------|
-| PulseMCP | Auto-ingest (~days). Expedite: send [`docs/PULSEMCP-EXPEDITE-EMAIL.md`](./PULSEMCP-EXPEDITE-EMAIL.md) to hello@pulsemcp.com | [ ] email |
-| Smithery | Sign in → https://smithery.ai/servers/new (or claim when crawled) | [ ] manual login |
+| PulseMCP | Auto-ingest (~days). Expedite emailed 2026-09-07 to hello@pulsemcp.com | [x] email sent |
+| Smithery | Sign in → https://smithery.ai/servers/new (or claim when crawled) | [x] live: https://smithery.ai/servers/abdulwahabraza0000/toolyour-mcp-server |
 | Glama | Wait for crawl / claim via GitHub when listed | [ ] wait |
 
 ---
@@ -66,8 +66,8 @@ Docs: https://www.toolyour.com/developers/mcp
 | Channel | Target URL | Status | Notes |
 |---------|------------|--------|-------|
 | **Official MCP Registry** | `com.toolyour/mcp` | [x] | v1.0.1 published 2026-09-07 |
-| PulseMCP | auto from registry | [ ] | Send expedite email |
-| Smithery | `/developers/mcp` | [ ] | Login required at smithery.ai/servers/new |
+| PulseMCP | auto from registry | [x] | Expedite email sent 2026-09-07 |
+| Smithery | `/developers/mcp` | [x] | https://smithery.ai/servers/abdulwahabraza0000/toolyour-mcp-server |
 | Glama | `/developers/mcp` | [ ] | Wait / claim |
 | GitHub README / awesome-mcp lists | `/developers/mcp` | [ ] | Optional PR |
 | Product Hunt / Indie Hackers | `/` or `/developers/mcp` | [ ] | Lead with MCP |
