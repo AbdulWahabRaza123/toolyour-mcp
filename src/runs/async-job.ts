@@ -41,6 +41,8 @@ export async function acceptAsyncJob(opts: {
   kind: StoredRun["kind"];
   apiKey: string;
   logger: Logger;
+  /** Reuse the canonical execution run id so async polling and result identity agree. */
+  runId?: string;
   work: () => Promise<unknown>;
 }): Promise<AsyncAcceptResponse> {
   const session = await validateApiKey(opts.apiKey, "", "node", opts.logger);
@@ -49,6 +51,7 @@ export async function acceptAsyncJob(opts: {
     userId: session.userId,
     apiKeyId: session.apiKeyId,
     kind: opts.kind,
+    id: opts.runId,
   });
 
   void (async () => {

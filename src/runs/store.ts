@@ -64,6 +64,8 @@ class RunStore {
     userId: string;
     apiKeyId: string;
     kind: StoredRun["kind"];
+    /** Optional caller-owned correlation id from the canonical execution context. */
+    id?: string;
   }): Promise<StoredRun> {
     this.sweep();
     while (
@@ -78,7 +80,7 @@ class RunStore {
 
     const now = Date.now();
     const entry: StoredRun = {
-      id: randomUUID(),
+      id: partial.id || randomUUID(),
       userId: partial.userId,
       apiKeyId: partial.apiKeyId,
       kind: partial.kind,

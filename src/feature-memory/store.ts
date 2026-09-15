@@ -3,6 +3,10 @@ import type { Logger } from "../observability/logger";
 
 export type FeatureMemoryRecord = {
   schemaVersion: "toolyour.featureMemory@1";
+  memoryType?: "feature" | "verification" | "workflow" | "project";
+  sourceRunId?: string;
+  intentId?: string;
+  idempotencyKey?: string;
   featureId: string;
   domain: string;
   title: string;
@@ -99,6 +103,7 @@ export async function matchFeatures(opts: {
   domain?: string;
   limit?: number;
   includeCommunity?: boolean;
+  memoryType?: FeatureMemoryRecord["memoryType"];
 }): Promise<{
   domain: string;
   matches: FeatureMemoryRecord[];
@@ -113,6 +118,7 @@ export async function matchFeatures(opts: {
     domain: opts.domain,
     limit: opts.limit,
     includeCommunity: opts.includeCommunity,
+    memoryType: opts.memoryType,
   });
   if (!res.ok) {
     throw new FeatureMemoryStoreError("unavailable", `feature match failed (${res.status})`);
@@ -160,6 +166,10 @@ export async function createFeature(opts: {
   event?: string;
   supersedesFeatureId?: string;
   logger?: Logger;
+  memoryType?: FeatureMemoryRecord["memoryType"];
+  sourceRunId?: string;
+  intentId?: string;
+  idempotencyKey?: string;
 }): Promise<{ feature: FeatureMemoryRecord; superseded?: FeatureMemoryRecord | null }> {
   const res = await internalFetch("POST", "", { ...opts });
   if (!res.ok) {
@@ -185,6 +195,10 @@ export async function updateFeature(opts: {
   outcomesSummary?: string;
   verificationGate?: string;
   event?: string;
+  memoryType?: FeatureMemoryRecord["memoryType"];
+  sourceRunId?: string;
+  intentId?: string;
+  idempotencyKey?: string;
   logger?: Logger;
 }): Promise<FeatureMemoryRecord | null> {
   const { featureId, logger, ...body } = opts;

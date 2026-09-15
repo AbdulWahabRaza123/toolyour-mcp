@@ -13,6 +13,7 @@ import {
   buildFeatureMemoryReminder,
   enrichWithFeatureMemory,
   shouldAutoRecordCompletedFeature,
+  classifyMemoryType,
 } from "../../dist/orchestrator/feature-memory-loop.js";
 
 describe("evaluation matrix", () => {
@@ -69,20 +70,25 @@ describe("feature domain", () => {
 });
 
 describe("feature memory record keeping", () => {
+  it("classifies memory by purpose", () => {
+    assert.equal(classifyMemoryType("verify production ship gate"), "verification");
+    assert.equal(classifyMemoryType("run the release workflow"), "workflow");
+    assert.equal(classifyMemoryType("build invoice OCR"), "feature");
+  });
   it("exposes system-first auto-record policy", () => {
     assert.equal(FEATURE_MEMORY_RECORD_KEEPING.policy, "toolyour_auto_record");
     assert.match(FEATURE_MEMORY_RECORD_KEEPING.message, /institutional memory/i);
     assert.ok(FEATURE_MEMORY_RECORD_KEEPING.autoCaptureOn.includes("verify_task_gate_pass"));
   });
 
-  it("auto-records on gate pass unless opted out or one-shot", () => {
+  it("auto-records feature builds; skips audits unless opted in", () => {
     assert.equal(
       shouldAutoRecordCompletedFeature({
         goal: "ship gate for https://example.com",
         payload: { loop: { initiate: true, gate: "pass" } },
         gate: "pass",
       }),
-      true
+      false
     );
     assert.equal(
       shouldAutoRecordCompletedFeature({
@@ -105,6 +111,15 @@ describe("feature memory record keeping", () => {
       shouldAutoRecordCompletedFeature({
         goal: "build OCR for invoices",
         input: { featureTitle: "Invoice OCR" },
+        payload: { loop: { initiate: false, gate: "pass" } },
+        gate: "pass",
+      }),
+      true
+    );
+    assert.equal(
+      shouldAutoRecordCompletedFeature({
+        goal: "ship gate for https://example.com",
+        input: { featureTitle: "Production ship baseline" },
         payload: { loop: { initiate: false, gate: "pass" } },
         gate: "pass",
       }),

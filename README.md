@@ -39,6 +39,14 @@ ToolYour does **not** replace Cursor/Claude. The host keeps editor, git, and ter
 3. Apply **only** rank-1 `loop.nextActions` in the workspace
 4. `verify_task` with prior result as baseline until `loop.gate` is `pass` (or stop)
 
+Skill-loop responses also include an additive `execution` envelope (`runId`, `intentId`,
+`intentType`, `idempotencyKey`, and `projectScope`). Preserve it when handing a result to
+another MCP tool. Async jobs reuse `execution.runId` as the `get_run` polling id.
+
+Internally, `plan_task`, `solve_task`, `run_playbook`, `run_workflow`, and `verify_task` use
+one `executeIntent` lifecycle boundary. This keeps correlation, logging, and future billing
+settlement consistent while preserving the public MCP tool contract.
+
 ## Offline evals (no API key)
 
 ```bash

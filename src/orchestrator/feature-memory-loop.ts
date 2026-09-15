@@ -33,6 +33,7 @@ export type FeatureMemoryRecordKeeping = {
 export type FeatureMemoryEnvelope = {
   schemaVersion: "toolyour.featureMemory@1";
   domain: string;
+  memoryType?: "feature" | "verification" | "workflow" | "project";
   recordKeeping: FeatureMemoryRecordKeeping;
   reminder?: string;
   matchConfidence?: "high" | "medium" | "low" | "none";
@@ -48,7 +49,7 @@ export type FeatureMemoryEnvelope = {
 export const FEATURE_MEMORY_RECORD_KEEPING: FeatureMemoryRecordKeeping = {
   policy: "toolyour_auto_record",
   message:
-    "ToolYour is your cross-project institutional memory. Every completed feature is recorded automatically when the harness reaches loop.gate=pass (requirements + evaluation matrix). Read plan_task.featureMemory before rebuilding similar work. Opt out only with input.featureMemory.capture=false.",
+    "ToolYour is your cross-project institutional memory. Completed feature builds are recorded automatically on loop.gate=pass (requirements + evaluation matrix). Audits and ship-gates are classified separately and only stored when you opt in (featureTitle / featureMemory.capture=true). Read plan_task.featureMemory before rebuilding similar work. Opt out with input.featureMemory.capture=false.",
   autoCaptureOn: ["verify_task_gate_pass", "run_playbook_gate_pass", "solve_task_gate_pass"],
   optOutField: "input.featureMemory.capture=false",
   manualRefineTool: "capture_feature",
@@ -56,7 +57,7 @@ export const FEATURE_MEMORY_RECORD_KEEPING: FeatureMemoryRecordKeeping = {
 };
 
 export const FEATURE_MEMORY_GOLDEN_PATH = [
-  "ToolYour auto-records every completed feature on loop.gate=pass — you do not own persistence",
+  "ToolYour auto-records completed feature builds on loop.gate=pass — you do not own persistence",
   "Before similar work → plan_task reads featureMemory.reminder + priorInstances (hybrid_embedding)",
   "After host fixes → verify_task until pass so ToolYour captures the feature record",
   "Manual refine only → capture_feature to adjust title/requirements or supersedeFeatureId",
@@ -83,12 +84,14 @@ export async function matchFeatureMemoryForGoal(opts: {
     const session = await resolveFeatureMemorySession(opts.apiKey, opts.logger);
     const requirements = extractFeatureRequirements(opts.goal, opts.input);
     const domain = detectFeatureDomain(opts.goal, requirements);
+    const memoryType = classifyMemoryType(opts.goal);
     return await matchFeatures({
       userId: session.userId,
       goal: opts.goal,
       requirements,
       domain,
       limit: 5,
+      memoryType,
     });
   } catch (e) {
     opts.logger.warn("feature memory match skipped", {
@@ -109,10 +112,18 @@ export function buildFeatureMemoryReminder(opts: {
   const project = top.projectName ? ` in ${top.projectName}` : "";
   const score = top.compositeScore ? ` (composite ${top.compositeScore})` : "";
   return (
-    `You already built a similar ${opts.domain} feature${project}: "${top.title}"${score}. ` +
-    `Read featureMemory.bestKnown / priorInstances before re-implementing. ` +
+    `ToolYour found similar ${opts.domain} work${project}: "${top.title}"${score}. ` +
+    `Read the matching memory type's bestKnown / priorInstances before repeating it. ` +
     `ToolYour auto-records new completions on verify_task gate pass.`
   );
+}
+
+export function classifyMemoryType(goal: string): "feature" | "verification" | "workflow" {
+  if (/\b(audit|verify|validate|regression|ship[- ]gate|security check|readiness)\b/i.test(goal)) {
+    return "verification";
+  }
+  if (/\b(workflow|pipeline|playbook|process|automation)\b/i.test(goal)) return "workflow";
+  return "feature";
 }
 
 export function attachFeatureMemoryEnvelope(
@@ -138,11 +149,13 @@ export async function enrichWithFeatureMemory(
 ): Promise<void> {
   const requirements = extractFeatureRequirements(opts.goal, opts.input);
   const inferredDomain = detectFeatureDomain(opts.goal, requirements);
+  const inferredMemoryType = classifyMemoryType(opts.goal);
 
   const attachBaseline = () => {
     attachFeatureMemoryEnvelope(root, {
       schemaVersion: "toolyour.featureMemory@1",
       domain: inferredDomain,
+      memoryType: inferredMemoryType,
       recordKeeping: FEATURE_MEMORY_RECORD_KEEPING,
       goldenPath: FEATURE_MEMORY_GOLDEN_PATH,
       reminder: FEATURE_MEMORY_RECORD_KEEPING.message,
@@ -159,6 +172,7 @@ export async function enrichWithFeatureMemory(
       attachFeatureMemoryEnvelope(root, {
         schemaVersion: "toolyour.featureMemory@1",
         domain: matched?.domain || inferredDomain,
+        memoryType: inferredMemoryType,
         recordKeeping: FEATURE_MEMORY_RECORD_KEEPING,
         goldenPath: FEATURE_MEMORY_GOLDEN_PATH,
         reminder: FEATURE_MEMORY_RECORD_KEEPING.message,
@@ -177,6 +191,7 @@ export async function enrichWithFeatureMemory(
     const envelope: FeatureMemoryEnvelope = {
       schemaVersion: "toolyour.featureMemory@1",
       domain: matched.domain,
+      memoryType: inferredMemoryType,
       recordKeeping: FEATURE_MEMORY_RECORD_KEEPING,
       matchConfidence,
       matchMethod: matched.matchMethod,
@@ -208,6 +223,13 @@ function isFeatureBuildGoal(goal: string): boolean {
   );
 }
 
+function executionString(payload: Record<string, unknown>, key: string): string | undefined {
+  const execution = payload.execution;
+  if (!execution || typeof execution !== "object" || Array.isArray(execution)) return undefined;
+  const value = (execution as Record<string, unknown>)[key];
+  return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
 export function shouldAutoRecordCompletedFeature(opts: {
   goal: string;
   input?: Record<string, unknown>;
@@ -225,11 +247,25 @@ export function shouldAutoRecordCompletedFeature(opts: {
     return false;
   }
 
+  const explicitCapture =
+    typeof fm === "object" &&
+    fm !== null &&
+    (fm as { capture?: boolean }).capture === true;
+  const hasExplicitFeatureInput =
+    typeof opts.input?.featureTitle === "string" ||
+    typeof opts.input?.requirements === "string" ||
+    typeof opts.input?.featureRequirements === "string" ||
+    explicitCapture;
+
+  // Phase 4: audits / ship-gates / playbooks are not Feature Memory by default.
+  // They may still be stored as verification/workflow when the host opts in.
+  if (classifyMemoryType(opts.goal) !== "feature") {
+    return hasExplicitFeatureInput;
+  }
+
   const loop = opts.payload.loop as { initiate?: boolean } | undefined;
   if (loop?.initiate === false) {
-    if (typeof opts.input?.featureTitle === "string") return true;
-    if (typeof opts.input?.requirements === "string") return true;
-    if (typeof opts.input?.featureRequirements === "string") return true;
+    if (hasExplicitFeatureInput) return true;
     return isFeatureBuildGoal(opts.goal);
   }
 
@@ -263,6 +299,14 @@ export async function autoRecordCompletedFeature(opts: {
     typeof opts.input?.featureTitle === "string"
       ? opts.input.featureTitle
       : opts.goal.slice(0, 120);
+  const report = extractJobReport(opts.payload);
+  const sourceRunId =
+    executionString(opts.payload, "runId") ||
+    (report && typeof report.jobId === "string" ? report.jobId : undefined);
+  const intentId = executionString(opts.payload, "intentId");
+  const idempotencyKey =
+    executionString(opts.payload, "idempotencyKey") ||
+    (sourceRunId ? `capture:${sourceRunId}` : undefined);
   try {
     const captured = await captureFeatureMemory({
       apiKey: opts.apiKey,
@@ -278,6 +322,10 @@ export async function autoRecordCompletedFeature(opts: {
             ? (fm as { supersedesFeatureId: string }).supersedesFeatureId
             : undefined,
       event: opts.phase === "verify" ? "verified" : "completed",
+      memoryType: classifyMemoryType(opts.goal),
+      sourceRunId,
+      intentId,
+      idempotencyKey,
     });
     const feature = captured.feature as FeatureMemoryRecord | undefined;
     if (feature?.featureId) {
@@ -325,6 +373,10 @@ export async function captureFeatureMemory(opts: {
   capabilities?: FeatureMemoryRecord["capabilities"];
   outcomesSummary?: string;
   event?: string;
+  memoryType?: "feature" | "verification" | "workflow" | "project";
+  sourceRunId?: string;
+  intentId?: string;
+  idempotencyKey?: string;
 }): Promise<Record<string, unknown>> {
   const session = await resolveFeatureMemorySession(opts.apiKey, opts.logger);
   const requirements =
@@ -357,6 +409,10 @@ export async function captureFeatureMemory(opts: {
       verificationGate: verificationGate as string | undefined,
       event: opts.event || "refined",
       logger: opts.logger,
+      memoryType: opts.memoryType,
+      sourceRunId: opts.sourceRunId,
+      intentId: opts.intentId,
+      idempotencyKey: opts.idempotencyKey,
     });
     if (!updated) {
       return {
@@ -393,6 +449,10 @@ export async function captureFeatureMemory(opts: {
     event: opts.event || (gate === "pass" ? "verified" : "completed"),
     supersedesFeatureId: opts.supersedesFeatureId,
     logger: opts.logger,
+    memoryType: opts.memoryType,
+    sourceRunId: opts.sourceRunId,
+    intentId: opts.intentId,
+    idempotencyKey: opts.idempotencyKey,
   });
 
   let matrixComparison;

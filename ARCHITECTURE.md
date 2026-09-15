@@ -12,6 +12,39 @@ How AI agents (Cursor, Claude Desktop, custom clients) communicate with ToolYour
 
 ## 1. High-level system view
 
+ToolYour has two distinct execution loops:
+
+1. The skill loop: plan → run → host applies the recommended action → verify.
+2. The control-plane loop: start a bounded host job → poll the frozen job until completion.
+
+They must not be mixed. The skill loop carries a canonical execution identity (`runId`,
+`intentId`, `projectScope`, and `idempotencyKey`) in the additive `execution` response
+envelope. This identity is the join key for billing settlement, verification baselines, and
+memory records. Existing MCP tools remain compatible.
+
+The target product architecture is an Agent Reliability Layer rather than a generic memory
+store:
+
+```text
+MCP transport → auth/rate limits → Intent Gateway
+  → Orchestrator Facade
+      → Context Recall → Workflow Runner → Host Action Contract
+      → Verification Engine → Evidence Builder → Billing + Memory Writer
+  → runs / evidence / project scopes / verification profiles / workflow memory
+```
+
+Memory is separated by purpose: project context, verification baselines, successful
+workflows, and feature implementations. The current Feature Memory endpoint now carries a
+purpose-aware `memoryType` (`feature`, `verification`, or `workflow`) and filters recall by
+that type. Feature Memory is one category inside this system. Captures also carry source run
+and idempotency metadata so retries return the existing record instead of duplicating it.
+
+All skill-loop execution passes through the internal `executeIntent` facade. It is the
+single lifecycle boundary for correlation logging and execution envelopes today, and is the
+extension point for centralized credit reservation/settlement, durable evidence, and audit
+events. `invoke_tool` remains an advanced one-shot compatibility path and is intentionally
+not part of the plan → run → verify loop.
+
 ```text
   ┌──────────────┐
   │  AI Agent    │  Cursor / Claude / custom MCP client

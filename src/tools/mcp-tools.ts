@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { randomUUID } from "crypto";
-import { MCP_ERROR_CODES } from "../contracts";
+import { MCP_ERROR_CODES, createRunContext } from "../contracts";
 import { formatCaughtError } from "../contracts/agent-error";
 import { constants } from "../config";
 import { RegistryLoader, searchTools } from "../registry/loader";
@@ -37,6 +37,7 @@ import {
   buildLocalhostNeedInput,
   resolveLocalhostUrl,
 } from "../orchestrator/local-dev";
+import { executeIntent } from "../orchestrator/execute-intent";
 
 export interface McpServerContext {
   apiKey: string;
@@ -107,8 +108,14 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
     async (args) => {
       const goal = String(args.goal || "");
       const input = (args.input || {}) as Record<string, unknown>;
-      const plan = planTask(goal, input, ctx.registry);
-      const shaped = { ...plan } as Record<string, unknown>;
+      const context = createRunContext(goal, input, { phase: "planning" });
+      const shaped = (await executeIntent({
+        operation: "plan_task",
+        context,
+        logger: ctx.logger,
+        sessionId: ctx.mcpSessionId,
+        run: async () => planTask(goal, input, ctx.registry),
+      })) as Record<string, unknown>;
       await enrichWithFeatureMemory(shaped, {
         apiKey: ctx.apiKey,
         logger: ctx.logger,
@@ -401,17 +408,31 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
       const goal = String(args.goal || "");
       const input = (args.input || {}) as Record<string, unknown>;
       const mode = parseResponseMode(args.responseMode);
+      const context = createRunContext(goal, input, { phase: "execution" });
       if (wantsAsync(args.async)) {
         return textResult(
           await acceptAsyncJob({
             kind: "solve_task",
             apiKey: ctx.apiKey,
             logger: ctx.logger,
-            work: () => solveTask(goal, input, ctx, mode),
+            runId: context.runId,
+            work: () => executeIntent({
+              operation: "solve_task",
+              context,
+              logger: ctx.logger,
+              sessionId: ctx.mcpSessionId,
+              run: () => solveTask(goal, input, ctx, mode),
+            }),
           })
         );
       }
-      const result = await solveTask(goal, input, ctx, mode);
+      const result = await executeIntent({
+        operation: "solve_task",
+        context,
+        logger: ctx.logger,
+        sessionId: ctx.mcpSessionId,
+        run: () => solveTask(goal, input, ctx, mode),
+      });
       if (result && typeof result === "object") {
         const shaped = result as Record<string, unknown>;
         const loop = shaped.loop as { gate?: string } | undefined;
@@ -461,17 +482,33 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
           : {}),
       };
       const mode = parseResponseMode(args.responseMode);
+      const context = createRunContext(`run playbook ${skillId}`, input, {
+        phase: "execution",
+      });
       if (wantsAsync(args.async)) {
         return textResult(
           await acceptAsyncJob({
             kind: "run_playbook",
             apiKey: ctx.apiKey,
             logger: ctx.logger,
-            work: () => runPlaybook(skillId, input, ctx, mode),
+            runId: context.runId,
+            work: () => executeIntent({
+              operation: "run_playbook",
+              context,
+              logger: ctx.logger,
+              sessionId: ctx.mcpSessionId,
+              run: () => runPlaybook(skillId, input, ctx, mode),
+            }),
           })
         );
       }
-      const result = await runPlaybook(skillId, input, ctx, mode);
+      const result = await executeIntent({
+        operation: "run_playbook",
+        context,
+        logger: ctx.logger,
+        sessionId: ctx.mcpSessionId,
+        run: () => runPlaybook(skillId, input, ctx, mode),
+      }) as Record<string, unknown>;
       if ((result as { status?: string }).status !== "error") {
         ctx.logger.info("run_playbook_tool", {
           mcpSessionId: ctx.mcpSessionId,
@@ -526,6 +563,17 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
       };
       const mode = parseResponseMode(args.responseMode);
       const baseline = args.baseline;
+      const baselineExecution =
+        baseline && typeof baseline === "object" && !Array.isArray(baseline)
+          ? (baseline as { execution?: { intentId?: unknown } }).execution
+          : undefined;
+      const contextInput = {
+        ...input,
+        ...(typeof baselineExecution?.intentId === "string"
+          ? { intentId: baselineExecution.intentId }
+          : {}),
+      };
+      const context = createRunContext(goal, contextInput, { phase: "verification" });
       const profileId =
         typeof args.profileId === "string" && args.profileId.trim()
           ? args.profileId.trim()
@@ -538,11 +586,27 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
             kind: "verify_task",
             apiKey: ctx.apiKey,
             logger: ctx.logger,
-            work,
+            runId: context.runId,
+            work: () => executeIntent({
+              operation: "verify_task",
+              context,
+              logger: ctx.logger,
+              sessionId: ctx.mcpSessionId,
+              run: work,
+            }),
           })
         );
       }
-      const result = await work();
+      const result = await executeIntent({
+        operation: "verify_task",
+        context,
+        logger: ctx.logger,
+        sessionId: ctx.mcpSessionId,
+        run: work,
+      }) as {
+        status?: string;
+        [key: string]: unknown;
+      };
       return textResult(
         result,
         result.status === "error" || result.status === "partial"
@@ -817,6 +881,9 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
       const workflowId = String(args.workflowId || "");
       const input = (args.input || {}) as Record<string, unknown>;
       const mode = parseResponseMode(args.responseMode);
+      const context = createRunContext(`run workflow ${workflowId}`, input, {
+        phase: "execution",
+      });
       const work = async () => {
         const localhostUrl = resolveLocalhostUrl(`run_workflow(${workflowId})`, input);
         if (localhostUrl) {
@@ -836,11 +903,6 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
           mcpTool: "run_workflow",
           workflowId,
         });
-        ctx.logger.info("run_workflow", {
-          mcpSessionId: ctx.mcpSessionId,
-          workflowId,
-          transport: "mcp",
-        });
         return shapeAgentResult(result, mode);
       };
       if (wantsAsync(args.async)) {
@@ -849,11 +911,24 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
             kind: "run_workflow",
             apiKey: ctx.apiKey,
             logger: ctx.logger,
-            work,
+            runId: context.runId,
+            work: () => executeIntent({
+              operation: "run_workflow",
+              context,
+              logger: ctx.logger,
+              sessionId: ctx.mcpSessionId,
+              run: work,
+            }),
           })
         );
       }
-      const result = await work();
+      const result = await executeIntent({
+        operation: "run_workflow",
+        context,
+        logger: ctx.logger,
+        sessionId: ctx.mcpSessionId,
+        run: work,
+      });
       return textResult(
         result,
         (result as { status?: string }).status === "partial"
