@@ -18,12 +18,14 @@ MCP never talks to Mongo directly. Private per account by default; opt-in **comm
 
 | Trigger | What ToolYour does |
 |---------|-------------------|
-| `verify_task` → `loop.gate=pass` | Auto-records requirements + evaluation matrix → `featureMemoryRecord` |
-| `run_playbook` / `solve_task` → `loop.gate=pass` | Same (closable jobs that pass without a separate verify) |
-| `plan_task` | Always returns `featureMemory.recordKeeping` + prior matches when found |
+| Feature-build goal → `loop.gate=pass` | Auto-records requirements + evaluation matrix → `featureMemoryRecord` (`memoryType: feature`) |
+| Audit / ship-gate / playbook pass | Not auto-stored unless opt-in (`featureTitle` or `featureMemory.capture=true`) |
+| `plan_task` | Always returns `featureMemory.recordKeeping` + prior matches when found (filtered by `memoryType`) |
 | `capture_feature` | **Manual refine only** — adjust title/requirements or supersede |
 
-Opt out: `input.featureMemory.capture=false` (exceptional; default is record).
+Opt out: `input.featureMemory.capture=false` (exceptional; default for feature builds is record).
+
+Captures carry `sourceRunId` / `intentId` / `idempotencyKey` from the additive `execution` envelope so retries do not duplicate records.
 
 ## Meta-tools
 
