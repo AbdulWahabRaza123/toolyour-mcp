@@ -81,14 +81,22 @@ describe("feature memory record keeping", () => {
     assert.ok(FEATURE_MEMORY_RECORD_KEEPING.autoCaptureOn.includes("verify_task_gate_pass"));
   });
 
-  it("auto-records feature builds; skips audits unless opted in", () => {
+  it("auto-records purpose-typed memory; skips thin converters", () => {
     assert.equal(
       shouldAutoRecordCompletedFeature({
         goal: "ship gate for https://example.com",
         payload: { loop: { initiate: true, gate: "pass" } },
         gate: "pass",
       }),
-      false
+      true
+    );
+    assert.equal(
+      shouldAutoRecordCompletedFeature({
+        goal: "seo site audit https://example.com",
+        payload: { loop: { initiate: false, gate: "pass" } },
+        gate: "pass",
+      }),
+      true
     );
     assert.equal(
       shouldAutoRecordCompletedFeature({
@@ -111,15 +119,6 @@ describe("feature memory record keeping", () => {
       shouldAutoRecordCompletedFeature({
         goal: "build OCR for invoices",
         input: { featureTitle: "Invoice OCR" },
-        payload: { loop: { initiate: false, gate: "pass" } },
-        gate: "pass",
-      }),
-      true
-    );
-    assert.equal(
-      shouldAutoRecordCompletedFeature({
-        goal: "ship gate for https://example.com",
-        input: { featureTitle: "Production ship baseline" },
         payload: { loop: { initiate: false, gate: "pass" } },
         gate: "pass",
       }),

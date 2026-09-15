@@ -9,7 +9,7 @@ import { loadSkillContent, loadSkills, enrichAllSkills } from "../skills/loader"
 import { runWorkflow } from "../workflow/engine";
 import { invokeOperation, solveTask } from "../orchestrator/solve-task";
 import { planTask } from "../orchestrator/plan-task";
-import { enrichWithFeatureMemory, autoRecordCompletedFeature, captureFeatureMemory } from "../orchestrator/feature-memory-loop";
+import { enrichWithFeatureMemory, autoRecordCompletedFeature, captureFeatureMemory, recallContext } from "../orchestrator/feature-memory-loop";
 import {
   compareFeaturePair,
   deleteFeature,
@@ -98,7 +98,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "plan_task",
-    "Skill-loop planner (SEO, security, ship-gate, feature memory, catalog). Free: ranked plan + featureMemory.recordKeeping (ToolYour auto-records completed features). Read loop.initiate — only start run/verify if true.",
+    "Skill-loop planner (SEO, security, ship-gate, feature memory, catalog). Free: ranked plan + featureMemory.recordKeeping (ToolYour auto-records purpose-typed memory on gate pass). Read loop.initiate — only start run/verify if true.",
     {
       goal: z
         .string()
@@ -128,8 +128,43 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
 
   registerTool(
     server,
+    "recall_context",
+    "Free primary recall: prior runs / workflows / feature patterns for this goal (memoryType + projectScope filtered). Prefer before rebuilding. For full routing still call plan_task.",
+    {
+      goal: z.string().describe("What you are about to build, verify, or run"),
+      input: z
+        .any()
+        .optional()
+        .describe("Optional projectScope / projectName / repository / memoryType override"),
+      memoryType: z
+        .enum(["feature", "verification", "workflow", "project"])
+        .optional()
+        .describe("Override purpose filter; default is inferred from the goal"),
+    },
+    async (args) => {
+      const goal = String(args.goal || "");
+      const input = {
+        ...((args.input || {}) as Record<string, unknown>),
+        ...(typeof args.memoryType === "string" ? { memoryType: args.memoryType } : {}),
+      };
+      const recalled = await recallContext({
+        apiKey: ctx.apiKey,
+        logger: ctx.logger,
+        goal,
+        input,
+        memoryType:
+          typeof args.memoryType === "string"
+            ? (args.memoryType as "feature" | "verification" | "workflow" | "project")
+            : undefined,
+      });
+      return textResult(recalled);
+    }
+  );
+
+  registerTool(
+    server,
     "capture_feature",
-    "Manual refine only: ToolYour auto-records completed features on loop.gate=pass. Use this to adjust title/requirements, pass baseline for matrix scoring, or supersede a prior record.",
+    "Manual refine only: ToolYour auto-records purpose-typed memory on loop.gate=pass. Use this to adjust title/requirements, pass baseline for matrix scoring, or supersede a prior record.",
     {
       title: z.string().describe("Short feature name, e.g. Stock ticker OCR"),
       requirements: z.string().optional().describe("What the feature must do"),
@@ -409,6 +444,29 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
       const input = (args.input || {}) as Record<string, unknown>;
       const mode = parseResponseMode(args.responseMode);
       const context = createRunContext(goal, input, { phase: "execution" });
+      const runSolve = async () => {
+        const result = await executeIntent({
+          operation: "solve_task",
+          context,
+          logger: ctx.logger,
+          sessionId: ctx.mcpSessionId,
+          run: () => solveTask(goal, input, ctx, mode),
+        });
+        if (result && typeof result === "object") {
+          const shaped = result as Record<string, unknown>;
+          const loop = shaped.loop as { gate?: string } | undefined;
+          await autoRecordCompletedFeature({
+            apiKey: ctx.apiKey,
+            logger: ctx.logger,
+            goal,
+            input,
+            payload: shaped,
+            gate: loop?.gate,
+            phase: "run",
+          });
+        }
+        return result;
+      };
       if (wantsAsync(args.async)) {
         return textResult(
           await acceptAsyncJob({
@@ -416,36 +474,11 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
             apiKey: ctx.apiKey,
             logger: ctx.logger,
             runId: context.runId,
-            work: () => executeIntent({
-              operation: "solve_task",
-              context,
-              logger: ctx.logger,
-              sessionId: ctx.mcpSessionId,
-              run: () => solveTask(goal, input, ctx, mode),
-            }),
+            work: runSolve,
           })
         );
       }
-      const result = await executeIntent({
-        operation: "solve_task",
-        context,
-        logger: ctx.logger,
-        sessionId: ctx.mcpSessionId,
-        run: () => solveTask(goal, input, ctx, mode),
-      });
-      if (result && typeof result === "object") {
-        const shaped = result as Record<string, unknown>;
-        const loop = shaped.loop as { gate?: string } | undefined;
-        await autoRecordCompletedFeature({
-          apiKey: ctx.apiKey,
-          logger: ctx.logger,
-          goal,
-          input,
-          payload: shaped,
-          gate: loop?.gate,
-          phase: "run",
-        });
-      }
+      const result = await runSolve();
       return textResult(
         result,
         (result as { status?: string }).status === "error" ||

@@ -21,6 +21,7 @@ describe("canonical intent execution", () => {
     assert.equal(result.execution.runId, context.runId);
     assert.equal(result.execution.intentId, context.intent.intentId);
     assert.equal(result.execution.projectScope.projectId, "billing");
+    assert.equal(result.billing.settledBy, "gateway_per_tool");
   });
 
   it("propagates failures for the MCP adapter to handle", async () => {

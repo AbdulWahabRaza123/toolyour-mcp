@@ -44,8 +44,9 @@ Skill-loop responses also include an additive `execution` envelope (`runId`, `in
 another MCP tool. Async jobs reuse `execution.runId` as the `get_run` polling id.
 
 Internally, `plan_task`, `solve_task`, `run_playbook`, `run_workflow`, and `verify_task` use
-one `executeIntent` lifecycle boundary. This keeps correlation, logging, and future billing
-settlement consistent while preserving the public MCP tool contract.
+one `executeIntent` lifecycle boundary for correlation and the `execution` envelope.
+Credits settle on each gateway tool invoke (`billing.settledBy = gateway_per_tool`) — MCP
+does not double-bill. Free `recall_context` recalls purpose-typed memory before rebuilds.
 
 ## Offline evals (no API key)
 

@@ -104,6 +104,8 @@ export async function matchFeatures(opts: {
   limit?: number;
   includeCommunity?: boolean;
   memoryType?: FeatureMemoryRecord["memoryType"];
+  projectName?: string;
+  repoHint?: string;
 }): Promise<{
   domain: string;
   matches: FeatureMemoryRecord[];
@@ -119,6 +121,8 @@ export async function matchFeatures(opts: {
     limit: opts.limit,
     includeCommunity: opts.includeCommunity,
     memoryType: opts.memoryType,
+    projectName: opts.projectName,
+    repoHint: opts.repoHint,
   });
   if (!res.ok) {
     throw new FeatureMemoryStoreError("unavailable", `feature match failed (${res.status})`);

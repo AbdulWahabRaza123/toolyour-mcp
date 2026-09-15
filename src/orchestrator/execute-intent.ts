@@ -20,13 +20,26 @@ export function attachExecutionContext(result: unknown, context: RunContext): un
       idempotencyKey: context.intent.idempotencyKey,
       projectScope: context.intent.projectScope,
     },
+    /**
+     * Credits are reserved/settled on each gateway tool invoke (Node/Python APIs),
+     * not again here — executeIntent must not double-bill.
+     */
+    billing: {
+      settledBy: "gateway_per_tool",
+      metaTool: optsBillingFree(context),
+    },
   };
+}
+
+function optsBillingFree(context: RunContext): boolean {
+  // plan_task and memory tools never hit gateway; run/verify may.
+  return context.phase === "planning";
 }
 
 /**
  * Canonical execution boundary for all skill-loop operations.
- * Billing settlement, durable evidence and audit events can be added here without
- * changing every MCP tool registration again.
+ * Credit settlement stays on the gateway tool path; this facade owns correlation,
+ * the additive execution envelope, and future audit/evidence hooks.
  */
 export async function executeIntent<T>(opts: {
   operation: ExecutionOperation;
@@ -49,6 +62,14 @@ export async function executeIntent<T>(opts: {
   try {
     const result = await opts.run();
     const shaped = attachExecutionContext(result, opts.context);
+    // Prefer accurate metaTool flag from the operation name.
+    if (shaped && typeof shaped === "object" && !Array.isArray(shaped)) {
+      const billing = (shaped as { billing?: Record<string, unknown> }).billing;
+      if (billing) {
+        billing.metaTool = opts.operation === "plan_task";
+        billing.operation = opts.operation;
+      }
+    }
     opts.logger.info("intent_completed", {
       operation: opts.operation,
       runId: opts.context.runId,

@@ -18,14 +18,14 @@ MCP never talks to Mongo directly. Private per account by default; opt-in **comm
 
 | Trigger | What ToolYour does |
 |---------|-------------------|
-| Feature-build goal → `loop.gate=pass` | Auto-records requirements + evaluation matrix → `featureMemoryRecord` (`memoryType: feature`) |
-| Audit / ship-gate / playbook pass | Not auto-stored unless opt-in (`featureTitle` or `featureMemory.capture=true`) |
-| `plan_task` | Always returns `featureMemory.recordKeeping` + prior matches when found (filtered by `memoryType`) |
+| Closable run → `loop.gate=pass` | Auto-records purpose-typed memory (`feature` / `verification` / `workflow`) with execution idempotency |
+| Thin one-shot converters | Not auto-stored unless named (`featureTitle`) or `capture=true` |
+| `plan_task` / `recall_context` | Returns `featureMemory` filtered by `memoryType` + project/repo scope |
 | `capture_feature` | **Manual refine only** — adjust title/requirements or supersede |
 
-Opt out: `input.featureMemory.capture=false` (exceptional; default for feature builds is record).
+Opt out: `input.featureMemory.capture=false`.
 
-Captures carry `sourceRunId` / `intentId` / `idempotencyKey` from the additive `execution` envelope so retries do not duplicate records.
+Captures carry `sourceRunId` / `intentId` / `idempotencyKey` from the additive `execution` envelope so retries do not duplicate records. Pass `input.projectScope` (`projectId`, `repository`, `environment`) so recall prefers the same project.
 
 ## Meta-tools
 

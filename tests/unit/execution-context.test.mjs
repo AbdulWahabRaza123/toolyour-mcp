@@ -1,6 +1,10 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { createRunContext, inferIntentType } from "../../dist/contracts/execution.js";
+import {
+  extractProjectName,
+  extractRepoHint,
+} from "../../dist/orchestrator/feature-domain.js";
 
 describe("canonical execution context", () => {
   it("classifies common intent types", () => {
@@ -28,5 +32,16 @@ describe("canonical execution context", () => {
       idempotencyKey: "customer-release-42",
     });
     assert.equal(context.intent.idempotencyKey, "customer-release-42");
+  });
+
+  it("extracts project scope labels for memory matching", () => {
+    assert.equal(
+      extractProjectName({ projectScope: { projectId: "billing-app" } }),
+      "billing-app"
+    );
+    assert.equal(
+      extractRepoHint({ projectScope: { repository: "org/billing-app" } }),
+      "org/billing-app"
+    );
   });
 });

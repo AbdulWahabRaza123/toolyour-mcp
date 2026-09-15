@@ -40,10 +40,15 @@ that type. Feature Memory is one category inside this system. Captures also carr
 and idempotency metadata so retries return the existing record instead of duplicating it.
 
 All skill-loop execution passes through the internal `executeIntent` facade. It is the
-single lifecycle boundary for correlation logging and execution envelopes today, and is the
-extension point for centralized credit reservation/settlement, durable evidence, and audit
-events. `invoke_tool` remains an advanced one-shot compatibility path and is intentionally
-not part of the plan → run → verify loop.
+single lifecycle boundary for correlation logging and execution envelopes today.
+**Credits are not settled here** — Node/Python gateway invokes already reserve and settle
+quota per tool call; re-billing inside MCP would double-charge. The additive `billing`
+block on results documents `settledBy: gateway_per_tool`. Future durable evidence and
+audit events can still hang off this facade. `invoke_tool` remains an advanced one-shot
+compatibility path and is intentionally not part of the plan → run → verify loop.
+
+Primary recall for agents is free `recall_context` (same backing store as
+`plan_task.featureMemory`, filtered by `memoryType` + project/repo scope).
 
 ```text
   ┌──────────────┐

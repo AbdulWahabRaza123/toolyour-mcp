@@ -62,6 +62,31 @@ export function extractProjectName(input?: Record<string, unknown>): string | un
     const v = input[key];
     if (typeof v === "string" && v.trim()) return v.trim().slice(0, 200);
   }
+  const scope = input.projectScope;
+  if (scope && typeof scope === "object" && !Array.isArray(scope)) {
+    const s = scope as Record<string, unknown>;
+    for (const key of ["projectId", "projectName", "repository"]) {
+      const v = s[key];
+      if (typeof v === "string" && v.trim()) return v.trim().slice(0, 200);
+    }
+  }
+  return undefined;
+}
+
+/** Prefer repository URL/name from projectScope for memory scoping. */
+export function extractRepoHint(input?: Record<string, unknown>): string | undefined {
+  if (!input) return undefined;
+  if (typeof input.repoHint === "string" && input.repoHint.trim()) {
+    return input.repoHint.trim().slice(0, 300);
+  }
+  if (typeof input.repository === "string" && input.repository.trim()) {
+    return input.repository.trim().slice(0, 300);
+  }
+  const scope = input.projectScope;
+  if (scope && typeof scope === "object" && !Array.isArray(scope)) {
+    const repo = (scope as Record<string, unknown>).repository;
+    if (typeof repo === "string" && repo.trim()) return repo.trim().slice(0, 300);
+  }
   return undefined;
 }
 

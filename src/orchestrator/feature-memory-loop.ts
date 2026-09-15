@@ -12,6 +12,7 @@ import {
   detectFeatureDomain,
   extractFeatureRequirements,
   extractProjectName,
+  extractRepoHint,
 } from "./feature-domain";
 import {
   createFeature,
@@ -49,7 +50,7 @@ export type FeatureMemoryEnvelope = {
 export const FEATURE_MEMORY_RECORD_KEEPING: FeatureMemoryRecordKeeping = {
   policy: "toolyour_auto_record",
   message:
-    "ToolYour is your cross-project institutional memory. Completed feature builds are recorded automatically on loop.gate=pass (requirements + evaluation matrix). Audits and ship-gates are classified separately and only stored when you opt in (featureTitle / featureMemory.capture=true). Read plan_task.featureMemory before rebuilding similar work. Opt out with input.featureMemory.capture=false.",
+    "ToolYour is your cross-project institutional memory. On loop.gate=pass it records a purpose-typed memory row: feature builds → memoryType=feature; audits/ship-gates → verification; playbooks/pipelines → workflow. plan_task / recall_context filter by type so audits never look like implementation recipes. Opt out with input.featureMemory.capture=false.",
   autoCaptureOn: ["verify_task_gate_pass", "run_playbook_gate_pass", "solve_task_gate_pass"],
   optOutField: "input.featureMemory.capture=false",
   manualRefineTool: "capture_feature",
@@ -57,9 +58,9 @@ export const FEATURE_MEMORY_RECORD_KEEPING: FeatureMemoryRecordKeeping = {
 };
 
 export const FEATURE_MEMORY_GOLDEN_PATH = [
-  "ToolYour auto-records completed feature builds on loop.gate=pass — you do not own persistence",
-  "Before similar work → plan_task reads featureMemory.reminder + priorInstances (hybrid_embedding)",
-  "After host fixes → verify_task until pass so ToolYour captures the feature record",
+  "ToolYour auto-records purpose-typed memory on loop.gate=pass — you do not own persistence",
+  "Before similar work → plan_task or recall_context (filtered by memoryType + projectScope)",
+  "After host fixes → verify_task until pass so ToolYour captures the record",
   "Manual refine only → capture_feature to adjust title/requirements or supersedeFeatureId",
   "Compare iterations → compare_feature_memory; opt-in share → publish_feature_pattern",
 ];
@@ -73,32 +74,123 @@ export async function matchFeatureMemoryForGoal(opts: {
   logger: Logger;
   goal: string;
   input?: Record<string, unknown>;
+  memoryType?: FeatureMemoryRecord["memoryType"];
 }): Promise<{
   domain: string;
   matches: FeatureMemoryRecord[];
   bestInDomain?: FeatureMemoryRecord | null;
   communityPatterns?: FeatureMemoryRecord[];
   matchMethod?: "hybrid_embedding";
+  memoryType?: FeatureMemoryRecord["memoryType"];
+  memoryDecision?: "reuse" | "adapt" | "create" | "none";
+  confidence?: number;
 } | null> {
   try {
     const session = await resolveFeatureMemorySession(opts.apiKey, opts.logger);
     const requirements = extractFeatureRequirements(opts.goal, opts.input);
     const domain = detectFeatureDomain(opts.goal, requirements);
-    const memoryType = classifyMemoryType(opts.goal);
-    return await matchFeatures({
+    const memoryType = opts.memoryType || classifyMemoryType(opts.goal);
+    const matched = await matchFeatures({
       userId: session.userId,
       goal: opts.goal,
       requirements,
       domain,
       limit: 5,
       memoryType,
+      projectName: extractProjectName(opts.input),
+      repoHint: extractRepoHint(opts.input),
     });
+    const top = matched.matches[0];
+    const topScore =
+      top && typeof (top as { matchScore?: number }).matchScore === "number"
+        ? (top as { matchScore: number }).matchScore
+        : top
+          ? 0.5
+          : 0;
+    let memoryDecision: "reuse" | "adapt" | "create" | "none" = "none";
+    if (topScore >= 0.75) memoryDecision = "reuse";
+    else if (topScore >= 0.4) memoryDecision = "adapt";
+    else if (matched.matches.length === 0) memoryDecision = "create";
+    else memoryDecision = "adapt";
+    return {
+      ...matched,
+      memoryType,
+      memoryDecision,
+      confidence: Number(topScore.toFixed(3)),
+    };
   } catch (e) {
     opts.logger.warn("feature memory match skipped", {
       message: e instanceof Error ? e.message : String(e),
     });
     return null;
   }
+}
+
+/**
+ * Primary recall path for agents (Phase 5). Same backing data as plan_task.featureMemory,
+ * without running the full planner.
+ */
+export async function recallContext(opts: {
+  apiKey: string;
+  logger: Logger;
+  goal: string;
+  input?: Record<string, unknown>;
+  memoryType?: FeatureMemoryRecord["memoryType"];
+}): Promise<Record<string, unknown>> {
+  const requirements = extractFeatureRequirements(opts.goal, opts.input);
+  const domain = detectFeatureDomain(opts.goal, requirements);
+  const memoryType = opts.memoryType || classifyMemoryType(opts.goal);
+  const matched = await matchFeatureMemoryForGoal(opts);
+  const envelope: FeatureMemoryEnvelope = {
+    schemaVersion: "toolyour.featureMemory@1",
+    domain: matched?.domain || domain,
+    memoryType,
+    recordKeeping: FEATURE_MEMORY_RECORD_KEEPING,
+    goldenPath: FEATURE_MEMORY_GOLDEN_PATH,
+    reminder:
+      matched && matched.matches.length
+        ? buildFeatureMemoryReminder({
+            goal: opts.goal,
+            domain: matched.domain,
+            matches: matched.matches,
+            best: matched.bestInDomain,
+          })
+        : FEATURE_MEMORY_RECORD_KEEPING.message,
+    matchConfidence:
+      matched?.confidence && matched.confidence >= 0.75
+        ? "high"
+        : matched?.confidence && matched.confidence >= 0.4
+          ? "medium"
+          : matched?.matches?.length
+            ? "low"
+            : "none",
+    matchMethod: matched?.matchMethod,
+    priorInstances: matched?.matches,
+    bestKnown: matched?.bestInDomain,
+    communityPatterns: matched?.communityPatterns,
+  };
+  return {
+    status: "recall",
+    free: true,
+    goal: opts.goal.trim(),
+    memoryDecision: matched?.memoryDecision || "create",
+    confidence: matched?.confidence ?? 0,
+    reason:
+      matched?.memoryDecision === "reuse"
+        ? "A strong same-purpose prior record exists — adapt it before rebuilding."
+        : matched?.memoryDecision === "adapt"
+          ? "Related prior work exists — review bestKnown / priorInstances."
+          : "No strong prior memory — create via a closable run then verify until pass.",
+    recommendedNext:
+      matched?.memoryDecision === "none" || matched?.memoryDecision === "create"
+        ? "Call plan_task, then run_playbook / solve_task, then verify_task until loop.gate=pass."
+        : "Read priorInstances / bestKnown, then run_playbook or solve_task with projectScope set.",
+    projectScope: {
+      projectName: extractProjectName(opts.input),
+      repoHint: extractRepoHint(opts.input),
+    },
+    featureMemory: envelope,
+  };
 }
 
 export function buildFeatureMemoryReminder(opts: {
@@ -119,10 +211,16 @@ export function buildFeatureMemoryReminder(opts: {
 }
 
 export function classifyMemoryType(goal: string): "feature" | "verification" | "workflow" {
-  if (/\b(audit|verify|validate|regression|ship[- ]gate|security check|readiness)\b/i.test(goal)) {
+  if (
+    /\b(audit|verify|validate|regression|ship[- ]?gate|security check|readiness|headers|seo[- ]site|web[- ]security)\b/i.test(
+      goal
+    )
+  ) {
     return "verification";
   }
-  if (/\b(workflow|pipeline|playbook|process|automation)\b/i.test(goal)) return "workflow";
+  if (/\b(workflow|pipeline|playbook|process|automation|run_playbook|run_workflow)\b/i.test(goal)) {
+    return "workflow";
+  }
   return "feature";
 }
 
@@ -257,19 +355,17 @@ export function shouldAutoRecordCompletedFeature(opts: {
     typeof opts.input?.featureRequirements === "string" ||
     explicitCapture;
 
-  // Phase 4: audits / ship-gates / playbooks are not Feature Memory by default.
-  // They may still be stored as verification/workflow when the host opts in.
-  if (classifyMemoryType(opts.goal) !== "feature") {
-    return hasExplicitFeatureInput;
+  const memoryType = classifyMemoryType(opts.goal);
+
+  // Phase 4: every completed closable run becomes durable purpose-typed memory.
+  // verification/workflow rows never pollute feature recall (match filters by type).
+  if (memoryType === "verification" || memoryType === "workflow") {
+    return true;
   }
 
-  const loop = opts.payload.loop as { initiate?: boolean } | undefined;
-  if (loop?.initiate === false) {
-    if (hasExplicitFeatureInput) return true;
-    return isFeatureBuildGoal(opts.goal);
-  }
-
-  return true;
+  // Feature type: only real builds (or explicit host naming), not one-shot converters.
+  if (hasExplicitFeatureInput) return true;
+  return isFeatureBuildGoal(opts.goal);
 }
 
 function appendRecordedNext(payload: Record<string, unknown>, featureId: string): void {
@@ -314,6 +410,7 @@ export async function autoRecordCompletedFeature(opts: {
       title,
       requirements: extractFeatureRequirements(opts.goal, opts.input),
       projectName: extractProjectName(opts.input),
+      repoHint: extractRepoHint(opts.input),
       baseline: opts.payload,
       supersedesFeatureId:
         typeof opts.input?.supersedesFeatureId === "string"
@@ -332,8 +429,9 @@ export async function autoRecordCompletedFeature(opts: {
       opts.payload.featureMemoryRecord = {
         status: "recorded",
         policy: FEATURE_MEMORY_RECORD_KEEPING.policy,
-        message: `ToolYour recorded this completed feature as ${feature.featureId}. Cross-project agents will see it on plan_task.`,
+        message: `ToolYour recorded ${feature.memoryType || "feature"} memory as ${feature.featureId}. Cross-project agents will see it on plan_task / recall_context.`,
         featureId: feature.featureId,
+        memoryType: feature.memoryType || classifyMemoryType(opts.goal),
         compositeScore: captured.compositeScore ?? feature.compositeScore,
         domain: feature.domain,
         capture: captured,

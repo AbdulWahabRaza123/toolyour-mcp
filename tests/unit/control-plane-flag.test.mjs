@@ -32,6 +32,7 @@ const CORE_TOOLS = [
   "load_skill",
   "plan_task",
   "publish_feature_pattern",
+  "recall_context",
   "run_playbook",
   "run_workflow",
   "solve_task",

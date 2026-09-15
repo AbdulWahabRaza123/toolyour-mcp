@@ -104,7 +104,7 @@ export const ALLOWED_COMMANDS = new Set([
 ]);
 
 export const DEFAULT_MCP_INSTRUCTIONS =
-  "ToolYour maintains cross-project Feature Memory (institutional record). Every completed feature is recorded automatically when loop.gate=pass on verify_task, run_playbook, or solve_task — agents do not own persistence; consult plan_task.featureMemory.recordKeeping before rebuilding similar work. Opt out only with input.featureMemory.capture=false. Manual refine: capture_feature (title/requirements/supersedes). " +
+  "ToolYour maintains cross-project Feature Memory (institutional record). Purpose-typed rows are recorded automatically when loop.gate=pass (feature | verification | workflow). Agents do not own persistence; call plan_task or free recall_context before rebuilding similar work. Opt out only with input.featureMemory.capture=false. Manual refine: capture_feature (title/requirements/supersedes). " +
   "ToolYour has two loops. Pick exactly one per user goal — never both. " +
   "Skill loop (SEO, security, ship-gate, production-readiness, secrets, catalog): " +
   "First call plan_task — free; read featureMemory.reminder + recordKeeping. " +
