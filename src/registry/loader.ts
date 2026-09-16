@@ -10,6 +10,7 @@ export class RegistryLoader {
   private manifest: McpRegistryManifest | null = null;
   private loadedAt = 0;
   private refreshTimer: ReturnType<typeof setInterval> | null = null;
+  private schemaCache = new Map<string, unknown | null>();
 
   constructor(private logger: Logger) {}
 
@@ -33,6 +34,7 @@ export class RegistryLoader {
       }
       this.manifest = loadManifestFile(env.registryPath);
       this.loadedAt = Date.now();
+      this.schemaCache.clear();
       if (!silent) {
         this.logger.info("registry loaded", {
           tools: this.manifest.stats.hasApiIncluded,
@@ -64,10 +66,27 @@ export class RegistryLoader {
   }
 
   getSchema(operationId: string): unknown | null {
+    if (this.schemaCache.has(operationId)) {
+      return this.schemaCache.get(operationId) ?? null;
+    }
     const env = getEnv();
     const p = path.join(env.schemasDir, `${operationId}.json`);
-    if (!fs.existsSync(p)) return null;
-    return JSON.parse(fs.readFileSync(p, "utf8"));
+    if (!fs.existsSync(p)) {
+      this.schemaCache.set(operationId, null);
+      return null;
+    }
+    try {
+      const schema = JSON.parse(fs.readFileSync(p, "utf8"));
+      this.schemaCache.set(operationId, schema);
+      return schema;
+    } catch (e) {
+      this.logger.error("failed to parse schema file", {
+        operationId,
+        error: e instanceof Error ? e.message : String(e),
+      });
+      this.schemaCache.set(operationId, null);
+      return null;
+    }
   }
 
   staleAgeMs(): number {
