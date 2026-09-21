@@ -18,22 +18,56 @@ const META_TOOLS = [
   {
     name: "plan_task",
     description:
-      "Free planning pass: ranked playbook/workflow plan + estimated credits. Does not execute. Next: run_playbook or solve_task, then verify_task.",
+      "Free planning pass: ranked playbook/workflow plan + heuristic credit estimate (not a bill; tools cost 1–10). Does not execute. Next: run_playbook or solve_task, then verify_task.",
+  },
+  {
+    name: "recall_context",
+    description:
+      "Free Feature Memory recall before rebuilding similar work. Prefer before plan_task when continuing a known domain/repo.",
   },
   {
     name: "solve_task",
     description:
-      "Run a job from a plain-language goal. Returns jobReport plus loop.remainingFixes and loop.gate. Then verify_task with this result as baseline.",
+      "Run a job from a plain-language goal. Workflow runs attach verification.evidence + profileId. Then verify_task with this result as baseline.",
   },
   {
     name: "run_playbook",
     description:
-      "Execute a skill playbook (ship-gate, SEO, security). Returns loop.remainingFixes; then verify_task.",
+      "Execute a skill playbook (ship-gate, SEO, security). Returns verification.evidence + loop.remainingFixes; then verify_task.",
   },
   {
     name: "verify_task",
     description:
       "Close the loop: requires a usable baseline jobReport. Read loop.gate; apply rank-1 loop.nextActions (full list: remainingFixes). Stops on loop.stop (max_rounds|same_findings) or loop.initiate false. Optional async:true; poll get_run.",
+  },
+  {
+    name: "capture_feature",
+    description:
+      "Free manual Feature Memory capture/refine (title, requirements, supersedes). Auto-capture also runs on loop.gate=pass.",
+  },
+  {
+    name: "list_feature_memory",
+    description: "Free list of your Feature Memory records.",
+  },
+  {
+    name: "compare_feature_memory",
+    description: "Free compare of Feature Memory records / patterns.",
+  },
+  {
+    name: "publish_feature_pattern",
+    description: "Free publish of a Feature Memory pattern to the community catalog.",
+  },
+  {
+    name: "unpublish_feature_pattern",
+    description: "Free unpublish of a community Feature Memory pattern you own.",
+  },
+  {
+    name: "delete_feature",
+    description: "Free delete of a Feature Memory record you own.",
+  },
+  {
+    name: "list_community_patterns",
+    description: "Free browse of published community Feature Memory patterns.",
   },
   {
     name: "list_skills",
@@ -89,7 +123,7 @@ const META_TOOLS = [
   {
     name: "check_submit",
     description:
-      "Completion-loop: host runner only (toolyour-check-run). Do not invent results.",
+      "Completion-loop: host runner only (`npx toolyour-check-run`). Do not invent HMAC pass/fail payloads.",
   },
   {
     name: "job_cancel",
@@ -163,10 +197,10 @@ export function buildServerCard() {
     },
     tools: [...META_TOOLS],
     notes: [
-      "Two loops — pick exactly one per goal. Skill loop: plan_task → run_playbook or solve_task → apply rank-1 loop.nextActions (full list: remainingFixes) → verify_task. Completion loop: job_status → host toolyour-check-run; do not invent check_submit.",
+      "Two loops — pick exactly one per goal. Skill loop: plan_task → run_playbook or solve_task (both attach verification.evidence on workflow runs) → apply rank-1 loop.nextActions → verify_task. Feature Memory: free recall_context / list_feature_memory / …; auto-record on gate=pass. Completion loop: job_status → `npx toolyour-check-run` (do not invent check_submit HMAC).",
       "invoke_tool is advanced (one-off operationId). Do not use it as the default path for ship-gate, SEO, or security jobs.",
-      "Catalog tools are dynamic — only hasApi tools are exposed. Discovery meta-tools are free; execution shares the REST monthly credit quota.",
-      "solve_task / run_playbook responses include loop.line (one-line gate · rank-1 · credits), loop.remainingFixes (patchType + acceptance), and rank-1 loop.nextActions. Apply rank-1 first; remainingFixes is the full list.",
+      "Catalog tools are dynamic — only hasApi tools are exposed. Discovery meta-tools are free; execution shares the REST monthly credit quota (1–10 credits per tool). estimatedCredits is always a heuristic.",
+      "solve_task / run_playbook responses include verification.evidence, loop.line (gate · rank-1 · credits), loop.remainingFixes (patchType + acceptance), and rank-1 loop.nextActions. Apply rank-1 first; remainingFixes is the full list.",
       "verify_task refuses without a usable baseline jobReport (prior solve_task/run_playbook result, verify_task.after, or raw jobReport).",
       "Loop stop: default maxRounds=5 and sameFindingsLimit=2. When loop.stop is set (max_rounds|same_findings), loop.initiate is false — escalate; do not re-verify.",
       "Large responses may include dataRefId — use fetch_payload (free in-process TTL store, no paid blob).",

@@ -415,7 +415,7 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
   registerTool(
     server,
     "solve_task",
-    "Run a job from a plain-language goal. Returns loop.line (gate · rank-1 · credits) and loop.initiate — if false, MCP cannot close this with verify_task. If true, apply rank-1 then verify_task.",
+    "Run a job from a plain-language goal. Workflow runs attach verification.evidence + profileId (same as run_playbook). Read loop.line — if initiate is false, stop; if true, apply rank-1 then verify_task.",
     {
       goal: z
         .string()

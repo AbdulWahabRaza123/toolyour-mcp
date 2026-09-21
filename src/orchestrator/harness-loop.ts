@@ -54,6 +54,9 @@ export interface LoopReceipt {
   toolsUsed: number;
   /** Rough estimate — SaaS bills 1–10 credits per tool. */
   estimatedCredits: number;
+  /** Always true — never treat estimatedCredits as the settled bill. */
+  isHeuristic: true;
+  billingRange: "1-10 credits per tool";
   note: string;
 }
 
@@ -218,10 +221,12 @@ function assembleLoop(
       maxRounds: progress.maxRounds,
       toolsUsed,
       estimatedCredits,
+      isHeuristic: true,
+      billingRange: "1-10 credits per tool",
       note:
         toolsUsed > 0
-          ? `This run used ${toolsUsed} API tool(s). estimatedCredits≈${estimatedCredits} (rough ×${CREDITS_PER_TOOL_EST}); SaaS bills 1–10 credits per tool on the shared REST+MCP quota. Credits buy evidence + re-checks — apply rank-1, then verify_task.`
-          : "No API tools counted on this payload. estimatedCredits is rough when tools run (1–10 credits each on the shared REST+MCP quota).",
+          ? `This run used ${toolsUsed} API tool(s). estimatedCredits≈${estimatedCredits} is a rough ×${CREDITS_PER_TOOL_EST} heuristic — not the SaaS bill. Gateway settles 1–10 credits per tool on the shared REST+MCP quota. Credits buy evidence + re-checks — apply rank-1, then verify_task.`
+          : "No API tools counted on this payload. When tools run, SaaS bills 1–10 credits each (shared REST+MCP quota). estimatedCredits is always a heuristic.",
     },
   };
 }

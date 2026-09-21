@@ -24,6 +24,7 @@ import {
 import { incr } from "../observability/counters";
 import { withSpan } from "../observability/tracing";
 import { constants } from "../config";
+import { randomUUID } from "crypto";
 import {
   shapeAgentResult,
   withHarnessLoop,
@@ -40,6 +41,16 @@ import {
   taskRequiresUrl,
   urlNeedInput,
 } from "./payload-intent";
+import { extractJobReport } from "./job-report";
+import {
+  attachVerificationEnvelope,
+  ensureVerificationProfile,
+  extractProfileId,
+  extractTargetUrl,
+  persistVerificationRun,
+  regressionVsLastPass,
+} from "./verification-loop";
+import { autoRecordCompletedFeature } from "./feature-memory-loop";
 
 export interface SolveTaskContext {
   apiKey: string;
@@ -362,7 +373,33 @@ async function solveTaskInner(
       transport: "mcp",
     });
 
-    return shapeAgentResult(
+    const profileData =
+      normalized.data && typeof normalized.data === "object"
+        ? (normalized.data as Record<string, unknown>)
+        : {};
+    const profileIdInput = extractProfileId(profileData);
+    const targetUrl = extractTargetUrl(profileData);
+    const profileMeta = await ensureVerificationProfile({
+      apiKey: ctx.apiKey,
+      logger: ctx.logger,
+      profileId: profileIdInput,
+      targetUrl,
+      playbook: task.target,
+      label: typeof profileData.label === "string" ? profileData.label : undefined,
+      autoCreate: profileData.autoProfile !== false,
+    }).catch(() => ({
+      profileId: profileIdInput,
+      lastPassSnapshot: null as Record<string, unknown> | null,
+      lastRunSnapshot: null as Record<string, unknown> | null,
+      lastPassAt: null as string | null,
+      lastPassGate: null as string | null,
+      lastPassRunId: null as string | null,
+    }));
+
+    const activeProfileId = profileMeta.profileId || profileIdInput;
+    const runId = `run_${randomUUID().replace(/-/g, "").slice(0, 16)}`;
+
+    const shaped = shapeAgentResult(
       {
         status:
           result.status === "completed"
@@ -377,9 +414,49 @@ async function solveTaskInner(
           score: match.score,
         },
         execution: result,
+        ...(activeProfileId ? { profileId: activeProfileId } : {}),
       },
       mode
-    );
+    ) as Record<string, unknown>;
+
+    const report = extractJobReport(shaped);
+    const loopGate = (shaped.loop as { gate?: string } | undefined)?.gate;
+    const vsLastPass = regressionVsLastPass(profileMeta.lastPassSnapshot, report);
+
+    attachVerificationEnvelope(shaped, {
+      profileId: activeProfileId,
+      targetUrl: targetUrl || report?.url,
+      playbook: task.target,
+      runId,
+      baselineRunId: profileMeta.lastPassRunId,
+      delta: vsLastPass,
+      lastPassAt: profileMeta.lastPassAt,
+      lastPassGate: profileMeta.lastPassGate,
+      phase: "run",
+    });
+
+    if (activeProfileId) {
+      await persistVerificationRun({
+        apiKey: ctx.apiKey,
+        logger: ctx.logger,
+        profileId: activeProfileId,
+        runPayload: shaped,
+        runId,
+        gate: loopGate as "pass" | "fail" | "unknown" | undefined,
+      });
+    }
+
+    await autoRecordCompletedFeature({
+      apiKey: ctx.apiKey,
+      logger: ctx.logger,
+      goal: trimmedGoal,
+      input: profileData,
+      payload: shaped,
+      gate: loopGate,
+      phase: "run",
+    });
+
+    return shaped;
   }
 
   const route = ctx.registry.getRoute(task.target);

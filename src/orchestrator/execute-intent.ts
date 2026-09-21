@@ -8,12 +8,25 @@ export type ExecutionOperation =
   | "run_workflow"
   | "verify_task";
 
-/** Add stable orchestration identity without changing any existing result fields. */
+const FREE_RESULT_STATUSES = new Set([
+  "plan",
+  "suggest",
+  "need_input",
+  "error",
+]);
+
+/** Add stable orchestration identity without wiping workflow/tool execution payloads. */
 export function attachExecutionContext(result: unknown, context: RunContext): unknown {
   if (!result || typeof result !== "object" || Array.isArray(result)) return result;
+  const root = result as Record<string, unknown>;
+  const priorExec =
+    root.execution && typeof root.execution === "object" && !Array.isArray(root.execution)
+      ? (root.execution as Record<string, unknown>)
+      : {};
   return {
-    ...(result as Record<string, unknown>),
+    ...root,
     execution: {
+      ...priorExec,
       runId: context.runId,
       intentId: context.intent.intentId,
       intentType: context.intent.type,
@@ -62,13 +75,29 @@ export async function executeIntent<T>(opts: {
   try {
     const result = await opts.run();
     const shaped = attachExecutionContext(result, opts.context);
-    // Prefer accurate metaTool flag from the operation name.
     if (shaped && typeof shaped === "object" && !Array.isArray(shaped)) {
-      const billing = (shaped as { billing?: Record<string, unknown> }).billing;
-      if (billing) {
-        billing.metaTool = opts.operation === "plan_task";
-        billing.operation = opts.operation;
-      }
+      const root = shaped as Record<string, unknown>;
+      const billing = (root.billing || {}) as Record<string, unknown>;
+      const status = String(root.status || "");
+      const metaTool = opts.operation === "plan_task";
+      const charged = !metaTool && !FREE_RESULT_STATUSES.has(status);
+      root.billing = {
+        ...billing,
+        settledBy: "gateway_per_tool",
+        metaTool,
+        operation: opts.operation,
+        charged,
+        ...(charged
+          ? {
+              note: "Credits settle only when gateway API tools run (1–10 each). This envelope does not double-bill.",
+            }
+          : {
+              chargedReason: metaTool
+                ? "plan_task"
+                : status || "no_gateway_settlement",
+              note: "No gateway settlement for this result — planning/suggest/need_input paths are free; only API tool invokes bill credits.",
+            }),
+      };
     }
     opts.logger.info("intent_completed", {
       operation: opts.operation,

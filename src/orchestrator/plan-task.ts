@@ -32,6 +32,9 @@ export interface PlanTaskResult {
   goal: string;
   free: true;
   estimatedCredits: number;
+  /** Always true — estimates are planning heuristics, not SaaS settlement. */
+  estimatedCreditsIsHeuristic: true;
+  estimatedCreditsNote: string;
   confidence: "high" | "medium" | "low" | "none";
   recommended?: {
     kind: "workflow" | "tool" | "local" | "playbook";
@@ -63,6 +66,19 @@ function estimateCredits(kind: string, stepCount: number): number {
   if (kind === "workflow") return Math.max(CREDITS_PER_TOOL, stepCount * CREDITS_PER_STEP);
   if (kind === "tool") return CREDITS_PER_TOOL;
   return 0;
+}
+
+const CREDIT_ESTIMATE_NOTE =
+  "Heuristic planning estimate only — not a reservation or invoice. SaaS bills 1–10 credits per gateway tool on the shared REST+MCP quota.";
+
+function finalizePlan(
+  plan: Omit<PlanTaskResult, "estimatedCreditsIsHeuristic" | "estimatedCreditsNote">
+): PlanTaskResult {
+  return {
+    ...plan,
+    estimatedCreditsIsHeuristic: true,
+    estimatedCreditsNote: CREDIT_ESTIMATE_NOTE,
+  };
 }
 
 function playbookHit(goal: string, skill: { id: string; title: string; description: string }): boolean {
@@ -109,7 +125,7 @@ function vagueSiteHealthPlan(trimmedGoal: string): PlanTaskResult {
     reason:
       "Need a public https:// URL (or say which job: ship-gate, SEO audit, or security audit).",
   };
-  return {
+  return finalizePlan({
     status: "plan",
     goal: trimmedGoal,
     free: true,
@@ -153,7 +169,7 @@ function vagueSiteHealthPlan(trimmedGoal: string): PlanTaskResult {
     toolHints: [],
     loop,
     next: 'Ask the user for a public https:// URL, then run_playbook("ship-gate", { url }). If they meant SEO or security, use seo-site-audit or web-security-audit instead. Do not start verify_task yet.',
-  };
+  });
 }
 
 /**
@@ -172,7 +188,7 @@ export function planTask(
     const localhostUrl = resolveLocalhostUrl(trimmedGoal, input);
     if (localhostUrl) {
       const loop = decidePlanLoop({ confidence: "high", recommendedKind: "local" });
-      return {
+      return finalizePlan({
         status: "plan",
         goal: trimmedGoal,
         free: true,
@@ -193,7 +209,7 @@ export function planTask(
         loop: { ...loop, initiate: false, inScope: true },
         goldenPath: DEV_VERIFICATION_GOLDEN_PATH,
         next: `MCP cannot fetch ${localhostUrl}. Deploy or tunnel a public https:// preview URL, then run_playbook("production-readiness-gate", { url }). Or pass workspace HTML via content-ship for local iteration.`,
-      };
+      });
     }
     const loop = decidePlanLoop({
       confidence: "high",
@@ -201,7 +217,7 @@ export function planTask(
       workflowId: "ship-gate-job",
     });
     const estimatedCredits = estimateCredits("workflow", 5);
-    return {
+    return finalizePlan({
       status: "plan",
       goal: trimmedGoal,
       free: true,
@@ -232,7 +248,7 @@ export function planTask(
       next: url
         ? developmentVerificationPlanNext(url)
         : "Ask for a public https:// preview URL (deploy or tunnel), then run_playbook('production-readiness-gate', { url }). profileId is auto-created on first run.",
-    };
+    });
   }
 
   const match = matchTask(trimmedGoal, tasks);
@@ -297,7 +313,7 @@ export function planTask(
     const loop = decidePlanLoop({ confidence });
     // Out-of-catalog / low confidence: do not spam unrelated toolHints.
     const toolHints: PlanTaskResult["toolHints"] = [];
-    return {
+    return finalizePlan({
       status: "plan",
       goal: trimmedGoal,
       free: true,
@@ -311,7 +327,7 @@ export function planTask(
         : topPlaybook && confidence === "low"
           ? `Possible playbook "${topPlaybook.id}" — confirm the goal maps to a ToolYour job before running it. Do not start verify_task yet.`
           : "Out of ToolYour MCP scope (SEO, security, ship-gate, documents, conversion, text). Do not start the harness loop.",
-    };
+    });
   }
 
   let { task } = match;
@@ -322,7 +338,7 @@ export function planTask(
       confidence: "high",
       recommendedKind: "local",
     });
-    return {
+    return finalizePlan({
       status: "plan",
       goal: trimmedGoal,
       free: true,
@@ -339,7 +355,7 @@ export function planTask(
       toolHints: [],
       loop: { ...loop, initiate: false, inScope: true },
       next: `MCP cannot fetch ${localhostUrl}. Pass input.html / input.text / input.code from the workspace, or a public/preview https:// URL (or tunnel). Do not start run_playbook with localhost.`,
-    };
+    });
   }
 
   // Bare "SEO audit" / "ship gate" / "this site" without URL or HTML → ask for
@@ -379,7 +395,7 @@ export function planTask(
       inScope: true,
       reason: "Need a public https:// URL before starting this live-site job.",
     };
-    return {
+    return finalizePlan({
       status: "plan",
       goal: trimmedGoal,
       free: true,
@@ -400,7 +416,7 @@ export function planTask(
       next: playbookSkill
         ? `Ask the user for a public https:// URL, then run_playbook("${playbookSkill.id}", { url }). If they meant local HTML / PR from the repo, pass input.html or input.text to solve_task instead. Do not start verify_task yet.`
         : `Ask the user for a public https:// URL in input.url, then re-call plan_task / solve_task. If they meant workspace HTML/PR, pass input.html / input.text instead. Do not start verify_task yet.`,
-    };
+    });
   }
 
   if (!live) {
@@ -438,7 +454,7 @@ export function planTask(
     const runLine = live
       ? `Call run_playbook("${playbookSkill.id}", input) with a reachable https:// URL — ~${estimatedCredits} credits estimated.`
       : `Call run_playbook("${playbookSkill.id}", input) with workspace file contents — ~${estimatedCredits} credits estimated. ${payloadNext}`;
-    return {
+    return finalizePlan({
       status: "plan",
       goal: trimmedGoal,
       free: true,
@@ -461,7 +477,7 @@ export function planTask(
       next: loop.initiate
         ? `${runLine} After the run, call verify_task only if that result has loop.initiate true.`
         : `${runLine} ${loop.reason}`,
-    };
+    });
   }
 
   const confidence = match.score >= 8 ? "high" : "medium";
@@ -484,7 +500,7 @@ export function planTask(
           ? `Call run_workflow("${task.target}", input) with workspace payload (input.text / input.code / input.html) — ~${estimatedCredits} credits estimated. ${payloadNext}`
           : `Call solve_task with workspace payload (input.text / input.code / input.html) — ~${estimatedCredits} credits estimated. ${payloadNext}`;
 
-  return {
+  return finalizePlan({
     status: "plan",
     goal: trimmedGoal,
     free: true,
@@ -508,5 +524,5 @@ export function planTask(
     next: loop.initiate
       ? `${runLine} After the run, call verify_task only if that result has loop.initiate true. Do not start with invoke_tool.`
       : `${runLine} ${loop.reason}`,
-  };
+  });
 }

@@ -113,8 +113,8 @@ export const DEFAULT_MCP_INSTRUCTIONS =
   "(3) Host applies ONLY rank-1 nextActions in the workspace — do not invent tools or invoke_tool for the same job. " +
   "(4) verify_task with baseline (or profileId) until loop.gate is pass — ToolYour records featureMemoryRecord on pass. " +
   "list_feature_memory · compare_feature_memory · publish_feature_pattern · unpublish_feature_pattern · delete_feature · list_community_patterns are free. " +
-  "Never pass localhost URLs. Credits buy evidence and re-checks. " +
-  "Completion loop (frozen jobId): job_status only; Do not invent check_submit. Do not call plan_task, solve_task, or verify_task for that jobId. " +
+  "Never pass localhost URLs. Credits buy evidence and re-checks (1–10 per tool; estimates are heuristics). " +
+  "Completion loop (frozen jobId): job_status only. Do not call check_submit yourself with invented pass/fail — run `npx toolyour-check-run` (HMAC host runner). Do not call plan_task, solve_task, or verify_task for that jobId. " +
   "Host keeps editor, git, and terminal. This server does not replace Cursor, Claude, or any host agent.";
 
 export function resolveMcpInstructions(): string {

@@ -22,6 +22,20 @@ describe("canonical intent execution", () => {
     assert.equal(result.execution.intentId, context.intent.intentId);
     assert.equal(result.execution.projectScope.projectId, "billing");
     assert.equal(result.billing.settledBy, "gateway_per_tool");
+    assert.equal(result.billing.charged, true);
+    assert.equal(result.billing.operation, "solve_task");
+  });
+
+  it("marks suggest/plan paths as not charged", async () => {
+    const context = createRunContext("what can you do");
+    const result = await executeIntent({
+      operation: "solve_task",
+      context,
+      logger,
+      run: async () => ({ status: "suggest", suggestions: [] }),
+    });
+    assert.equal(result.billing.charged, false);
+    assert.equal(result.billing.chargedReason, "suggest");
   });
 
   it("propagates failures for the MCP adapter to handle", async () => {

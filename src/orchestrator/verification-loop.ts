@@ -198,7 +198,7 @@ export function attachVerificationEnvelope(
     },
     goldenPath: [
       "1. plan_task(goal with preview https URL) — free",
-      "2. run_playbook(playbook, { url, profileId? }) — read verification.evidence + loop.line",
+      "2. run_playbook or solve_task (workflow) — read verification.evidence + loop.line",
       "3. Host applies ONLY loop.nextActions[0] (patchType + acceptance)",
       "4. Redeploy preview if needed",
       "5. verify_task(goal, { url, profileId }, baseline=<entire prior result>)",
