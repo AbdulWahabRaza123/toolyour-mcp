@@ -50,4 +50,34 @@ describe("tier1 work package", () => {
     assert.match(text, /roleHint/);
     assert.match(text, /does not replace/i);
   });
+
+  it("adds a portable caller-propagated handoff", async () => {
+    const { withHarnessLoop } = await import("../../dist/orchestrator/harness-loop.js");
+    const result = withHarnessLoop({
+      status: "completed",
+      execution: { workId: "work_checkout", runId: "run_1", intentId: "intent_1" },
+      jobReport: {
+        schemaVersion: "toolyour.jobReport@1",
+        jobId: "job_1",
+        workflowId: "ship-gate-job",
+        summary: [],
+        scores: { securityHeaders: { label: "h", value: 10, status: "poor" } },
+        findings: [
+          {
+            workstream: "securityHeaders",
+            severity: "high",
+            title: "Missing Content-Security-Policy",
+            whyItMatters: "xss",
+            howToFix: ["Add CSP header"],
+          },
+        ],
+        prioritizedActions: [],
+        toolsUsed: [],
+      },
+    });
+    assert.equal(result.handoff.schemaVersion, "toolyour.handoff@1");
+    assert.equal(result.handoff.workId, "work_checkout");
+    assert.equal(result.handoff.state, "needs_action");
+    assert.equal(result.handoff.persistence, "caller-propagated");
+  });
 });

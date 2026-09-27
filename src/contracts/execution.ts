@@ -16,6 +16,11 @@ export interface ProjectScope {
 }
 
 export interface WorkIntent {
+  /**
+   * Stable caller-propagated correlation key for a multi-step job. It is not
+   * durable storage by itself; a future WorkRecord service will own that.
+   */
+  workId: string;
   intentId: string;
   type: IntentType;
   goal: string;
@@ -50,7 +55,12 @@ export function inferIntentType(goal: string, explicit?: unknown): IntentType {
 export function createRunContext(
   goal: string,
   input: Record<string, unknown> = {},
-  options: { runId?: string; intentId?: string; phase?: RunContext["phase"] } = {}
+  options: {
+    runId?: string;
+    intentId?: string;
+    workId?: string;
+    phase?: RunContext["phase"];
+  } = {}
 ): RunContext {
   const runId = options.runId || `run_${cryptoRandomId()}`;
   const execution = (input.execution || {}) as Record<string, unknown>;
@@ -59,6 +69,11 @@ export function createRunContext(
     asNonEmptyString(execution.intentId) ||
     options.intentId ||
     `intent_${cryptoRandomId()}`;
+  const workId =
+    asNonEmptyString(input.workId) ||
+    asNonEmptyString(execution.workId) ||
+    options.workId ||
+    `work_${stableInputFingerprint(goal, input)}`;
   const explicitIdempotency = asNonEmptyString(input.idempotencyKey);
   const idempotencyKey = explicitIdempotency || `idem_${stableInputFingerprint(goal, input)}`;
   const project = (input.projectScope || {}) as Record<string, unknown>;
@@ -72,6 +87,7 @@ export function createRunContext(
   return {
     runId,
     intent: {
+      workId,
       intentId,
       type: inferIntentType(goal, input.intentType),
       goal: goal.trim(),

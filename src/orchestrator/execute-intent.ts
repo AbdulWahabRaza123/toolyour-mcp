@@ -28,6 +28,7 @@ export function attachExecutionContext(result: unknown, context: RunContext): un
     execution: {
       ...priorExec,
       runId: context.runId,
+      workId: context.intent.workId,
       intentId: context.intent.intentId,
       intentType: context.intent.type,
       idempotencyKey: context.intent.idempotencyKey,
@@ -65,6 +66,7 @@ export async function executeIntent<T>(opts: {
   opts.logger.info("intent_started", {
     operation: opts.operation,
     runId: opts.context.runId,
+    workId: opts.context.intent.workId,
     intentId: opts.context.intent.intentId,
     intentType: opts.context.intent.type,
     idempotencyKey: opts.context.intent.idempotencyKey,
@@ -102,6 +104,7 @@ export async function executeIntent<T>(opts: {
     opts.logger.info("intent_completed", {
       operation: opts.operation,
       runId: opts.context.runId,
+      workId: opts.context.intent.workId,
       intentId: opts.context.intent.intentId,
       durationMs: Date.now() - startedAt,
       status:
@@ -115,6 +118,7 @@ export async function executeIntent<T>(opts: {
     opts.logger.warn("intent_failed", {
       operation: opts.operation,
       runId: opts.context.runId,
+      workId: opts.context.intent.workId,
       intentId: opts.context.intent.intentId,
       durationMs: Date.now() - startedAt,
       error: error instanceof Error ? error.message : String(error),

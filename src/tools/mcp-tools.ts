@@ -38,6 +38,7 @@ import {
   resolveLocalhostUrl,
 } from "../orchestrator/local-dev";
 import { executeIntent } from "../orchestrator/execute-intent";
+import { registerSavedPlaybookTools, savedPlaybooksBetaEnabled } from "../playbooks/mcp";
 
 export interface McpServerContext {
   apiKey: string;
@@ -47,7 +48,85 @@ export interface McpServerContext {
 }
 
 type TextContent = { type: "text"; text: string };
-type ToolResult = { content: TextContent[]; isError?: boolean };
+type ToolResult = {
+  content: TextContent[];
+  structuredContent?: { result: unknown };
+  isError?: boolean;
+};
+type ToolAnnotations = {
+  readOnlyHint: boolean;
+  openWorldHint: boolean;
+  destructiveHint: boolean;
+};
+
+export const TOOL_ANNOTATIONS: Record<string, ToolAnnotations> = {
+  plan_task: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  recall_context: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  capture_feature: { readOnlyHint: false, openWorldHint: false, destructiveHint: false },
+  list_feature_memory: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  publish_feature_pattern: { readOnlyHint: false, openWorldHint: true, destructiveHint: false },
+  compare_feature_memory: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  list_community_patterns: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  delete_feature: { readOnlyHint: false, openWorldHint: false, destructiveHint: true },
+  unpublish_feature_pattern: { readOnlyHint: false, openWorldHint: true, destructiveHint: true },
+  solve_task: { readOnlyHint: false, openWorldHint: true, destructiveHint: false },
+  run_playbook: { readOnlyHint: false, openWorldHint: true, destructiveHint: false },
+  verify_task: { readOnlyHint: false, openWorldHint: true, destructiveHint: false },
+  discover_tools: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  list_categories: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  get_tool_schema: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  invoke_tool: { readOnlyHint: false, openWorldHint: true, destructiveHint: false },
+  list_skills: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  load_skill: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  fetch_payload: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  get_run: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  run_workflow: { readOnlyHint: false, openWorldHint: true, destructiveHint: false },
+  job_start: { readOnlyHint: false, openWorldHint: false, destructiveHint: false },
+  job_status: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  check_submit: { readOnlyHint: false, openWorldHint: false, destructiveHint: false },
+  job_cancel: { readOnlyHint: false, openWorldHint: false, destructiveHint: true },
+  job_declare_action: { readOnlyHint: false, openWorldHint: false, destructiveHint: false },
+  job_approve: { readOnlyHint: false, openWorldHint: false, destructiveHint: true },
+  create_saved_playbook: { readOnlyHint: false, openWorldHint: false, destructiveHint: false },
+  list_saved_playbooks: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  get_saved_playbook: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  update_saved_playbook: { readOnlyHint: false, openWorldHint: false, destructiveHint: false },
+  run_saved_playbook: { readOnlyHint: false, openWorldHint: true, destructiveHint: false },
+  get_saved_playbook_run: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+};
+
+export type McpServerProfile = "default" | "chatgpt-public";
+
+const serverProfiles = new WeakMap<McpServer, McpServerProfile>();
+
+type LowLevelRequestHandler = (
+  request: unknown,
+  extra: unknown
+) => Promise<Record<string, unknown>> | Record<string, unknown>;
+
+function publishChatGptSecuritySchemes(server: McpServer): void {
+  // MCP SDK 1.29 accepts `_meta` but omits the newer top-level
+  // `securitySchemes` field from tools/list. Keep the compatibility mirror and
+  // decorate the generated response until the SDK exposes this field directly.
+  const lowLevelServer = server.server as unknown as {
+    _requestHandlers: Map<string, LowLevelRequestHandler>;
+  };
+  const original = lowLevelServer._requestHandlers.get("tools/list");
+  if (!original) {
+    throw new Error("MCP tools/list handler was not registered");
+  }
+  lowLevelServer._requestHandlers.set("tools/list", async (request, extra) => {
+    const result = await original(request, extra);
+    const tools = Array.isArray(result.tools) ? result.tools : [];
+    return {
+      ...result,
+      tools: tools.map((tool) => ({
+        ...(tool as Record<string, unknown>),
+        securitySchemes: [{ type: "oauth2", scopes: ["toolyour:mcp"] }],
+      })),
+    };
+  });
+}
 
 function registerTool(
   server: McpServer,
@@ -56,18 +135,62 @@ function registerTool(
   schema: Record<string, z.ZodTypeAny>,
   handler: (args: Record<string, unknown>) => Promise<ToolResult>
 ): void {
-  const register = server.tool.bind(server) as (
+  const annotations = TOOL_ANNOTATIONS[name];
+  if (!annotations) {
+    throw new Error(`Missing required MCP tool annotations for: ${name}`);
+  }
+  const isChatGptPublic = serverProfiles.get(server) === "chatgpt-public";
+  const register = server.registerTool.bind(server) as (
     n: string,
-    d: string,
-    s: Record<string, z.ZodTypeAny>,
-    h: (args: Record<string, unknown>) => Promise<ToolResult>
+    config: {
+      description: string;
+      inputSchema: Record<string, z.ZodTypeAny>;
+      outputSchema: { result: z.ZodUnknown };
+      annotations: ToolAnnotations;
+      _meta?: Record<string, unknown>;
+    },
+    callback: (args: Record<string, unknown>) => Promise<ToolResult & { structuredContent: { result: unknown } }>
   ) => void;
-  register(name, description, schema, handler);
+  register(
+    name,
+    {
+      description,
+      inputSchema: schema,
+      outputSchema: { result: z.unknown() },
+      annotations,
+      ...(isChatGptPublic
+        ? {
+            _meta: {
+              securitySchemes: [
+                { type: "oauth2", scopes: ["toolyour:mcp"] },
+              ],
+            },
+          }
+        : {}),
+    },
+    async (args) => {
+      const result = await handler(args);
+      if (result.structuredContent) {
+        return result as ToolResult & { structuredContent: { result: unknown } };
+      }
+      const text = result.content[0]?.text;
+      let payload: unknown = text ?? null;
+      if (text) {
+        try {
+          payload = JSON.parse(text);
+        } catch {
+          // Preserve non-JSON tool text in the generic result envelope.
+        }
+      }
+      return { ...result, structuredContent: { result: payload } };
+    }
+  );
 }
 
 function textResult(payload: unknown, isError = false): ToolResult {
   return {
     content: [{ type: "text", text: JSON.stringify(payload, null, 2) }],
+    structuredContent: { result: payload },
     isError,
   };
 }
@@ -84,7 +207,10 @@ function assertNoForbiddenExecutionTools(server: McpServer): void {
   }
 }
 
-export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
+export function createToolYourMcpServer(
+  ctx: McpServerContext,
+  options: { profile?: McpServerProfile } = {}
+): McpServer {
   const server = new McpServer(
     {
       name: constants.serverName,
@@ -94,6 +220,8 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
       instructions: resolveMcpInstructions(),
     }
   );
+  const profile = options.profile || "default";
+  serverProfiles.set(server, profile);
 
   registerTool(
     server,
@@ -598,12 +726,15 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
       const baseline = args.baseline;
       const baselineExecution =
         baseline && typeof baseline === "object" && !Array.isArray(baseline)
-          ? (baseline as { execution?: { intentId?: unknown } }).execution
+          ? (baseline as { execution?: { intentId?: unknown; workId?: unknown } }).execution
           : undefined;
       const contextInput = {
         ...input,
         ...(typeof baselineExecution?.intentId === "string"
           ? { intentId: baselineExecution.intentId }
+          : {}),
+        ...(typeof baselineExecution?.workId === "string"
+          ? { workId: baselineExecution.workId }
           : {}),
       };
       const context = createRunContext(goal, contextInput, { phase: "verification" });
@@ -969,7 +1100,13 @@ export function createToolYourMcpServer(ctx: McpServerContext): McpServer {
     }
   );
 
-  registerControlPlaneTools(server, registerTool, ctx, { approvals: true });
+  if (profile !== "chatgpt-public") {
+    registerControlPlaneTools(server, registerTool, ctx, { approvals: true });
+    // Keep this beta out of /mcp/chatgpt while the public app is under review.
+    if (savedPlaybooksBetaEnabled()) registerSavedPlaybookTools(server, registerTool, ctx);
+  } else {
+    publishChatGptSecuritySchemes(server);
+  }
 
   assertNoForbiddenExecutionTools(server);
   return server;

@@ -1,0 +1,248 @@
+{
+  "$schema": "https://developers.openai.com/apps-sdk/schemas/chatgpt-app-submission.v1.json",
+  "schema_version": 1,
+  "app_info": {
+    "display_name": "ToolYour",
+    "subtitle": "Plan, run, and verify work",
+    "description": "ToolYour helps users plan technical work, run specialized playbooks and tools, verify results, and reuse project knowledge through ChatGPT.",
+    "category": "DEVELOPER_TOOLS"
+  },
+  "tools": {
+    "plan_task": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Builds a ranked execution plan and reads relevant feature memory without changing stored data.",
+        "open_world_justification": "Plans only against ToolYour's bounded catalog and the user's private project context.",
+        "destructive_justification": "Does not delete, overwrite, publish, or authorize irreversible actions."
+      }
+    },
+    "recall_context": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Retrieves matching feature-memory context without creating or updating records.",
+        "open_world_justification": "Searches only the user's bounded ToolYour feature-memory store.",
+        "destructive_justification": "Does not alter or remove stored feature memory."
+      }
+    },
+    "capture_feature": {
+      "annotations": { "readOnlyHint": false, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Creates a feature-memory record in the user's ToolYour account.",
+        "open_world_justification": "Writes only to the user's bounded private ToolYour workspace.",
+        "destructive_justification": "Adds a new record without deleting or irreversibly replacing existing records."
+      }
+    },
+    "list_feature_memory": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Lists stored feature-memory records without modifying them.",
+        "open_world_justification": "Access is limited to the user's bounded ToolYour feature-memory store.",
+        "destructive_justification": "Does not delete, overwrite, or publish feature-memory records."
+      }
+    },
+    "publish_feature_pattern": {
+      "annotations": { "readOnlyHint": false, "openWorldHint": true, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Publishes a selected private feature pattern to the ToolYour community catalog.",
+        "open_world_justification": "Makes content available to an open-ended community audience outside the user's private workspace.",
+        "destructive_justification": "Creates a community publication without deleting the original private feature record."
+      }
+    },
+    "compare_feature_memory": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Reads two stored feature records and computes a comparison without changing either record.",
+        "open_world_justification": "Compares records only within the bounded ToolYour feature-memory system.",
+        "destructive_justification": "Does not delete, overwrite, publish, or revoke any record."
+      }
+    },
+    "list_community_patterns": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Retrieves community feature patterns without modifying community or private data.",
+        "open_world_justification": "Reads from ToolYour's bounded community catalog rather than arbitrary external services.",
+        "destructive_justification": "Does not publish, unpublish, delete, or replace community content."
+      }
+    },
+    "delete_feature": {
+      "annotations": { "readOnlyHint": false, "openWorldHint": false, "destructiveHint": true },
+      "justifications": {
+        "read_only_justification": "Deletes a selected feature-memory record from the user's account.",
+        "open_world_justification": "Operates only within the user's bounded private ToolYour workspace.",
+        "destructive_justification": "Permanently removes the selected stored feature record."
+      }
+    },
+    "unpublish_feature_pattern": {
+      "annotations": { "readOnlyHint": false, "openWorldHint": true, "destructiveHint": true },
+      "justifications": {
+        "read_only_justification": "Changes the publication state of a community feature pattern.",
+        "open_world_justification": "Removes content previously exposed to an open-ended community audience.",
+        "destructive_justification": "Withdraws the selected pattern from the public community catalog."
+      }
+    },
+    "solve_task": {
+      "annotations": { "readOnlyHint": false, "openWorldHint": true, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "May execute catalog tools and persist run or feature-memory state while solving the task.",
+        "open_world_justification": "Can invoke catalog operations that interact with open-ended external services and content.",
+        "destructive_justification": "The orchestrator does not itself expose deletion or irreversible transaction controls."
+      }
+    },
+    "run_playbook": {
+      "annotations": { "readOnlyHint": false, "openWorldHint": true, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Runs a multi-step playbook and records execution state and results.",
+        "open_world_justification": "Playbook steps can invoke tools that access open-ended external services and content.",
+        "destructive_justification": "The playbook runner does not expose a direct delete or irreversible transaction operation."
+      }
+    },
+    "verify_task": {
+      "annotations": { "readOnlyHint": false, "openWorldHint": true, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Runs verification operations and may record verification and feature-memory results.",
+        "open_world_justification": "Verification may call tools that inspect open-ended external services or content.",
+        "destructive_justification": "Verification does not directly delete data or execute irreversible transactions."
+      }
+    },
+    "discover_tools": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Searches ToolYour's tool registry and returns matching metadata without executing tools.",
+        "open_world_justification": "Search is limited to ToolYour's bounded catalog.",
+        "destructive_justification": "Does not run, modify, or remove any catalog tool."
+      }
+    },
+    "list_categories": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Lists categories from the ToolYour registry without changing registry data.",
+        "open_world_justification": "Reads only ToolYour's bounded catalog taxonomy.",
+        "destructive_justification": "Does not add, update, or remove categories."
+      }
+    },
+    "get_tool_schema": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Retrieves a catalog tool's schema and metadata without invoking it.",
+        "open_world_justification": "Reads only from ToolYour's bounded registry.",
+        "destructive_justification": "Does not execute tools or change registry entries."
+      }
+    },
+    "invoke_tool": {
+      "annotations": { "readOnlyHint": false, "openWorldHint": true, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Executes a selected catalog tool, which can create run state or cause external side effects.",
+        "open_world_justification": "Catalog tools can operate on open-ended external services, URLs, and content.",
+        "destructive_justification": "The generic invocation surface excludes direct destructive execution tools and does not itself delete records."
+      }
+    },
+    "list_skills": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Lists installed ToolYour skill metadata without running or modifying skills.",
+        "open_world_justification": "Reads only ToolYour's bounded skill catalog.",
+        "destructive_justification": "Does not install, update, execute, or remove skills."
+      }
+    },
+    "load_skill": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Loads instructions for one registered skill without executing or modifying it.",
+        "open_world_justification": "Reads only from ToolYour's bounded skill catalog.",
+        "destructive_justification": "Does not update, delete, or execute skill content."
+      }
+    },
+    "fetch_payload": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Retrieves a stored ToolYour payload by reference without modifying it.",
+        "open_world_justification": "Reads only from ToolYour's bounded payload store.",
+        "destructive_justification": "Does not delete, replace, or publish stored payloads."
+      }
+    },
+    "get_run": {
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Retrieves status and results for an existing ToolYour run without changing it.",
+        "open_world_justification": "Reads only run data within the user's bounded ToolYour account.",
+        "destructive_justification": "Does not cancel, restart, or remove the run."
+      }
+    },
+    "run_workflow": {
+      "annotations": { "readOnlyHint": false, "openWorldHint": true, "destructiveHint": false },
+      "justifications": {
+        "read_only_justification": "Executes multiple workflow steps and records run state and outputs.",
+        "open_world_justification": "Workflow steps can interact with open-ended external services and content.",
+        "destructive_justification": "The workflow runner does not expose a direct delete or irreversible transaction operation."
+      }
+    }
+  },
+  "test_cases": [
+    {
+      "description": "Plan a production-readiness workflow before any execution begins.",
+      "user_prompt": "Create a ranked plan to check whether my web application is ready for production, but do not run anything yet.",
+      "file_attachment_urls": null,
+      "tools_triggered": "plan_task",
+      "expected_output": "Returns a ranked plan, relevant project context, and a clear indication of whether execution should begin.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Run a supported SEO audit playbook for a public site.",
+      "user_prompt": "Run the SEO audit playbook for https://www.toolyour.com and summarize the highest-priority findings.",
+      "file_attachment_urls": null,
+      "tools_triggered": "run_playbook",
+      "expected_output": "Runs the selected playbook and returns prioritized findings with structured execution results.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Verify the result of a prior technical task.",
+      "user_prompt": "Verify that the completed production-readiness task passed its required checks and explain any failures.",
+      "file_attachment_urls": null,
+      "tools_triggered": "verify_task",
+      "expected_output": "Returns verification status, evidence for each check, and concise remediation guidance for failures.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Discover a suitable utility without executing it.",
+      "user_prompt": "Find ToolYour tools that can convert a PDF into images; show me the best matches without running them.",
+      "file_attachment_urls": null,
+      "tools_triggered": "discover_tools",
+      "expected_output": "Returns matching catalog tools with enough metadata to select the appropriate converter.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Execute a specifically requested catalog utility.",
+      "user_prompt": "Use the appropriate ToolYour catalog tool to convert my supplied document to PDF.",
+      "file_attachment_urls": null,
+      "tools_triggered": "invoke_tool",
+      "expected_output": "Invokes the selected converter and returns a clear result or a precise request for any required missing input.",
+      "expected_output_url": null
+    }
+  ],
+  "negative_test_cases": [
+    {
+      "description": "Do not trigger for personal calendar management.",
+      "user_prompt": "Schedule a meeting with my design team tomorrow afternoon.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked because it does not manage calendars or meetings.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not trigger for email composition or sending.",
+      "user_prompt": "Write and send an email to my customer about their invoice.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked because it does not provide email delivery workflows.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not trigger for financial trading or payments.",
+      "user_prompt": "Buy 20 shares of a technology stock for me right now.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked because it cannot place trades or perform financial transactions.",
+      "expected_output_url": null
+    }
+  ]
+}

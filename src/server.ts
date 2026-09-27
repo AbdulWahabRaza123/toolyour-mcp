@@ -13,7 +13,7 @@ import { serializeRunPoll } from "./runs/serialize";
 import { registerHealthRoutes } from "./health/routes";
 import { registerDiscoveryRoutes } from "./discovery/routes";
 import { createToolYourMcpServer } from "./tools/mcp-tools";
-import { validateApiKey } from "./auth/session";
+import { exchangeOAuthAccessToken, validateApiKey } from "./auth/session";
 
 const env = getEnv();
 const logger = createLogger(env.logLevel);
@@ -33,6 +33,7 @@ app.use((req, res, next) => {
   if (
     req.path.startsWith("/mcp") &&
     req.path !== "/mcp/http" &&
+    req.path !== "/mcp/chatgpt" &&
     req.path !== "/mcp"
   ) {
     return next();
@@ -57,6 +58,9 @@ interface HttpSessionEntry {
   createdAt: number;
   lastActiveAt: number;
   mcpSessionId: string;
+  profile: "default" | "chatgpt-public";
+  credential?: string;
+  oauthSubject?: string;
 }
 
 const sseTransports = new Map<string, SseSessionEntry>();
@@ -118,6 +122,50 @@ function extractApiKey(req: express.Request): string | null {
   }
   return null;
 }
+
+function extractOAuthBearer(req: express.Request): string | null {
+  const auth = req.headers.authorization;
+  if (typeof auth !== "string" || !auth.startsWith("Bearer ")) return null;
+  const token = auth.slice(7).trim();
+  if (!token || token.startsWith("ty_")) return null;
+  return token;
+}
+
+function oauthResourceMetadataUrl(): string {
+  return `${env.mcpPublicBaseUrl}/.well-known/oauth-protected-resource`;
+}
+
+function sendOAuthChallenge(res: express.Response): void {
+  res.setHeader(
+    "WWW-Authenticate",
+    `Bearer resource_metadata="${oauthResourceMetadataUrl()}", scope="toolyour:mcp"`
+  );
+  res.status(401).json({ error: "OAuth authorization required" });
+}
+
+app.get("/.well-known/oauth-protected-resource", (_req, res) => {
+  if (!env.auth0IssuerBaseUrl) {
+    res.status(503).json({ error: "OAuth provider is not configured" });
+    return;
+  }
+  res.json({
+    resource: `${env.mcpPublicBaseUrl}/mcp/chatgpt`,
+    authorization_servers: [`${env.auth0IssuerBaseUrl}/`],
+    scopes_supported: ["openid", "profile", "email", "toolyour:mcp"],
+    bearer_methods_supported: ["header"],
+    resource_documentation: "https://www.toolyour.com/developers/mcp",
+    resource_policy_uri: "https://www.toolyour.com/privacy-policies",
+    resource_tos_uri: "https://www.toolyour.com/terms-and-conditions",
+  });
+});
+
+app.get("/.well-known/openai-apps-challenge", (_req, res) => {
+  if (!env.openaiAppsChallenge) {
+    res.status(404).type("text/plain").send("Not configured");
+    return;
+  }
+  res.status(200).type("text/plain").send(env.openaiAppsChallenge);
+});
 
 /** Legacy SSE transport (Cursor / existing clients). */
 app.get("/mcp", async (req, res) => {
@@ -192,6 +240,10 @@ async function handleStreamableHttp(
 
   if (existingId && httpTransports.has(existingId)) {
     const entry = httpTransports.get(existingId)!;
+    if (entry.profile !== "default") {
+      res.status(400).json({ error: "MCP session belongs to another endpoint" });
+      return;
+    }
     touchHttp(existingId);
     await entry.transport.handleRequest(req, res, req.body);
     return;
@@ -228,6 +280,7 @@ async function handleStreamableHttp(
         createdAt: now,
         lastActiveAt: now,
         mcpSessionId,
+        profile: "default",
       });
       logger.info("mcp http session started", {
         mcpSessionId,
@@ -241,6 +294,98 @@ async function handleStreamableHttp(
   res.status(400).json({
     error:
       "Unknown or missing MCP session. Initialize with POST /mcp or POST /mcp/http (Streamable HTTP).",
+  });
+}
+
+/** Public ChatGPT transport: OAuth 2.1 bearer tokens and reviewer-safe tools only. */
+async function handleChatGptHttp(
+  req: express.Request,
+  res: express.Response
+): Promise<void> {
+  const accessToken = extractOAuthBearer(req);
+  if (!accessToken) {
+    sendOAuthChallenge(res);
+    return;
+  }
+
+  const sessionHeader = req.headers["mcp-session-id"];
+  const existingId =
+    typeof sessionHeader === "string" && sessionHeader.trim()
+      ? sessionHeader.trim()
+      : undefined;
+  const existing = existingId ? httpTransports.get(existingId) : undefined;
+
+  let oauth;
+  try {
+    oauth = await exchangeOAuthAccessToken(
+      accessToken,
+      logger,
+      existing?.credential
+    );
+  } catch {
+    sendOAuthChallenge(res);
+    return;
+  }
+
+  if (existingId && existing) {
+    if (
+      existing.profile !== "chatgpt-public" ||
+      existing.oauthSubject !== oauth.subject
+    ) {
+      res.status(403).json({ error: "MCP session identity mismatch" });
+      return;
+    }
+    touchHttp(existingId);
+    await existing.transport.handleRequest(req, res, req.body);
+    return;
+  }
+
+  if (req.method === "POST" && !existingId) {
+    const mcpSessionId = randomUUID();
+    const transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: () => randomUUID(),
+    });
+    transport.onclose = () => {
+      const sid = transport.sessionId;
+      if (sid) httpTransports.delete(sid);
+    };
+
+    const server = createToolYourMcpServer(
+      {
+        apiKey: oauth.credential,
+        mcpSessionId,
+        registry,
+        logger,
+      },
+      { profile: "chatgpt-public" }
+    );
+    await server.connect(transport);
+    const now = Date.now();
+    await transport.handleRequest(req, res, req.body);
+
+    const sid = transport.sessionId;
+    if (sid) {
+      httpTransports.set(sid, {
+        kind: "http",
+        transport,
+        createdAt: now,
+        lastActiveAt: now,
+        mcpSessionId,
+        profile: "chatgpt-public",
+        credential: oauth.credential,
+        oauthSubject: oauth.subject,
+      });
+      logger.info("chatgpt mcp session started", {
+        mcpSessionId,
+        transport: "mcp-http",
+        sessionId: sid,
+      });
+    }
+    return;
+  }
+
+  res.status(400).json({
+    error: "Unknown or missing MCP session. Initialize with POST /mcp/chatgpt.",
   });
 }
 
@@ -258,6 +403,15 @@ app.get("/mcp/http", (req, res) => {
 });
 app.delete("/mcp/http", (req, res) => {
   void handleStreamableHttp(req, res);
+});
+app.post("/mcp/chatgpt", (req, res) => {
+  void handleChatGptHttp(req, res);
+});
+app.get("/mcp/chatgpt", (req, res) => {
+  void handleChatGptHttp(req, res);
+});
+app.delete("/mcp/chatgpt", (req, res) => {
+  void handleChatGptHttp(req, res);
 });
 
 /** Retrieve full truncated payload (same API key). Free in-process store. */
@@ -312,6 +466,11 @@ app.get("/mcp/runs/:id", async (req, res) => {
 app.listen(env.port, () => {
   logger.info("toolyour-mcp listening", {
     port: env.port,
-    transports: ["sse:GET /mcp", "http:POST /mcp", "http:/mcp/http"],
+    transports: [
+      "sse:GET /mcp",
+      "http:POST /mcp",
+      "http:/mcp/http",
+      "oauth-http:/mcp/chatgpt",
+    ],
   });
 });

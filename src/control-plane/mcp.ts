@@ -37,6 +37,8 @@ import {
   type ProjectSpec,
 } from "./types";
 import { isAllowedCheckCommand } from "./host-checks";
+import { capturePullRequestReadiness } from "../github/capture-pr-readiness";
+import { requestWorkApproval } from "../work-record/approval-store";
 
 export interface ControlPlaneCtx {
   apiKey: string;
@@ -55,6 +57,14 @@ export const CONTROL_PLANE_APPROVAL_TOOLS = [
   "job_declare_action",
   "job_approve",
 ] as const;
+
+/** Opt-in beta tool; never included in the ChatGPT public server profile. */
+export const GITHUB_EVIDENCE_BETA_TOOL = "capture_pr_readiness" as const;
+export const WORK_APPROVAL_BETA_TOOL = "request_pr_approval" as const;
+
+export function githubEvidenceBetaEnabled(): boolean {
+  return String(process.env.GITHUB_EVIDENCE_BETA || "").trim().toLowerCase() === "true";
+}
 
 /** Never register these. Host owns the shell; ToolYour is not an execution sandbox. */
 export const FORBIDDEN_EXECUTION_TOOLS = [
@@ -148,6 +158,46 @@ function storeErr(e: unknown) {
     return err("job_not_found", "Job not found or expired");
   }
   return err("store_unavailable", "Job store unavailable");
+}
+
+async function handleCapturePullRequestReadiness(args: Record<string, unknown>, ctx: ControlPlaneCtx) {
+  const denied = await denyIfNotOptedIn(ctx);
+  if (denied) return denied;
+  const pullRequestUrl = typeof args.pullRequestUrl === "string" ? args.pullRequestUrl.trim() : "";
+  const objective = typeof args.objective === "string" ? args.objective.trim() : "Establish merge readiness for this pull request";
+  const workId = typeof args.workId === "string" && args.workId.trim()
+    ? args.workId.trim()
+    : `work_${randomUUID().replace(/-/g, "")}`;
+  if (!pullRequestUrl) return err("invalid_input", "pullRequestUrl is required");
+  const appId = String(process.env.GITHUB_APP_ID || "").trim();
+  const privateKey = String(process.env.GITHUB_APP_PRIVATE_KEY || "").trim();
+  if (!appId || !privateKey) {
+    return err("github_evidence_unavailable", "GitHub evidence beta is not configured on this server");
+  }
+  try {
+    const readiness = await capturePullRequestReadiness({
+      pullRequestUrl,
+      workId,
+      ownerKey: ownerKeyFromApiKey(ctx.apiKey),
+      objective,
+      githubAppId: appId,
+      githubAppPrivateKey: privateKey,
+    });
+    return textResult({ workId, ...readiness });
+  } catch (e) {
+    ctx.logger.warn("GitHub PR evidence capture failed", { message: e instanceof Error ? e.message : "unknown" });
+    return err("github_evidence_unavailable", "GitHub pull-request evidence could not be collected or stored");
+  }
+}
+
+async function handleRequestPullRequestApproval(args: Record<string, unknown>, ctx: ControlPlaneCtx) {
+  const denied = await denyIfNotOptedIn(ctx); if (denied) return denied;
+  const workId = typeof args.workId === "string" ? args.workId.trim() : "";
+  if (!workId) return err("invalid_input", "workId is required");
+  try {
+    const approval = await requestWorkApproval({ workId, ownerKey: ownerKeyFromApiKey(ctx.apiKey), ...(typeof args.summary === "string" ? { summary: args.summary } : {}), ...(typeof args.expiresInHours === "number" ? { expiresInHours: args.expiresInHours } : {}) });
+    return textResult({ approval, next: "A human must approve or reject this exact evidence digest outside MCP. The agent cannot self-approve." });
+  } catch (e) { ctx.logger.warn("Work approval request failed", { message: e instanceof Error ? e.message : "unknown" }); return err("approval_unavailable", "Approval request could not be created from this WorkRecord"); }
 }
 
 async function denyIfNotOptedIn(ctx: ControlPlaneCtx) {
@@ -694,4 +744,18 @@ export function registerControlPlaneTools(
     },
     async (args) => handleApprove(args, ctx)
   );
+
+  if (!githubEvidenceBetaEnabled()) return;
+  registerTool(
+    server,
+    GITHUB_EVIDENCE_BETA_TOOL,
+    "Beta, read-only: collect GitHub pull-request evidence, return an honest merge-readiness decision, and save a durable WorkRecord. It never comments, merges, or changes GitHub.",
+    {
+      pullRequestUrl: z.string().url(),
+      objective: z.string().max(4000).optional(),
+      workId: z.string().regex(/^work_[A-Za-z0-9_-]{6,160}$/).optional(),
+    },
+    async (args) => handleCapturePullRequestReadiness(args, ctx)
+  );
+  registerTool(server, WORK_APPROVAL_BETA_TOOL, "Beta: request human merge/release approval for a WorkRecord's immutable PR evidence. This never approves, merges, or changes GitHub.", { workId: z.string().regex(/^work_[A-Za-z0-9_-]{6,160}$/), summary: z.string().max(2000).optional(), expiresInHours: z.number().int().min(1).max(168).optional() }, async (args) => handleRequestPullRequestApproval(args, ctx));
 }

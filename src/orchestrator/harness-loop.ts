@@ -77,6 +77,26 @@ export interface HarnessLoop extends LoopEligibility {
   receipt: LoopReceipt;
 }
 
+export interface WorkHandoff {
+  schemaVersion: "toolyour.handoff@1";
+  /** Pass this into the next plan/run/verify input as input.workId. */
+  workId: string;
+  runId?: string;
+  intentId?: string;
+  state: "ready" | "needs_action" | "stopped";
+  nextOwner: string;
+  nextAction: string | null;
+  acceptance: string | null;
+  remainingFixCount: number;
+  verification: {
+    method: "verify_task";
+    baseline: "prior_result";
+    note: string;
+  };
+  /** This is correlation metadata until a durable WorkRecord backend is enabled. */
+  persistence: "caller-propagated";
+}
+
 function truncateLabel(text: string, max: number): string {
   const t = String(text || "")
     .trim()
@@ -308,12 +328,45 @@ export function withHarnessLoop<T>(
         gate,
         progress
       );
+      attachWorkHandoff(root, root.loop as HarnessLoop);
       return result;
     }
   }
 
   root.loop = buildHarnessLoopFromReport(root, phase);
+  attachWorkHandoff(root, root.loop as HarnessLoop);
   return result;
+}
+
+function attachWorkHandoff(root: Record<string, unknown>, loop: HarnessLoop): void {
+  const execution =
+    root.execution && typeof root.execution === "object" && !Array.isArray(root.execution)
+      ? (root.execution as Record<string, unknown>)
+      : undefined;
+  const workId = typeof execution?.workId === "string" ? execution.workId : undefined;
+  if (!workId) return;
+
+  const next = loop.nextActions[0];
+  const state: WorkHandoff["state"] =
+    loop.gate === "pass" ? "ready" : loop.initiate ? "needs_action" : "stopped";
+  root.handoff = {
+    schemaVersion: "toolyour.handoff@1",
+    workId,
+    ...(typeof execution?.runId === "string" ? { runId: execution.runId } : {}),
+    ...(typeof execution?.intentId === "string" ? { intentId: execution.intentId } : {}),
+    state,
+    nextOwner: next?.roleHint || (state === "ready" ? "human" : "host"),
+    nextAction: next?.label || null,
+    acceptance: next?.acceptance || null,
+    remainingFixCount: loop.remainingFixes.length,
+    verification: {
+      method: "verify_task",
+      baseline: "prior_result",
+      note:
+        "Keep this workId in input.workId. Until durable WorkRecord storage is enabled, verify_task still needs the prior result as its baseline.",
+    },
+    persistence: "caller-propagated",
+  } satisfies WorkHandoff;
 }
 
 export function shapeAgentResult(

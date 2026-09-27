@@ -8,6 +8,8 @@ import { createToolYourMcpServer } from "../../dist/tools/mcp-tools.js";
 import {
   CONTROL_PLANE_APPROVAL_TOOLS,
   CONTROL_PLANE_TOOLS,
+  GITHUB_EVIDENCE_BETA_TOOL,
+  githubEvidenceBetaEnabled,
   FORBIDDEN_EXECUTION_TOOLS,
   DEFAULT_MCP_INSTRUCTIONS,
   FROZEN_TEST_INVENTORY,
@@ -70,6 +72,15 @@ describe("control-plane MCP loops", { concurrency: 1 }, () => {
     bothLoops(names(makeServer()));
   });
 
+  it("keeps GitHub evidence out of the default tool surface", () => {
+    const previous = process.env.GITHUB_EVIDENCE_BETA;
+    delete process.env.GITHUB_EVIDENCE_BETA;
+    assert.equal(githubEvidenceBetaEnabled(), false);
+    assert.equal(names(makeServer()).includes(GITHUB_EVIDENCE_BETA_TOOL), false);
+    if (previous === undefined) delete process.env.GITHUB_EVIDENCE_BETA;
+    else process.env.GITHUB_EVIDENCE_BETA = previous;
+  });
+
   it("never registers a ToolYour-owned shell or sandbox tool", () => {
     const n = names(makeServer());
     for (const t of FORBIDDEN_EXECUTION_TOOLS) {
@@ -82,7 +93,7 @@ describe("control-plane MCP loops", { concurrency: 1 }, () => {
     assert.match(resolveMcpInstructions(), /Pick exactly one/);
     assert.match(resolveMcpInstructions(), /institutional record/i);
     assert.match(resolveMcpInstructions(), /featureMemoryRecord/i);
-    assert.match(resolveMcpInstructions(), /Do not invent check_submit/);
+    assert.match(resolveMcpInstructions(), /Do not call check_submit yourself with invented pass\/fail/);
     assert.match(resolveMcpInstructions(), /Do not call plan_task, solve_task, or verify_task for that jobId/);
   });
 });

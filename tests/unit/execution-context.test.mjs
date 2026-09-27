@@ -24,6 +24,7 @@ describe("canonical execution context", () => {
     assert.equal(first.intent.projectScope.projectId, "website");
     assert.equal(first.intent.projectScope.environment, "production");
     assert.equal(first.intent.idempotencyKey, second.intent.idempotencyKey);
+    assert.equal(first.intent.workId, second.intent.workId);
     assert.notEqual(first.runId, second.runId);
   });
 
@@ -32,6 +33,13 @@ describe("canonical execution context", () => {
       idempotencyKey: "customer-release-42",
     });
     assert.equal(context.intent.idempotencyKey, "customer-release-42");
+  });
+
+  it("preserves a caller-provided work id across run phases", () => {
+    const context = createRunContext("run the workflow", {
+      workId: "work_checkout_release",
+    });
+    assert.equal(context.intent.workId, "work_checkout_release");
   });
 
   it("extracts project scope labels for memory matching", () => {

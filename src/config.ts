@@ -73,7 +73,28 @@ export function getEnv() {
     featureMemoryUrl:
       process.env.FEATURE_MEMORY_URL?.replace(/\/$/, "") ||
       `${saasInternalBase}/feature-memory`,
+    workRecordsUrl:
+      process.env.WORK_RECORDS_URL?.replace(/\/$/, "") ||
+      `${saasInternalBase}/work-records`,
+    repositoryPoliciesUrl:
+      process.env.REPOSITORY_POLICIES_URL?.replace(/\/$/, "") ||
+      `${saasInternalBase}/repository-policies`,
+    approvalRequestsUrl:
+      process.env.APPROVAL_REQUESTS_URL?.replace(/\/$/, "") ||
+      `${saasInternalBase}/approval-requests`,
+    savedPlaybooksUrl:
+      process.env.SAVED_PLAYBOOKS_URL?.replace(/\/$/, "") ||
+      `${saasInternalBase}/saved-playbooks`,
+    playbookRunsUrl:
+      process.env.PLAYBOOK_RUNS_URL?.replace(/\/$/, "") ||
+      `${saasInternalBase}/playbook-runs`,
     internalSecret: process.env.SAAS_INTERNAL_SECRET || "",
+    oauthExchangeUrl:
+      process.env.SAAS_OAUTH_EXCHANGE_URL ||
+      `${saasInternalBase}/oauth-session`,
+    auth0IssuerBaseUrl: (process.env.AUTH0_ISSUER_BASE_URL || "").replace(/\/$/, ""),
+    mcpPublicBaseUrl: (process.env.MCP_PUBLIC_BASE_URL || "https://api.toolyour.com").replace(/\/$/, ""),
+    openaiAppsChallenge: process.env.OPENAI_APPS_CHALLENGE || "",
     registryPath:
       process.env.REGISTRY_PATH ||
       path.join(__dirname, "..", "registry", "manifest.json"),

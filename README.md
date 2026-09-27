@@ -48,6 +48,21 @@ one `executeIntent` lifecycle boundary for correlation and the `execution` envel
 Credits settle on each gateway tool invoke (`billing.settledBy = gateway_per_tool`) — MCP
 does not double-bill. Free `recall_context` recalls purpose-typed memory before rebuilds.
 
+## Saved Playbooks (private beta)
+
+Saved Playbooks turns a repeatable ToolYour workflow into a named, versioned recipe that an
+MCP-capable agent can run again. V1 deliberately points only to **existing ToolYour skills or
+workflows**; it does not store arbitrary shell commands, control another agent, or bypass host
+approval. Each account gets owner-scoped playbooks and durable run receipts.
+
+Enable this only on a private/default MCP deployment with `PLAYBOOKS_BETA=true`. The beta adds
+`create_saved_playbook`, `list_saved_playbooks`, `get_saved_playbook`, `update_saved_playbook`,
+`run_saved_playbook`, and `get_saved_playbook_run`. It is intentionally excluded from
+`/mcp/chatgpt` so the reviewed public 21-tool surface stays unchanged.
+
+See [Saved Playbooks beta design](./docs/SAVED-PLAYBOOKS-BETA.md) for the data model, safe
+execution boundary, and rollout guidance.
+
 ## Offline evals (no API key)
 
 ```bash
