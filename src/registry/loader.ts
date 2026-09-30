@@ -5,12 +5,15 @@ import type { McpRegistryManifest, McpToolRoute } from "../contracts";
 import type { Logger } from "../observability/logger";
 import { scoreFuzzyQuery } from "../search/fuzzy-search";
 import { expandQueryForDiscovery } from "../search/query-expand";
+import { compileNativeActionCatalog } from "../actions/native-catalog";
+import type { ActionContract } from "../actions/types";
 
 export class RegistryLoader {
   private manifest: McpRegistryManifest | null = null;
   private loadedAt = 0;
   private refreshTimer: ReturnType<typeof setInterval> | null = null;
   private schemaCache = new Map<string, unknown | null>();
+  private nativeActions: ActionContract[] = [];
 
   constructor(private logger: Logger) {}
 
@@ -32,12 +35,18 @@ export class RegistryLoader {
       if (!fs.existsSync(env.registryPath)) {
         throw new Error(`Registry not found: ${env.registryPath}`);
       }
-      this.manifest = loadManifestFile(env.registryPath);
+      const manifest = loadManifestFile(env.registryPath);
+      // Fail closed at load time: a malformed route must not become an action
+      // that a future connector/task runtime could execute.
+      const nativeActions = compileNativeActionCatalog(manifest);
+      this.manifest = manifest;
+      this.nativeActions = nativeActions;
       this.loadedAt = Date.now();
       this.schemaCache.clear();
       if (!silent) {
         this.logger.info("registry loaded", {
           tools: this.manifest.stats.hasApiIncluded,
+          actions: this.nativeActions.length,
         });
       }
     } catch (e) {
@@ -55,6 +64,12 @@ export class RegistryLoader {
   getManifest(): McpRegistryManifest {
     if (!this.manifest) throw new Error("Registry not loaded");
     return this.manifest;
+  }
+
+  /** Internal catalogue only. It is deliberately not returned by MCP tools/list. */
+  getNativeActions(): readonly ActionContract[] {
+    if (!this.manifest) throw new Error("Registry not loaded");
+    return this.nativeActions;
   }
 
   getRoute(operationId: string): McpToolRoute | undefined {

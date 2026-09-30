@@ -7,6 +7,7 @@ import { MCP_ERROR_CODES, type McpToolRoute } from "../contracts";
 import type { Logger } from "../observability/logger";
 import type { RegistryLoader } from "../registry/loader";
 import { validateInputAgainstSchema } from "./schema-validate";
+import { recordNativeActionSuccess } from "../actions/receipt-saas";
 
 export interface InvokeOperationContext {
   apiKey: string;
@@ -91,6 +92,22 @@ export async function invokeOperation(
     res.data,
     res.text
   );
+
+  // Beta-only, best-effort receipt capture. This never changes the gateway
+  // result and stays disabled unless ACTION_REGISTRY_BETA=true.
+  if (!res.status || (res.status >= 200 && res.status < 300)) {
+    const contract = ctx.registry?.getNativeActions().find((action) => action.providerRef === operationId);
+    if (contract) {
+      void recordNativeActionSuccess({
+        ownerKey: `user_${session.userId || session.apiKeyId}`,
+        contract,
+        requestId: reqId,
+        input: normalized,
+        result: shaped,
+        logger: ctx.logger,
+      });
+    }
+  }
 
   return {
     requestId: reqId,

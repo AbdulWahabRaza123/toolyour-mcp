@@ -88,6 +88,9 @@ export function getEnv() {
     playbookRunsUrl:
       process.env.PLAYBOOK_RUNS_URL?.replace(/\/$/, "") ||
       `${saasInternalBase}/playbook-runs`,
+    actionRegistryUrl:
+      process.env.ACTION_REGISTRY_URL?.replace(/\/$/, "") ||
+      `${saasInternalBase}`,
     internalSecret: process.env.SAAS_INTERNAL_SECRET || "",
     oauthExchangeUrl:
       process.env.SAAS_OAUTH_EXCHANGE_URL ||
