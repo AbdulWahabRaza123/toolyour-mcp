@@ -24,7 +24,7 @@ See [DEVELOPMENT-VERIFICATION-GUIDE.md](./DEVELOPMENT-VERIFICATION-GUIDE.md).
 
 ## Feature Memory (hot path)
 
-Cross-project memory so agents do not rebuild the same feature blind. **ToolYour records automatically** — agents must treat ToolYour as institutional memory.
+Deprecated compatibility surface. Automatic capture and planning enrichment are disabled by default; existing authenticated records remain temporarily available for review and deletion.
 
 1. `plan_task` — read `featureMemory.recordKeeping` on every goal; prior matches when they exist.
 2. `verify_task` / `run_playbook` / `solve_task` on `loop.gate=pass` — ToolYour writes `featureMemoryRecord` (no agent action required).

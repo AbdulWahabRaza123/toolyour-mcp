@@ -12,6 +12,7 @@ import {
   attachFeatureMemoryEnvelope,
   buildFeatureMemoryReminder,
   enrichWithFeatureMemory,
+  featureMemoryAutomaticCaptureEnabled,
   shouldAutoRecordCompletedFeature,
   classifyMemoryType,
 } from "../../dist/orchestrator/feature-memory-loop.js";
@@ -70,14 +71,20 @@ describe("feature domain", () => {
 });
 
 describe("feature memory record keeping", () => {
+  it("keeps automatic capture disabled by default", () => {
+    const previous = process.env.FEATURE_MEMORY_AUTO_CAPTURE;
+    delete process.env.FEATURE_MEMORY_AUTO_CAPTURE;
+    assert.equal(featureMemoryAutomaticCaptureEnabled(), false);
+    if (previous !== undefined) process.env.FEATURE_MEMORY_AUTO_CAPTURE = previous;
+  });
   it("classifies memory by purpose", () => {
     assert.equal(classifyMemoryType("verify production ship gate"), "verification");
     assert.equal(classifyMemoryType("run the release workflow"), "workflow");
     assert.equal(classifyMemoryType("build invoice OCR"), "feature");
   });
-  it("exposes system-first auto-record policy", () => {
+  it("labels the legacy auto-record policy as compatibility-only", () => {
     assert.equal(FEATURE_MEMORY_RECORD_KEEPING.policy, "toolyour_auto_record");
-    assert.match(FEATURE_MEMORY_RECORD_KEEPING.message, /institutional memory/i);
+    assert.match(FEATURE_MEMORY_RECORD_KEEPING.message, /deprecated compatibility mode/i);
     assert.ok(FEATURE_MEMORY_RECORD_KEEPING.autoCaptureOn.includes("verify_task_gate_pass"));
   });
 
@@ -159,6 +166,8 @@ describe("feature memory envelope", () => {
   });
 
   it("enrichWithFeatureMemory attaches baseline when match is unavailable", async () => {
+    const previous = process.env.FEATURE_MEMORY_AUTO_CAPTURE;
+    process.env.FEATURE_MEMORY_AUTO_CAPTURE = "true";
     const root = {};
     const logger = { warn() {}, info() {}, error() {}, debug() {} };
     await enrichWithFeatureMemory(root, {
@@ -169,6 +178,8 @@ describe("feature memory envelope", () => {
     assert.equal(root.featureMemory?.recordKeeping?.policy, "toolyour_auto_record");
     assert.equal(root.featureMemory?.schemaVersion, "toolyour.featureMemory@1");
     assert.ok(root.featureMemory?.goldenPath?.length >= 1);
+    if (previous === undefined) delete process.env.FEATURE_MEMORY_AUTO_CAPTURE;
+    else process.env.FEATURE_MEMORY_AUTO_CAPTURE = previous;
   });
 
   it("skips auto-record when featureMemoryRecord already present", () => {

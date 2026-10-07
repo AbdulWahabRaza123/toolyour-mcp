@@ -50,7 +50,7 @@ export type FeatureMemoryEnvelope = {
 export const FEATURE_MEMORY_RECORD_KEEPING: FeatureMemoryRecordKeeping = {
   policy: "toolyour_auto_record",
   message:
-    "ToolYour is your cross-project institutional memory. On loop.gate=pass it records a purpose-typed memory row: feature builds → memoryType=feature; audits/ship-gates → verification; playbooks/pipelines → workflow. plan_task / recall_context filter by type so audits never look like implementation recipes. Opt out with input.featureMemory.capture=false.",
+    "Feature Memory is a deprecated compatibility mode. Automatic capture and plan enrichment are disabled unless the server operator explicitly sets FEATURE_MEMORY_AUTO_CAPTURE=true. Existing account-owned records remain available for review and deletion during migration.",
   autoCaptureOn: ["verify_task_gate_pass", "run_playbook_gate_pass", "solve_task_gate_pass"],
   optOutField: "input.featureMemory.capture=false",
   manualRefineTool: "capture_feature",
@@ -58,12 +58,23 @@ export const FEATURE_MEMORY_RECORD_KEEPING: FeatureMemoryRecordKeeping = {
 };
 
 export const FEATURE_MEMORY_GOLDEN_PATH = [
-  "ToolYour auto-records purpose-typed memory on loop.gate=pass — you do not own persistence",
-  "Before similar work → plan_task or recall_context (filtered by memoryType + projectScope)",
-  "After host fixes → verify_task until pass so ToolYour captures the record",
-  "Manual refine only → capture_feature to adjust title/requirements or supersedeFeatureId",
-  "Compare iterations → compare_feature_memory; opt-in share → publish_feature_pattern",
+  "Compatibility only: automatic capture and plan enrichment are disabled by default",
+  "Existing owners may review records with recall_context or list_feature_memory",
+  "Use delete_feature or unpublish_feature_pattern to manage existing data",
+  "Do not treat Feature Memory as ToolYour's future publisher-API product direction",
 ];
+
+/**
+ * Compatibility switch while Feature Memory is retired from the default
+ * product path. Existing manual read/export/delete tools remain available,
+ * but planners and successful runs do not attach or create records unless an
+ * operator explicitly enables the legacy behavior.
+ */
+export function featureMemoryAutomaticCaptureEnabled(): boolean {
+  return String(process.env.FEATURE_MEMORY_AUTO_CAPTURE || "")
+    .trim()
+    .toLowerCase() === "true";
+}
 
 export async function resolveFeatureMemorySession(apiKey: string, logger: Logger) {
   return validateApiKey(apiKey, "mcp/feature-memory", "node", logger);
@@ -245,6 +256,7 @@ export async function enrichWithFeatureMemory(
     input?: Record<string, unknown>;
   }
 ): Promise<void> {
+  if (!featureMemoryAutomaticCaptureEnabled()) return;
   const requirements = extractFeatureRequirements(opts.goal, opts.input);
   const inferredDomain = detectFeatureDomain(opts.goal, requirements);
   const inferredMemoryType = classifyMemoryType(opts.goal);
@@ -388,6 +400,7 @@ export async function autoRecordCompletedFeature(opts: {
   gate?: string;
   phase?: "run" | "verify";
 }): Promise<void> {
+  if (!featureMemoryAutomaticCaptureEnabled()) return;
   if (!shouldAutoRecordCompletedFeature(opts)) return;
 
   const fm = opts.input?.featureMemory;

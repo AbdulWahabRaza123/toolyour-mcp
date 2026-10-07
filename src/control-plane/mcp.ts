@@ -114,15 +114,13 @@ export const ALLOWED_COMMANDS = new Set([
 ]);
 
 export const DEFAULT_MCP_INSTRUCTIONS =
-  "ToolYour maintains cross-project Feature Memory (institutional record). Purpose-typed rows are recorded automatically when loop.gate=pass (feature | verification | workflow). Agents do not own persistence; call plan_task or free recall_context before rebuilding similar work. Opt out only with input.featureMemory.capture=false. Manual refine: capture_feature (title/requirements/supersedes). " +
   "ToolYour has two loops. Pick exactly one per user goal — never both. " +
   "Skill loop (SEO, security, ship-gate, production-readiness, secrets, catalog): " +
-  "First call plan_task — free; read featureMemory.reminder + recordKeeping. " +
+  "First call plan_task — free; read its ranked recommendation and loop decision. " +
   "If loop.initiate is false, stop; do not verify_task. For dev goals (preview deploy), read goldenPath + verification.evidence. " +
   "(2) solve_task or run_playbook — read verification.evidence + loop.line, then loop.nextActions (rank-1 only; patchType + acceptance + roleHint). " +
   "(3) Host applies ONLY rank-1 nextActions in the workspace — do not invent tools or invoke_tool for the same job. " +
-  "(4) verify_task with baseline (or profileId) until loop.gate is pass — ToolYour records featureMemoryRecord on pass. " +
-  "list_feature_memory · compare_feature_memory · publish_feature_pattern · unpublish_feature_pattern · delete_feature · list_community_patterns are free. " +
+  "(4) verify_task with baseline (or profileId) until loop.gate is pass. " +
   "Never pass localhost URLs. Credits buy evidence and re-checks (1–10 per tool; estimates are heuristics). " +
   "Completion loop (frozen jobId): job_status only. Do not call check_submit yourself with invented pass/fail — run `npx toolyour-check-run` (HMAC host runner). Do not call plan_task, solve_task, or verify_task for that jobId. " +
   "Host keeps editor, git, and terminal. This server does not replace Cursor, Claude, or any host agent.";

@@ -91,8 +91,9 @@ describe("control-plane MCP loops", { concurrency: 1 }, () => {
   it("instructions route two loops without mixing", () => {
     assert.equal(resolveMcpInstructions(), DEFAULT_MCP_INSTRUCTIONS);
     assert.match(resolveMcpInstructions(), /Pick exactly one/);
-    assert.match(resolveMcpInstructions(), /institutional record/i);
-    assert.match(resolveMcpInstructions(), /featureMemoryRecord/i);
+    assert.doesNotMatch(resolveMcpInstructions(), /institutional record/i);
+    assert.doesNotMatch(resolveMcpInstructions(), /featureMemoryRecord/i);
+    assert.match(resolveMcpInstructions(), /ranked recommendation/i);
     assert.match(resolveMcpInstructions(), /Do not call check_submit yourself with invented pass\/fail/);
     assert.match(resolveMcpInstructions(), /Do not call plan_task, solve_task, or verify_task for that jobId/);
   });

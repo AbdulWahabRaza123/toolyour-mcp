@@ -28,6 +28,12 @@ const logger = { warn() {}, info() {}, error() {}, debug() {} };
 
 describe("feature memory auto-record (live SaaS)", () => {
   it("writes featureMemoryRecord on loop.gate=pass", async (t) => {
+    const previous = process.env.FEATURE_MEMORY_AUTO_CAPTURE;
+    process.env.FEATURE_MEMORY_AUTO_CAPTURE = "true";
+    t.after(() => {
+      if (previous === undefined) delete process.env.FEATURE_MEMORY_AUTO_CAPTURE;
+      else process.env.FEATURE_MEMORY_AUTO_CAPTURE = previous;
+    });
     const apiKey = findKey();
     if (!apiKey) {
       t.skip("no TOOLYOUR_API_KEY or .cursor/mcp.json key");

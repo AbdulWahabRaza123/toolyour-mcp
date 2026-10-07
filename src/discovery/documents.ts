@@ -23,7 +23,7 @@ const META_TOOLS = [
   {
     name: "recall_context",
     description:
-      "Free Feature Memory recall before rebuilding similar work. Prefer before plan_task when continuing a known domain/repo.",
+      "Deprecated compatibility tool for recalling existing account-owned Feature Memory records; no longer part of default planning.",
   },
   {
     name: "solve_task",
@@ -43,31 +43,31 @@ const META_TOOLS = [
   {
     name: "capture_feature",
     description:
-      "Free manual Feature Memory capture/refine (title, requirements, supersedes). Auto-capture also runs on loop.gate=pass.",
+      "Deprecated compatibility tool for manually maintaining an existing Feature Memory record. Automatic capture is disabled by default.",
   },
   {
     name: "list_feature_memory",
-    description: "Free list of your Feature Memory records.",
+    description: "Deprecated compatibility tool to list existing Feature Memory records.",
   },
   {
     name: "compare_feature_memory",
-    description: "Free compare of Feature Memory records / patterns.",
+    description: "Deprecated compatibility tool to compare existing Feature Memory records.",
   },
   {
     name: "publish_feature_pattern",
-    description: "Free publish of a Feature Memory pattern to the community catalog.",
+    description: "Deprecated compatibility tool for previously created Feature Memory patterns.",
   },
   {
     name: "unpublish_feature_pattern",
-    description: "Free unpublish of a community Feature Memory pattern you own.",
+    description: "Deprecated compatibility tool to unpublish a Feature Memory pattern you own.",
   },
   {
     name: "delete_feature",
-    description: "Free delete of a Feature Memory record you own.",
+    description: "Compatibility tool to delete a Feature Memory record you own.",
   },
   {
     name: "list_community_patterns",
-    description: "Free browse of published community Feature Memory patterns.",
+    description: "Deprecated compatibility view of previously published Feature Memory patterns.",
   },
   {
     name: "list_skills",
@@ -197,7 +197,7 @@ export function buildServerCard() {
     },
     tools: [...META_TOOLS],
     notes: [
-      "Two loops — pick exactly one per goal. Skill loop: plan_task → run_playbook or solve_task (both attach verification.evidence on workflow runs) → apply rank-1 loop.nextActions → verify_task. Feature Memory: free recall_context / list_feature_memory / …; auto-record on gate=pass. Completion loop: job_status → `npx toolyour-check-run` (do not invent check_submit HMAC).",
+      "Two loops — pick exactly one per goal. Skill loop: plan_task → run_playbook or solve_task (both attach verification.evidence on workflow runs) → apply rank-1 loop.nextActions → verify_task. Completion loop: job_status → `npx toolyour-check-run` (do not invent check_submit HMAC).",
       "invoke_tool is advanced (one-off operationId). Do not use it as the default path for ship-gate, SEO, or security jobs.",
       "Catalog tools are dynamic — only hasApi tools are exposed. Discovery meta-tools are free; execution shares the REST monthly credit quota (1–10 credits per tool). estimatedCredits is always a heuristic.",
       "solve_task / run_playbook responses include verification.evidence, loop.line (gate · rank-1 · credits), loop.remainingFixes (patchType + acceptance), and rank-1 loop.nextActions. Apply rank-1 first; remainingFixes is the full list.",

@@ -1,5 +1,7 @@
 # Feature Memory (MCP hot path)
 
+> Deprecated compatibility guide. Automatic capture and plan enrichment now require explicit operator opt-in. Existing tools remain temporarily for record review and deletion.
+
 Cross-project **feature memory** for AI agents. **ToolYour is the system of record** — completed features are persisted automatically; agents consult memory before rebuilding.
 
 ## Architecture

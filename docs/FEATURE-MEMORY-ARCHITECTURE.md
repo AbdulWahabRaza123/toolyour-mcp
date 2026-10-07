@@ -1,5 +1,7 @@
 # Feature Memory — architecture (MCP hot path)
 
+> Archived compatibility design. Automatic capture and plan enrichment are disabled by default while Feature Memory is retired from the public product direction. Do not use this document as current positioning.
+
 **Status:** Phases 1–5 implemented (2026-08-28)  
 **User guide:** [FEATURE-MEMORY-GUIDE.md](./FEATURE-MEMORY-GUIDE.md)
 

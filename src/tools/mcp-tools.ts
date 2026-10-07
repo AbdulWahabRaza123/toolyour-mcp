@@ -226,7 +226,7 @@ export function createToolYourMcpServer(
   registerTool(
     server,
     "plan_task",
-    "Skill-loop planner (SEO, security, ship-gate, feature memory, catalog). Free: ranked plan + featureMemory.recordKeeping (ToolYour auto-records purpose-typed memory on gate pass). Read loop.initiate — only start run/verify if true.",
+    "Free skill-loop planner for supported SEO, security, ship-gate, and catalog jobs. Returns a ranked recommendation and loop decision; it does not execute the work.",
     {
       goal: z
         .string()
@@ -257,7 +257,7 @@ export function createToolYourMcpServer(
   registerTool(
     server,
     "recall_context",
-    "Free primary recall: prior runs / workflows / feature patterns for this goal (memoryType + projectScope filtered). Prefer before rebuilding. For full routing still call plan_task.",
+    "Deprecated compatibility tool: recall existing Feature Memory records owned by this account. It is no longer part of the default planning path.",
     {
       goal: z.string().describe("What you are about to build, verify, or run"),
       input: z
@@ -292,7 +292,7 @@ export function createToolYourMcpServer(
   registerTool(
     server,
     "capture_feature",
-    "Manual refine only: ToolYour auto-records purpose-typed memory on loop.gate=pass. Use this to adjust title/requirements, pass baseline for matrix scoring, or supersede a prior record.",
+    "Deprecated compatibility tool: manually create or refine an existing Feature Memory record. Automatic capture is disabled by default.",
     {
       title: z.string().describe("Short feature name, e.g. Stock ticker OCR"),
       requirements: z.string().optional().describe("What the feature must do"),
@@ -347,7 +347,7 @@ export function createToolYourMcpServer(
   registerTool(
     server,
     "list_feature_memory",
-    "Free: list your captured features (private per account). Filter by domain. Read before rebuilding similar work.",
+    "Deprecated compatibility tool: list existing private Feature Memory records for export, review, or deletion.",
     {
       domain: z.string().optional(),
       limit: z.number().optional(),
