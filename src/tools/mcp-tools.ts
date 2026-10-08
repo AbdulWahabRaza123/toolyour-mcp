@@ -39,6 +39,12 @@ import {
 } from "../orchestrator/local-dev";
 import { executeIntent } from "../orchestrator/execute-intent";
 import { registerSavedPlaybookTools, savedPlaybooksBetaEnabled } from "../playbooks/mcp";
+import {
+  getProviderOperation,
+  listProviderProjects,
+  ProviderDiscoveryError,
+  searchProviderOperations,
+} from "../provider-discovery/store";
 
 export interface McpServerContext {
   apiKey: string;
@@ -93,6 +99,9 @@ export const TOOL_ANNOTATIONS: Record<string, ToolAnnotations> = {
   update_saved_playbook: { readOnlyHint: false, openWorldHint: false, destructiveHint: false },
   run_saved_playbook: { readOnlyHint: false, openWorldHint: true, destructiveHint: false },
   get_saved_playbook_run: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  list_provider_projects: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  search_provider_operations: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  get_provider_operation: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
 };
 
 export type McpServerProfile = "default" | "chatgpt-public";
@@ -1101,6 +1110,79 @@ export function createToolYourMcpServer(
   );
 
   if (profile !== "chatgpt-public") {
+    // Authenticate the account without treating these private metadata tools as
+    // billable catalog operations.
+    const providerUserId = async () =>
+      (await validateApiKey(ctx.apiKey, "", "node", ctx.logger)).userId;
+    const providerError = (error: unknown) => {
+      const notFound = error instanceof ProviderDiscoveryError && error.code === "not_found";
+      return textResult(
+        {
+          status: "error",
+          code: notFound ? "provider_operation_not_found" : "provider_discovery_unavailable",
+          message: error instanceof Error ? error.message : "Provider discovery is unavailable",
+          invocationAvailable: false,
+        },
+        true
+      );
+    };
+
+    registerTool(
+      server,
+      "list_provider_projects",
+      "Private draft: list this account's API projects that contain selected and approved operations. Metadata only; does not invoke provider APIs.",
+      {},
+      async () => {
+        try {
+          return textResult(await listProviderProjects(await providerUserId()));
+        } catch (error) {
+          return providerError(error);
+        }
+      }
+    );
+    registerTool(
+      server,
+      "search_provider_operations",
+      "Private draft: search selected and approved operation metadata owned by this account. Does not expose credentials or invoke APIs.",
+      {
+        query: z.string().max(200).default("").describe("Words from the operation name, route, purpose, or tags"),
+        projectId: z.string().max(100).optional(),
+        limit: z.number().int().min(1).max(20).optional(),
+      },
+      async (args) => {
+        try {
+          return textResult(await searchProviderOperations({
+            userId: await providerUserId(),
+            query: String(args.query || ""),
+            projectId: typeof args.projectId === "string" ? args.projectId : undefined,
+            limit: typeof args.limit === "number" ? args.limit : undefined,
+          }));
+        } catch (error) {
+          return providerError(error);
+        }
+      }
+    );
+    registerTool(
+      server,
+      "get_provider_operation",
+      "Private draft: inspect one selected and approved provider operation contract. Metadata only; invocation remains unavailable.",
+      {
+        projectId: z.string().min(1).max(100),
+        operationId: z.string().min(1).max(100),
+      },
+      async (args) => {
+        try {
+          return textResult(await getProviderOperation({
+            userId: await providerUserId(),
+            projectId: String(args.projectId),
+            operationId: String(args.operationId),
+          }));
+        } catch (error) {
+          return providerError(error);
+        }
+      }
+    );
+
     registerControlPlaneTools(server, registerTool, ctx, { approvals: true });
     // Keep this beta out of /mcp/chatgpt while the public app is under review.
     if (savedPlaybooksBetaEnabled()) registerSavedPlaybookTools(server, registerTool, ctx);

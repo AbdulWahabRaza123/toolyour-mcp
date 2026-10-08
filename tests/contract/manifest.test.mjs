@@ -58,6 +58,9 @@ describe("manifest contract", () => {
       "update_saved_playbook",
       "run_saved_playbook",
       "get_saved_playbook_run",
+      "list_provider_projects",
+      "search_provider_operations",
+      "get_provider_operation",
     ];
 
     assert.deepEqual(Object.keys(TOOL_ANNOTATIONS).sort(), expectedTools.sort());
