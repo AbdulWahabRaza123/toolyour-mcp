@@ -42,6 +42,14 @@ const CORE_TOOLS = [
   "verify_task",
 ];
 
+const PRIVATE_PROVIDER_TOOLS = [
+  "get_provider_invocation",
+  "get_provider_operation",
+  "list_provider_projects",
+  "prepare_provider_invocation",
+  "search_provider_operations",
+];
+
 function names(server) {
   return Object.keys(server._registeredTools || {}).sort();
 }
@@ -62,9 +70,10 @@ describe("control-plane MCP loops", { concurrency: 1 }, () => {
     for (const t of CORE_TOOLS) assert.equal(n.includes(t), true, t);
     for (const t of CONTROL_PLANE_TOOLS) assert.equal(n.includes(t), true, t);
     for (const t of CONTROL_PLANE_APPROVAL_TOOLS) assert.equal(n.includes(t), true, t);
+    for (const t of PRIVATE_PROVIDER_TOOLS) assert.equal(n.includes(t), true, t);
     assert.equal(
       n.length,
-      CORE_TOOLS.length + CONTROL_PLANE_TOOLS.length + CONTROL_PLANE_APPROVAL_TOOLS.length
+      CORE_TOOLS.length + CONTROL_PLANE_TOOLS.length + CONTROL_PLANE_APPROVAL_TOOLS.length + PRIVATE_PROVIDER_TOOLS.length
     );
   }
 

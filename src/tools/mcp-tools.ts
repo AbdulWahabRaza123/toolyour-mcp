@@ -41,7 +41,9 @@ import { executeIntent } from "../orchestrator/execute-intent";
 import { registerSavedPlaybookTools, savedPlaybooksBetaEnabled } from "../playbooks/mcp";
 import {
   getProviderOperation,
+  getProviderInvocation,
   listProviderProjects,
+  prepareProviderInvocation,
   ProviderDiscoveryError,
   searchProviderOperations,
 } from "../provider-discovery/store";
@@ -102,6 +104,8 @@ export const TOOL_ANNOTATIONS: Record<string, ToolAnnotations> = {
   list_provider_projects: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
   search_provider_operations: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
   get_provider_operation: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  prepare_provider_invocation: { readOnlyHint: false, openWorldHint: false, destructiveHint: false },
+  get_provider_invocation: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
 };
 
 export type McpServerProfile = "default" | "chatgpt-public";
@@ -1177,6 +1181,43 @@ export function createToolYourMcpServer(
             projectId: String(args.projectId),
             operationId: String(args.operationId),
           }));
+        } catch (error) {
+          return providerError(error);
+        }
+      }
+    );
+    registerTool(
+      server,
+      "prepare_provider_invocation",
+      "Private draft: create an encrypted, idempotent invocation intent for an approved operation. This does not call the provider. State-changing operations remain pending until the owner approves the exact input digest.",
+      {
+        projectId: z.string().min(1).max(100),
+        operationId: z.string().min(1).max(100),
+        input: z.record(z.unknown()).describe("Input matching the reviewed operation contract"),
+        idempotencyKey: z.string().min(1).max(200).describe("Stable unique key for this intended action"),
+      },
+      async (args) => {
+        try {
+          return textResult(await prepareProviderInvocation({
+            userId: await providerUserId(),
+            projectId: String(args.projectId),
+            operationId: String(args.operationId),
+            values: args.input as Record<string, unknown>,
+            idempotencyKey: String(args.idempotencyKey),
+          }));
+        } catch (error) {
+          return providerError(error);
+        }
+      }
+    );
+    registerTool(
+      server,
+      "get_provider_invocation",
+      "Private draft: inspect an owned invocation intent and its approval state. Never returns encrypted input or provider credentials.",
+      { invocationId: z.string().min(1).max(100) },
+      async (args) => {
+        try {
+          return textResult(await getProviderInvocation(await providerUserId(), String(args.invocationId)));
         } catch (error) {
           return providerError(error);
         }
