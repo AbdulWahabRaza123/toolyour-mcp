@@ -116,3 +116,7 @@ export async function prepareProviderInvocation(input: {
 export async function getProviderInvocation(userId: string, invocationId: string) {
   return invocationFetch("GET", `/${encodeURIComponent(invocationId)}`, userId);
 }
+
+export async function executeProviderInvocation(userId: string, invocationId: string) {
+  return invocationFetch("POST", `/${encodeURIComponent(invocationId)}/execute`, userId, {});
+}

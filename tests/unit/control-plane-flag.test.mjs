@@ -43,6 +43,7 @@ const CORE_TOOLS = [
 ];
 
 const PRIVATE_PROVIDER_TOOLS = [
+  "execute_provider_invocation",
   "get_provider_invocation",
   "get_provider_operation",
   "list_provider_projects",

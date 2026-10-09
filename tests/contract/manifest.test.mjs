@@ -63,6 +63,7 @@ describe("manifest contract", () => {
       "get_provider_operation",
       "prepare_provider_invocation",
       "get_provider_invocation",
+      "execute_provider_invocation",
     ];
 
     assert.deepEqual(Object.keys(TOOL_ANNOTATIONS).sort(), expectedTools.sort());

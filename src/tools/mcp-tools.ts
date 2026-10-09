@@ -42,6 +42,7 @@ import { registerSavedPlaybookTools, savedPlaybooksBetaEnabled } from "../playbo
 import {
   getProviderOperation,
   getProviderInvocation,
+  executeProviderInvocation,
   listProviderProjects,
   prepareProviderInvocation,
   ProviderDiscoveryError,
@@ -106,6 +107,7 @@ export const TOOL_ANNOTATIONS: Record<string, ToolAnnotations> = {
   get_provider_operation: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
   prepare_provider_invocation: { readOnlyHint: false, openWorldHint: false, destructiveHint: false },
   get_provider_invocation: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  execute_provider_invocation: { readOnlyHint: false, openWorldHint: true, destructiveHint: false },
 };
 
 export type McpServerProfile = "default" | "chatgpt-public";
@@ -1218,6 +1220,19 @@ export function createToolYourMcpServer(
       async (args) => {
         try {
           return textResult(await getProviderInvocation(await providerUserId(), String(args.invocationId)));
+        } catch (error) {
+          return providerError(error);
+        }
+      }
+    );
+    registerTool(
+      server,
+      "execute_provider_invocation",
+      "Private beta: execute one ready invocation. The current runtime permits approved GET/HEAD operations only, revalidates the exact contract revision, and stores a body-free receipt.",
+      { invocationId: z.string().min(1).max(100) },
+      async (args) => {
+        try {
+          return textResult(await executeProviderInvocation(await providerUserId(), String(args.invocationId)));
         } catch (error) {
           return providerError(error);
         }
