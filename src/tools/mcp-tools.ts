@@ -1171,7 +1171,7 @@ export function createToolYourMcpServer(
     registerTool(
       server,
       "get_provider_operation",
-      "Private draft: inspect one selected and approved provider operation contract this account owns or may access through an active grant. The response states whether encrypted invocation preparation is available and whether a consumer pilot session is required. Metadata only.",
+      "Private draft: inspect one selected and approved provider operation contract this account owns or may access through an active grant. The response states whether encrypted invocation preparation and read-only execution are available and whether a consumer pilot session is required. Metadata only.",
       {
         projectId: z.string().min(1).max(100),
         operationId: z.string().min(1).max(100),
@@ -1228,7 +1228,7 @@ export function createToolYourMcpServer(
     registerTool(
       server,
       "execute_provider_invocation",
-      "Private beta: execute one ready invocation owned by this account. Consumer-granted execution remains disabled. The runtime permits approved GET/HEAD operations only, revalidates the exact contract revision, and stores a body-free receipt.",
+      "Private beta: execute one ready invocation owned by this account or prepared through an explicit execution-capable provider grant. Granted execution requires independent server gates and an active consumer execution pilot session. The runtime permits approved GET/HEAD operations only, revalidates the exact contract revision, uses provider-owned credentials without exposing them, and stores a body-free receipt.",
       { invocationId: z.string().min(1).max(100) },
       async (args) => {
         try {
