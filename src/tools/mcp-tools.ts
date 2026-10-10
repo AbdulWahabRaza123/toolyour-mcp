@@ -1171,7 +1171,7 @@ export function createToolYourMcpServer(
     registerTool(
       server,
       "get_provider_operation",
-      "Private draft: inspect one selected and approved provider operation contract. Metadata only; invocation remains unavailable.",
+      "Private draft: inspect one selected and approved provider operation contract. Metadata only; the response reports whether invocation preparation is currently available.",
       {
         projectId: z.string().min(1).max(100),
         operationId: z.string().min(1).max(100),
