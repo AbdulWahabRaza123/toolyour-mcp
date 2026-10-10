@@ -1171,7 +1171,7 @@ export function createToolYourMcpServer(
     registerTool(
       server,
       "get_provider_operation",
-      "Private draft: inspect one selected and approved provider operation contract this account owns or may discover through an active grant. Granted operations remain non-invocable in this phase. Metadata only.",
+      "Private draft: inspect one selected and approved provider operation contract this account owns or may access through an active grant. The response states whether encrypted invocation preparation is available and whether a consumer pilot session is required. Metadata only.",
       {
         projectId: z.string().min(1).max(100),
         operationId: z.string().min(1).max(100),
@@ -1191,7 +1191,7 @@ export function createToolYourMcpServer(
     registerTool(
       server,
       "prepare_provider_invocation",
-      "Private draft: create an encrypted, idempotent invocation intent for an approved operation. This does not call the provider. State-changing operations remain pending until the owner approves the exact input digest.",
+      "Private draft: create an encrypted, idempotent invocation intent for an owned approved operation or a granted read-only operation. Granted preparation requires independent server gates and an active consumer pilot session. This does not call the provider.",
       {
         projectId: z.string().min(1).max(100),
         operationId: z.string().min(1).max(100),
@@ -1228,7 +1228,7 @@ export function createToolYourMcpServer(
     registerTool(
       server,
       "execute_provider_invocation",
-      "Private beta: execute one ready invocation. The current runtime permits approved GET/HEAD operations only, revalidates the exact contract revision, and stores a body-free receipt.",
+      "Private beta: execute one ready invocation owned by this account. Consumer-granted execution remains disabled. The runtime permits approved GET/HEAD operations only, revalidates the exact contract revision, and stores a body-free receipt.",
       { invocationId: z.string().min(1).max(100) },
       async (args) => {
         try {
