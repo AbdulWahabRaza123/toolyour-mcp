@@ -1149,7 +1149,7 @@ export function createToolYourMcpServer(
     registerTool(
       server,
       "search_provider_operations",
-      "Private draft: search selected and approved operation metadata owned by this account. Does not expose credentials or invoke APIs.",
+      "Private draft: search a bounded, relevance-ranked catalog of selected and approved operation metadata owned by this account. Narrow with projectId when results report truncation. Does not expose schemas, credentials, or provider responses and does not invoke APIs.",
       {
         query: z.string().max(200).default("").describe("Words from the operation name, route, purpose, or tags"),
         projectId: z.string().max(100).optional(),
