@@ -1136,7 +1136,7 @@ export function createToolYourMcpServer(
     registerTool(
       server,
       "list_provider_projects",
-      "Private draft: list this account's API projects that contain selected and approved operations. Metadata only; does not invoke provider APIs.",
+      "Private draft: list API projects this account owns or has an active discovery-only grant to use. Granted projects appear only behind independent server gates. Metadata only; does not invoke provider APIs.",
       {},
       async () => {
         try {
@@ -1149,7 +1149,7 @@ export function createToolYourMcpServer(
     registerTool(
       server,
       "search_provider_operations",
-      "Private draft: search a bounded, relevance-ranked catalog of selected and approved operation metadata owned by this account. Narrow with projectId when results report truncation. Does not expose schemas, credentials, or provider responses and does not invoke APIs.",
+      "Private draft: search a bounded, relevance-ranked catalog of selected and approved operation metadata this account owns or may discover through an active grant. Narrow with projectId when results report truncation. Does not expose schemas, credentials, or provider responses and does not invoke APIs.",
       {
         query: z.string().max(200).default("").describe("Words from the operation name, route, purpose, or tags"),
         projectId: z.string().max(100).optional(),
@@ -1171,7 +1171,7 @@ export function createToolYourMcpServer(
     registerTool(
       server,
       "get_provider_operation",
-      "Private draft: inspect one selected and approved provider operation contract. Metadata only; the response reports whether invocation preparation is currently available.",
+      "Private draft: inspect one selected and approved provider operation contract this account owns or may discover through an active grant. Granted operations remain non-invocable in this phase. Metadata only.",
       {
         projectId: z.string().min(1).max(100),
         operationId: z.string().min(1).max(100),
