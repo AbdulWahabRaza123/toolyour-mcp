@@ -1149,11 +1149,16 @@ export function createToolYourMcpServer(
     registerTool(
       server,
       "search_provider_operations",
-      "Private draft: search a bounded, relevance-ranked catalog of selected and approved operation metadata this account owns or may discover through an active grant. Narrow with projectId when results report truncation. Does not expose schemas, credentials, or provider responses and does not invoke APIs.",
+      "Private draft: search selected and approved operation metadata this account owns or may discover through an active grant. Use access=owned or access=granted with nextCursor for stable pagination; filter by provider, risk, or tag. Does not expose schemas, credentials, or provider responses and does not invoke APIs.",
       {
         query: z.string().max(200).default("").describe("Words from the operation name, route, purpose, or tags"),
         projectId: z.string().max(100).optional(),
         limit: z.number().int().min(1).max(20).optional(),
+        cursor: z.string().max(500).optional().describe("Opaque cursor returned by an access-scoped prior search"),
+        provider: z.string().max(80).optional(),
+        risk: z.enum(["read_only", "approval_required", "irreversible"]).optional(),
+        tag: z.string().max(80).optional(),
+        access: z.enum(["owned", "granted"]).optional().describe("Use a single access mode when paginating"),
       },
       async (args) => {
         try {
@@ -1162,6 +1167,11 @@ export function createToolYourMcpServer(
             query: String(args.query || ""),
             projectId: typeof args.projectId === "string" ? args.projectId : undefined,
             limit: typeof args.limit === "number" ? args.limit : undefined,
+            cursor: typeof args.cursor === "string" ? args.cursor : undefined,
+            provider: typeof args.provider === "string" ? args.provider : undefined,
+            risk: args.risk as "read_only" | "approval_required" | "irreversible" | undefined,
+            tag: typeof args.tag === "string" ? args.tag : undefined,
+            access: args.access as "owned" | "granted" | undefined,
           }));
         } catch (error) {
           return providerError(error);

@@ -47,10 +47,20 @@ export async function searchProviderOperations(input: {
   query: string;
   projectId?: string;
   limit?: number;
+  cursor?: string;
+  provider?: string;
+  risk?: "read_only" | "approval_required" | "irreversible";
+  tag?: string;
+  access?: "owned" | "granted";
 }) {
   const params = new URLSearchParams({ query: input.query });
   if (input.projectId) params.set("projectId", input.projectId);
   if (input.limit) params.set("limit", String(input.limit));
+  if (input.cursor) params.set("cursor", input.cursor);
+  if (input.provider) params.set("provider", input.provider);
+  if (input.risk) params.set("risk", input.risk);
+  if (input.tag) params.set("tag", input.tag);
+  if (input.access) params.set("access", input.access);
   return discoveryFetch(`/operations?${params.toString()}`, input.userId);
 }
 
