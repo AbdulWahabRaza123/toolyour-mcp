@@ -47,6 +47,8 @@ import {
   prepareProviderInvocation,
   ProviderDiscoveryError,
   disconnectProviderAccess,
+  cancelProviderAccessRequest,
+  listProviderAccessRequests,
   requestProviderAccess,
   searchProviderOperations,
 } from "../provider-discovery/store";
@@ -109,6 +111,8 @@ export const TOOL_ANNOTATIONS: Record<string, ToolAnnotations> = {
   get_provider_operation: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
   request_provider_access: { readOnlyHint: false, openWorldHint: false, destructiveHint: false },
   disconnect_provider_access: { readOnlyHint: false, openWorldHint: false, destructiveHint: true },
+  list_provider_access_requests: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  cancel_provider_access_request: { readOnlyHint: false, openWorldHint: false, destructiveHint: true },
   prepare_provider_invocation: { readOnlyHint: false, openWorldHint: false, destructiveHint: false },
   get_provider_invocation: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
   execute_provider_invocation: { readOnlyHint: false, openWorldHint: true, destructiveHint: false },
@@ -1222,6 +1226,12 @@ export function createToolYourMcpServer(
         catch (error) { return providerError(error); }
       }
     );
+    registerTool(server, "list_provider_access_requests", "Private draft: list this account's provider access requests. Metadata only.", {}, async () => {
+      try { return textResult(await listProviderAccessRequests(await providerUserId())); } catch (error) { return providerError(error); }
+    });
+    registerTool(server, "cancel_provider_access_request", "Private draft: cancel one of this account's pending provider access requests.", { requestId: z.string().min(1).max(100) }, async (args) => {
+      try { return textResult(await cancelProviderAccessRequest(await providerUserId(), String(args.requestId))); } catch (error) { return providerError(error); }
+    });
     registerTool(
       server,
       "prepare_provider_invocation",

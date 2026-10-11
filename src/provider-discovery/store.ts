@@ -98,6 +98,21 @@ export async function disconnectProviderAccess(userId: string, projectId: string
   return body;
 }
 
+export async function listProviderAccessRequests(userId: string) {
+  return discoveryFetch("/access-requests", userId);
+}
+
+export async function cancelProviderAccessRequest(userId: string, requestId: string) {
+  const env = getEnv();
+  if (!env.internalSecret) throw new ProviderDiscoveryError("unavailable", "Provider access requests are unavailable");
+  let response: Response;
+  try { response = await fetch(`${discoveryBaseUrl()}/access-requests/${encodeURIComponent(requestId)}/cancel`, { method: "POST", headers: { "Content-Type": "application/json", "X-SaaS-Secret": env.internalSecret }, body: JSON.stringify({ userId }), signal: AbortSignal.timeout(5_000) }); }
+  catch { throw new ProviderDiscoveryError("unavailable", "Provider access requests are unavailable"); }
+  const body = await response.json().catch(() => ({})) as Record<string, unknown>;
+  if (!response.ok) throw new ProviderDiscoveryError(response.status === 404 ? "not_found" : "unavailable", typeof body.message === "string" ? body.message : "Provider access request cancellation failed");
+  return body;
+}
+
 async function invocationFetch(
   method: "GET" | "POST",
   path: string,

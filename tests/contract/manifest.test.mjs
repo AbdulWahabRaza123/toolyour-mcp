@@ -63,6 +63,8 @@ describe("manifest contract", () => {
       "get_provider_operation",
       "request_provider_access",
       "disconnect_provider_access",
+      "list_provider_access_requests",
+      "cancel_provider_access_request",
       "prepare_provider_invocation",
       "get_provider_invocation",
       "execute_provider_invocation",
