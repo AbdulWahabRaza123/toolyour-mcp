@@ -1157,7 +1157,7 @@ export function createToolYourMcpServer(
     registerTool(
       server,
       "search_provider_operations",
-      "Private draft: search selected and approved operation metadata this account owns or may discover through an active grant. Use access=owned or access=granted with nextCursor for stable pagination; filter by provider, risk, or tag. Does not expose schemas, credentials, or provider responses and does not invoke APIs.",
+      "Private draft: search selected and approved operation metadata this account owns or may discover through an active grant. Use access=owned or access=granted with nextCursor for stable pagination; filter by provider, risk, tag, or category. Category is an operation classification tag. Does not expose schemas, credentials, or provider responses and does not invoke APIs.",
       {
         query: z.string().max(200).default("").describe("Words from the operation name, route, purpose, or tags"),
         projectId: z.string().max(100).optional(),
@@ -1166,6 +1166,7 @@ export function createToolYourMcpServer(
         provider: z.string().max(80).optional(),
         risk: z.enum(["read_only", "approval_required", "irreversible"]).optional(),
         tag: z.string().max(80).optional(),
+        category: z.string().max(80).optional().describe("Operation category classification tag"),
         access: z.enum(["owned", "granted"]).optional().describe("Use a single access mode when paginating"),
       },
       async (args) => {
@@ -1179,6 +1180,7 @@ export function createToolYourMcpServer(
             provider: typeof args.provider === "string" ? args.provider : undefined,
             risk: args.risk as "read_only" | "approval_required" | "irreversible" | undefined,
             tag: typeof args.tag === "string" ? args.tag : undefined,
+            category: typeof args.category === "string" ? args.category : undefined,
             access: args.access as "owned" | "granted" | undefined,
           }));
         } catch (error) {

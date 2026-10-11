@@ -55,6 +55,7 @@ export async function searchProviderOperations(input: {
   provider?: string;
   risk?: "read_only" | "approval_required" | "irreversible";
   tag?: string;
+  category?: string;
   access?: "owned" | "granted";
 }) {
   const params = new URLSearchParams({ query: input.query });
@@ -64,6 +65,7 @@ export async function searchProviderOperations(input: {
   if (input.provider) params.set("provider", input.provider);
   if (input.risk) params.set("risk", input.risk);
   if (input.tag) params.set("tag", input.tag);
+  if (input.category) params.set("category", input.category);
   if (input.access) params.set("access", input.access);
   return discoveryFetch(`/operations?${params.toString()}`, input.userId);
 }
