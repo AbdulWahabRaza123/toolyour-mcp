@@ -38,7 +38,7 @@ async function discoveryFetch(path: string, userId: string): Promise<Record<stri
   return (await response.json()) as Record<string, unknown>;
 }
 
-export async function listProviderProjects(input: { userId: string; access?: "owned" | "granted"; cursor?: string; limit?: number }) {
+export async function listProviderProjects(input: { userId: string; access?: "owned" | "granted" | "free"; cursor?: string; limit?: number }) {
   const params = new URLSearchParams();
   if (input.access) params.set("access", input.access);
   if (input.cursor) params.set("cursor", input.cursor);
@@ -56,7 +56,7 @@ export async function searchProviderOperations(input: {
   risk?: "read_only" | "approval_required" | "irreversible";
   tag?: string;
   category?: string;
-  access?: "owned" | "granted";
+  access?: "owned" | "granted" | "free";
 }) {
   const params = new URLSearchParams({ query: input.query });
   if (input.projectId) params.set("projectId", input.projectId);

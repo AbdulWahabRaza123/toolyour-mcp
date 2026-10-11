@@ -1144,11 +1144,11 @@ export function createToolYourMcpServer(
     registerTool(
       server,
       "list_provider_projects",
-      "Private draft: list API projects this account owns or has an active discovery grant to use. Use access=owned or access=granted with nextCursor for stable pagination. Metadata only; does not invoke provider APIs.",
-      { access: z.enum(["owned", "granted"]).optional(), cursor: z.string().max(500).optional(), limit: z.number().int().min(1).max(50).optional() },
+      "Private draft: list API projects this account owns, has an active discovery grant to use, or may discover through a free metadata policy. Use one access mode with nextCursor for stable pagination. Metadata only; does not invoke provider APIs.",
+      { access: z.enum(["owned", "granted", "free"]).optional(), cursor: z.string().max(500).optional(), limit: z.number().int().min(1).max(50).optional() },
       async (args) => {
         try {
-          return textResult(await listProviderProjects({ userId: await providerUserId(), access: args.access as "owned" | "granted" | undefined, cursor: typeof args.cursor === "string" ? args.cursor : undefined, limit: typeof args.limit === "number" ? args.limit : undefined }));
+          return textResult(await listProviderProjects({ userId: await providerUserId(), access: args.access as "owned" | "granted" | "free" | undefined, cursor: typeof args.cursor === "string" ? args.cursor : undefined, limit: typeof args.limit === "number" ? args.limit : undefined }));
         } catch (error) {
           return providerError(error);
         }
@@ -1157,7 +1157,7 @@ export function createToolYourMcpServer(
     registerTool(
       server,
       "search_provider_operations",
-      "Private draft: search selected and approved operation metadata this account owns or may discover through an active grant. Use access=owned or access=granted with nextCursor for stable pagination; filter by provider, risk, tag, or category. Category is an operation classification tag. Does not expose schemas, credentials, or provider responses and does not invoke APIs.",
+      "Private draft: search selected and approved operation metadata this account owns, may discover through an active grant, or may discover through a free metadata policy. Use one access mode with nextCursor for stable pagination; filter by provider, risk, tag, or category. Category is an operation classification tag. Does not expose schemas, credentials, or provider responses and does not invoke APIs.",
       {
         query: z.string().max(200).default("").describe("Words from the operation name, route, purpose, or tags"),
         projectId: z.string().max(100).optional(),
@@ -1167,7 +1167,7 @@ export function createToolYourMcpServer(
         risk: z.enum(["read_only", "approval_required", "irreversible"]).optional(),
         tag: z.string().max(80).optional(),
         category: z.string().max(80).optional().describe("Operation category classification tag"),
-        access: z.enum(["owned", "granted"]).optional().describe("Use a single access mode when paginating"),
+        access: z.enum(["owned", "granted", "free"]).optional().describe("Use a single access mode when paginating"),
       },
       async (args) => {
         try {
@@ -1181,7 +1181,7 @@ export function createToolYourMcpServer(
             risk: args.risk as "read_only" | "approval_required" | "irreversible" | undefined,
             tag: typeof args.tag === "string" ? args.tag : undefined,
             category: typeof args.category === "string" ? args.category : undefined,
-            access: args.access as "owned" | "granted" | undefined,
+            access: args.access as "owned" | "granted" | "free" | undefined,
           }));
         } catch (error) {
           return providerError(error);
