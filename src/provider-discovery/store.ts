@@ -38,8 +38,12 @@ async function discoveryFetch(path: string, userId: string): Promise<Record<stri
   return (await response.json()) as Record<string, unknown>;
 }
 
-export async function listProviderProjects(userId: string) {
-  return discoveryFetch("/projects", userId);
+export async function listProviderProjects(input: { userId: string; access?: "owned" | "granted"; cursor?: string; limit?: number }) {
+  const params = new URLSearchParams();
+  if (input.access) params.set("access", input.access);
+  if (input.cursor) params.set("cursor", input.cursor);
+  if (input.limit) params.set("limit", String(input.limit));
+  return discoveryFetch(`/projects${params.size ? `?${params}` : ""}`, input.userId);
 }
 
 export async function searchProviderOperations(input: {

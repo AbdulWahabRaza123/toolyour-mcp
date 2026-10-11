@@ -1144,11 +1144,11 @@ export function createToolYourMcpServer(
     registerTool(
       server,
       "list_provider_projects",
-      "Private draft: list API projects this account owns or has an active discovery-only grant to use. Granted projects appear only behind independent server gates. Metadata only; does not invoke provider APIs.",
-      {},
-      async () => {
+      "Private draft: list API projects this account owns or has an active discovery grant to use. Use access=owned or access=granted with nextCursor for stable pagination. Metadata only; does not invoke provider APIs.",
+      { access: z.enum(["owned", "granted"]).optional(), cursor: z.string().max(500).optional(), limit: z.number().int().min(1).max(50).optional() },
+      async (args) => {
         try {
-          return textResult(await listProviderProjects(await providerUserId()));
+          return textResult(await listProviderProjects({ userId: await providerUserId(), access: args.access as "owned" | "granted" | undefined, cursor: typeof args.cursor === "string" ? args.cursor : undefined, limit: typeof args.limit === "number" ? args.limit : undefined }));
         } catch (error) {
           return providerError(error);
         }
