@@ -46,6 +46,8 @@ import {
   listProviderProjects,
   prepareProviderInvocation,
   ProviderDiscoveryError,
+  disconnectProviderAccess,
+  requestProviderAccess,
   searchProviderOperations,
 } from "../provider-discovery/store";
 
@@ -105,6 +107,8 @@ export const TOOL_ANNOTATIONS: Record<string, ToolAnnotations> = {
   list_provider_projects: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
   search_provider_operations: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
   get_provider_operation: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  request_provider_access: { readOnlyHint: false, openWorldHint: false, destructiveHint: false },
+  disconnect_provider_access: { readOnlyHint: false, openWorldHint: false, destructiveHint: true },
   prepare_provider_invocation: { readOnlyHint: false, openWorldHint: false, destructiveHint: false },
   get_provider_invocation: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
   execute_provider_invocation: { readOnlyHint: false, openWorldHint: true, destructiveHint: false },
@@ -1196,6 +1200,26 @@ export function createToolYourMcpServer(
         } catch (error) {
           return providerError(error);
         }
+      }
+    );
+    registerTool(
+      server,
+      "request_provider_access",
+      "Private draft: request access to selected approved provider operations. The provider must explicitly approve the request before any grant exists. The reason is metadata only; never include credentials or request/response content.",
+      { projectId: z.string().min(1).max(100), operationIds: z.array(z.string().min(1).max(100)).min(1).max(50), capabilities: z.array(z.enum(["discovery", "invocation", "execution"])).min(1).max(3).default(["discovery"]), reason: z.string().min(3).max(500) },
+      async (args) => {
+        try { return textResult(await requestProviderAccess({ userId: await providerUserId(), projectId: String(args.projectId), operationIds: args.operationIds as string[], capabilities: args.capabilities as ("discovery" | "invocation" | "execution")[], reason: String(args.reason) })); }
+        catch (error) { return providerError(error); }
+      }
+    );
+    registerTool(
+      server,
+      "disconnect_provider_access",
+      "Private draft: immediately revoke this account's active grants and pilot sessions for one provider API. This does not affect the provider or other consumers.",
+      { projectId: z.string().min(1).max(100) },
+      async (args) => {
+        try { return textResult(await disconnectProviderAccess(await providerUserId(), String(args.projectId))); }
+        catch (error) { return providerError(error); }
       }
     );
     registerTool(
