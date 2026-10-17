@@ -60,6 +60,7 @@ describe("manifest contract", () => {
       "get_saved_playbook_run",
       "list_provider_projects",
       "search_provider_operations",
+      "get_toolyour_provider_example",
       "get_provider_operation",
       "request_provider_access",
       "disconnect_provider_access",

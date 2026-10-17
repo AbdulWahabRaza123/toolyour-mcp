@@ -56,9 +56,10 @@ export async function searchProviderOperations(input: {
   risk?: "read_only" | "approval_required" | "irreversible";
   tag?: string;
   category?: string;
-  access?: "owned" | "granted" | "free";
+  access?: "owned" | "granted" | "free" | "requestable";
 }) {
   const params = new URLSearchParams({ query: input.query });
+  params.set("surface", "mcp");
   if (input.projectId) params.set("projectId", input.projectId);
   if (input.limit) params.set("limit", String(input.limit));
   if (input.cursor) params.set("cursor", input.cursor);
@@ -68,6 +69,15 @@ export async function searchProviderOperations(input: {
   if (input.category) params.set("category", input.category);
   if (input.access) params.set("access", input.access);
   return discoveryFetch(`/operations?${params.toString()}`, input.userId);
+}
+
+/**
+ * Returns the same safe first-party reference shown by the authenticated REST
+ * catalog. It is not a grant or an entitlement and never reaches a publisher
+ * endpoint.
+ */
+export async function getToolYourProviderExample(userId: string) {
+  return discoveryFetch("/toolyour-example", userId);
 }
 
 export async function getProviderOperation(input: {

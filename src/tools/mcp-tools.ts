@@ -41,6 +41,7 @@ import { executeIntent } from "../orchestrator/execute-intent";
 import { registerSavedPlaybookTools, savedPlaybooksBetaEnabled } from "../playbooks/mcp";
 import {
   getProviderOperation,
+  getToolYourProviderExample,
   getProviderInvocation,
   executeProviderInvocation,
   listProviderProjects,
@@ -108,6 +109,7 @@ export const TOOL_ANNOTATIONS: Record<string, ToolAnnotations> = {
   get_saved_playbook_run: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
   list_provider_projects: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
   search_provider_operations: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
+  get_toolyour_provider_example: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
   get_provider_operation: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
   request_provider_access: { readOnlyHint: false, openWorldHint: false, destructiveHint: false },
   disconnect_provider_access: { readOnlyHint: false, openWorldHint: false, destructiveHint: true },
@@ -1157,7 +1159,7 @@ export function createToolYourMcpServer(
     registerTool(
       server,
       "search_provider_operations",
-      "Private draft: search selected and approved operation metadata this account owns, may discover through an active grant, or may discover through a free metadata policy. Use one access mode with nextCursor for stable pagination; filter by provider, risk, tag, or category. Category is an operation classification tag. Does not expose schemas, credentials, or provider responses and does not invoke APIs.",
+      "Private draft: search selected and approved operation metadata this account owns, may discover through an active grant or free metadata policy, or may request from an invite-only provider. Results label whether a capability is ToolYour-owned or publisher-owned, whether it is offered through API, MCP, or both, and its availability and plan scope. Use one access mode with nextCursor for stable pagination; filter by provider, risk, tag, or category. Category is an operation classification tag. Does not expose schemas, credentials, or provider responses and does not invoke APIs.",
       {
         query: z.string().max(200).default("").describe("Words from the operation name, route, purpose, or tags"),
         projectId: z.string().max(100).optional(),
@@ -1167,7 +1169,7 @@ export function createToolYourMcpServer(
         risk: z.enum(["read_only", "approval_required", "irreversible"]).optional(),
         tag: z.string().max(80).optional(),
         category: z.string().max(80).optional().describe("Operation category classification tag"),
-        access: z.enum(["owned", "granted", "free"]).optional().describe("Use a single access mode when paginating"),
+        access: z.enum(["owned", "granted", "free", "requestable"]).optional().describe("Use requestable to find invite-only metadata; use a single access mode when paginating"),
       },
       async (args) => {
         try {
@@ -1181,8 +1183,21 @@ export function createToolYourMcpServer(
             risk: args.risk as "read_only" | "approval_required" | "irreversible" | undefined,
             tag: typeof args.tag === "string" ? args.tag : undefined,
             category: typeof args.category === "string" ? args.category : undefined,
-            access: args.access as "owned" | "granted" | "free" | undefined,
+            access: args.access as "owned" | "granted" | "free" | "requestable" | undefined,
           }));
+        } catch (error) {
+          return providerError(error);
+        }
+      }
+    );
+    registerTool(
+      server,
+      "get_toolyour_provider_example",
+      "Private draft: return ToolYour's canonical read-only API and MCP reference, including the separate ToolYour usage boundary. It is metadata only: it does not create access, invoke an API, execute a provider operation, enable billing, or make a network request to a publisher.",
+      {},
+      async () => {
+        try {
+          return textResult(await getToolYourProviderExample(await providerUserId()));
         } catch (error) {
           return providerError(error);
         }
@@ -1228,7 +1243,7 @@ export function createToolYourMcpServer(
         catch (error) { return providerError(error); }
       }
     );
-    registerTool(server, "list_provider_access_requests", "Private draft: list this account's provider access requests. Metadata only.", {}, async () => {
+    registerTool(server, "list_provider_access_requests", "Private draft: list this account's provider access requests and current access state. An approved request can later be revoked, expire, or be temporarily unavailable; this tool exposes metadata only.", {}, async () => {
       try { return textResult(await listProviderAccessRequests(await providerUserId())); } catch (error) { return providerError(error); }
     });
     registerTool(server, "cancel_provider_access_request", "Private draft: cancel one of this account's pending provider access requests.", { requestId: z.string().min(1).max(100) }, async (args) => {

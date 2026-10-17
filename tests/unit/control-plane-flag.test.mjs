@@ -43,11 +43,16 @@ const CORE_TOOLS = [
 ];
 
 const PRIVATE_PROVIDER_TOOLS = [
+  "cancel_provider_access_request",
+  "disconnect_provider_access",
   "execute_provider_invocation",
   "get_provider_invocation",
   "get_provider_operation",
+  "get_toolyour_provider_example",
+  "list_provider_access_requests",
   "list_provider_projects",
   "prepare_provider_invocation",
+  "request_provider_access",
   "search_provider_operations",
 ];
 
