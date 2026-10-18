@@ -38,12 +38,25 @@ async function discoveryFetch(path: string, userId: string): Promise<Record<stri
   return (await response.json()) as Record<string, unknown>;
 }
 
+function isMcpDelivery(value: unknown): boolean {
+  return value === "mcp" || value === "both";
+}
+
+function requireMcpRows(body: Record<string, unknown>, key: "projects" | "operations"): Record<string, unknown> {
+  const rows = body[key];
+  if (!Array.isArray(rows) || rows.some((row) => !row || typeof row !== "object" || !isMcpDelivery((row as Record<string, unknown>).delivery))) {
+    throw new ProviderDiscoveryError("unavailable", "Provider discovery returned an incompatible delivery surface");
+  }
+  return body;
+}
+
 export async function listProviderProjects(input: { userId: string; access?: "owned" | "granted" | "free"; cursor?: string; limit?: number }) {
   const params = new URLSearchParams();
+  params.set("surface", "mcp");
   if (input.access) params.set("access", input.access);
   if (input.cursor) params.set("cursor", input.cursor);
   if (input.limit) params.set("limit", String(input.limit));
-  return discoveryFetch(`/projects${params.size ? `?${params}` : ""}`, input.userId);
+  return requireMcpRows(await discoveryFetch(`/projects${params.size ? `?${params}` : ""}`, input.userId), "projects");
 }
 
 export async function searchProviderOperations(input: {
@@ -68,7 +81,7 @@ export async function searchProviderOperations(input: {
   if (input.tag) params.set("tag", input.tag);
   if (input.category) params.set("category", input.category);
   if (input.access) params.set("access", input.access);
-  return discoveryFetch(`/operations?${params.toString()}`, input.userId);
+  return requireMcpRows(await discoveryFetch(`/operations?${params.toString()}`, input.userId), "operations");
 }
 
 /**
@@ -85,10 +98,15 @@ export async function getProviderOperation(input: {
   projectId: string;
   operationId: string;
 }) {
-  return discoveryFetch(
-    `/projects/${encodeURIComponent(input.projectId)}/operations/${encodeURIComponent(input.operationId)}`,
+  const body = await discoveryFetch(
+    `/projects/${encodeURIComponent(input.projectId)}/operations/${encodeURIComponent(input.operationId)}?surface=mcp`,
     input.userId
   );
+  const operation = body.operation;
+  if (!operation || typeof operation !== "object" || !isMcpDelivery((operation as Record<string, unknown>).delivery)) {
+    throw new ProviderDiscoveryError("not_found", "MCP-compatible provider operation not found");
+  }
+  return body;
 }
 
 export async function requestProviderAccess(input: { userId: string; projectId: string; operationIds: string[]; capabilities: ("discovery" | "invocation" | "execution")[]; reason: string }) {
@@ -96,7 +114,7 @@ export async function requestProviderAccess(input: { userId: string; projectId: 
   if (!env.internalSecret) throw new ProviderDiscoveryError("unavailable", "Provider access requests are unavailable");
   let response: Response;
   try {
-    response = await fetch(`${discoveryBaseUrl()}/projects/${encodeURIComponent(input.projectId)}/access-requests`, { method: "POST", headers: { "Content-Type": "application/json", "X-SaaS-Secret": env.internalSecret }, body: JSON.stringify({ userId: input.userId, operationIds: input.operationIds, capabilities: input.capabilities, reason: input.reason }), signal: AbortSignal.timeout(5_000) });
+    response = await fetch(`${discoveryBaseUrl()}/projects/${encodeURIComponent(input.projectId)}/access-requests`, { method: "POST", headers: { "Content-Type": "application/json", "X-SaaS-Secret": env.internalSecret }, body: JSON.stringify({ userId: input.userId, operationIds: input.operationIds, capabilities: input.capabilities, surfaces: ["mcp"], reason: input.reason }), signal: AbortSignal.timeout(5_000) });
   } catch { throw new ProviderDiscoveryError("unavailable", "Provider access requests are unavailable"); }
   const body = await response.json().catch(() => ({})) as Record<string, unknown>;
   if (!response.ok) throw new ProviderDiscoveryError(response.status === 404 ? "not_found" : "unavailable", typeof body.message === "string" ? body.message : "Provider access request failed");
@@ -140,13 +158,16 @@ async function invocationFetch(
     throw new ProviderDiscoveryError("unavailable", "Provider invocation preparation is unavailable");
   }
   const url = new URL(`${env.actionRegistryUrl}/provider-invocations${path}`);
-  if (method === "GET") url.searchParams.set("userId", userId);
+  if (method === "GET") {
+    url.searchParams.set("userId", userId);
+    url.searchParams.set("surface", "mcp");
+  }
   let response: Response;
   try {
     response = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json", "X-SaaS-Secret": env.internalSecret },
-      body: method === "POST" ? JSON.stringify({ userId, ...body }) : undefined,
+      body: method === "POST" ? JSON.stringify({ userId, surface: "mcp", ...body }) : undefined,
       signal: AbortSignal.timeout(5_000),
     });
   } catch {
@@ -178,7 +199,12 @@ export async function prepareProviderInvocation(input: {
 }
 
 export async function getProviderInvocation(userId: string, invocationId: string) {
-  return invocationFetch("GET", `/${encodeURIComponent(invocationId)}`, userId);
+  const body = await invocationFetch("GET", `/${encodeURIComponent(invocationId)}`, userId);
+  const invocation = body.invocation;
+  if (!invocation || typeof invocation !== "object" || (invocation as Record<string, unknown>).surface !== "mcp") {
+    throw new ProviderDiscoveryError("not_found", "MCP provider invocation not found");
+  }
+  return body;
 }
 
 export async function executeProviderInvocation(userId: string, invocationId: string) {
