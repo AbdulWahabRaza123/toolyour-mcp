@@ -53,6 +53,14 @@ MCP_API_KEY=ty_... npm run smoke:live:agent
 
 Confirm:
 
+- [ ] Stateless HTTP smoke initializes without a session ID and `tools/list`
+      succeeds with a stale `Mcp-Session-Id`:
+
+  ```powershell
+  $env:MCP_API_KEY = "ty_..."
+  $env:MCP_URL = "https://api.toolyour.com/mcp/http"
+  npm run smoke:stateless-http
+  ```
 - [ ] Multi-replica MCP has `REDIS_URL` set (otherwise async `get_run` is sticky to one instance)
 - [ ] `/developers/mcp` lists job workflows (from `brand.mcpJobWorkflows`)
 - [ ] Customer docs `/developers/docs/mcp-skills` shows new workflows

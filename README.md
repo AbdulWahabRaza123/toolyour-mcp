@@ -18,7 +18,10 @@ npm run build
 npm run dev
 ```
 
-Endpoint: `http://localhost:3090/mcp` (SSE) · Streamable HTTP: `/mcp/http`
+Endpoints: `http://localhost:3090/mcp` (legacy SSE for compatible hosts) · Streamable HTTP: `/mcp` or `/mcp/http`.
+The API-key Streamable HTTP endpoints are stateless: clients do not need session
+affinity, and a stale `Mcp-Session-Id` is ignored. The OAuth-protected
+`/mcp/chatgpt` endpoint has its own session behavior.
 
 Health: `GET /health/mcp` · Ready: `GET /health/mcp/ready` · Metrics: `GET /health/mcp/metrics` (Prometheus text)
 

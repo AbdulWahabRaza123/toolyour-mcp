@@ -14,6 +14,7 @@ import { registerHealthRoutes } from "./health/routes";
 import { registerDiscoveryRoutes } from "./discovery/routes";
 import { createToolYourMcpServer } from "./tools/mcp-tools";
 import { exchangeOAuthAccessToken, validateApiKey } from "./auth/session";
+import { handleStatelessMcpHttpRequest } from "./transport/stateless-http";
 
 const env = getEnv();
 const logger = createLogger(env.logLevel);
@@ -167,6 +168,18 @@ app.get("/.well-known/openai-apps-challenge", (_req, res) => {
   res.status(200).type("text/plain").send(env.openaiAppsChallenge);
 });
 
+/** Glama connector ownership proof (must stay on api.toolyour.com origin, no redirect). */
+app.get("/.well-known/glama.json", (_req, res) => {
+  if (!env.glamaClaimToken) {
+    res.status(404).json({ error: "Not configured" });
+    return;
+  }
+  res.status(200).json({
+    $schema: "https://glama.ai/mcp/schemas/connector.json",
+    claim: env.glamaClaimToken,
+  });
+});
+
 /** Legacy SSE transport (Cursor / existing clients). */
 app.get("/mcp", async (req, res) => {
   const apiKey = extractApiKey(req);
@@ -219,8 +232,9 @@ app.post("/mcp/messages", async (req, res) => {
 });
 
 /**
- * Streamable HTTP (SDK-native). POST initialize on /mcp (directories like Smithery)
- * or the explicit alias /mcp/http. GET /mcp stays SSE for Cursor.
+ * Streamable HTTP (SDK-native). These API-key endpoints are stateless so a
+ * client can reconnect after a process restart or reach another replica.
+ * GET /mcp stays the legacy SSE transport for Cursor.
  */
 async function handleStreamableHttp(
   req: express.Request,
@@ -232,68 +246,19 @@ async function handleStreamableHttp(
     return;
   }
 
-  const sessionHeader = req.headers["mcp-session-id"];
-  const existingId =
-    typeof sessionHeader === "string" && sessionHeader.trim()
-      ? sessionHeader.trim()
-      : undefined;
-
-  if (existingId && httpTransports.has(existingId)) {
-    const entry = httpTransports.get(existingId)!;
-    if (entry.profile !== "default") {
-      res.status(400).json({ error: "MCP session belongs to another endpoint" });
-      return;
-    }
-    touchHttp(existingId);
-    await entry.transport.handleRequest(req, res, req.body);
-    return;
-  }
-
-  if (req.method === "POST" && !existingId) {
-    const mcpSessionId = randomUUID();
-    const transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: () => randomUUID(),
-    });
-
-    transport.onclose = () => {
-      const sid = transport.sessionId;
-      if (sid) httpTransports.delete(sid);
-    };
-
-    const server = createToolYourMcpServer({
-      apiKey,
-      mcpSessionId,
-      registry,
-      logger,
-    });
-    await server.connect(transport);
-
-    const now = Date.now();
-    // sessionId is assigned during handleRequest init
-    await transport.handleRequest(req, res, req.body);
-
-    const sid = transport.sessionId;
-    if (sid) {
-      httpTransports.set(sid, {
-        kind: "http",
-        transport,
-        createdAt: now,
-        lastActiveAt: now,
-        mcpSessionId,
-        profile: "default",
-      });
-      logger.info("mcp http session started", {
-        mcpSessionId,
-        transport: "mcp-http",
-        sessionId: sid,
-      });
-    }
-    return;
-  }
-
-  res.status(400).json({
-    error:
-      "Unknown or missing MCP session. Initialize with POST /mcp or POST /mcp/http (Streamable HTTP).",
+  const mcpSessionId = randomUUID();
+  const server = createToolYourMcpServer({
+    apiKey,
+    mcpSessionId,
+    registry,
+    logger,
+  });
+  await handleStatelessMcpHttpRequest(server, req, res, req.body);
+  logger.info("mcp http request served", {
+    mcpSessionId,
+    method: req.method,
+    path: req.path,
+    transport: "mcp-http",
   });
 }
 

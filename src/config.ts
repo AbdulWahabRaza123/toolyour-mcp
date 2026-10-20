@@ -98,6 +98,8 @@ export function getEnv() {
     auth0IssuerBaseUrl: (process.env.AUTH0_ISSUER_BASE_URL || "").replace(/\/$/, ""),
     mcpPublicBaseUrl: (process.env.MCP_PUBLIC_BASE_URL || "https://api.toolyour.com").replace(/\/$/, ""),
     openaiAppsChallenge: process.env.OPENAI_APPS_CHALLENGE || "",
+    /** Glama connector claim token (opaque `glama_claim_…` from Claim ownership dialog). */
+    glamaClaimToken: process.env.GLAMA_CLAIM_TOKEN || "",
     registryPath:
       process.env.REGISTRY_PATH ||
       path.join(__dirname, "..", "registry", "manifest.json"),
