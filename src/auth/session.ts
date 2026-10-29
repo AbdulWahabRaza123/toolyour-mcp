@@ -19,6 +19,9 @@ const oauthSessions = new Map<string, SessionData & { expiresAt: number }>();
 
 const VALIDATE_TIMEOUT_MS = 5_000;
 const SESSION_CACHE_MAX_ENTRIES = 2_000;
+const OAUTH_SESSION_CACHE_MAX_ENTRIES = 2_000;
+const OAUTH_SESSION_SWEEP_INTERVAL_MS = 60_000;
+let lastOAuthSessionSweepAt = 0;
 
 function cacheKey(apiKey: string, backend: string): string {
   return `${apiKey}:${backend}`;
@@ -34,6 +37,28 @@ function evictExpiredAndCap(): void {
     const oldest = cache.keys().next().value;
     if (oldest === undefined) break;
     cache.delete(oldest);
+  }
+}
+
+/**
+ * OAuth stateless requests mint a new opaque credential each time, so expired
+ * entries are rarely revisited by validateApiKey. Sweep periodically instead
+ * of scanning the whole map on every request; the hard cap below bounds memory
+ * between sweeps.
+ */
+function evictExpiredOAuthSessions(now = Date.now()): void {
+  if (now - lastOAuthSessionSweepAt < OAUTH_SESSION_SWEEP_INTERVAL_MS) return;
+  for (const [credential, session] of oauthSessions) {
+    if (session.expiresAt <= now) oauthSessions.delete(credential);
+  }
+  lastOAuthSessionSweepAt = now;
+}
+
+function capOAuthSessionCache(): void {
+  while (oauthSessions.size > OAUTH_SESSION_CACHE_MAX_ENTRIES) {
+    const oldest = oauthSessions.keys().next().value;
+    if (oldest === undefined) break;
+    oauthSessions.delete(oldest);
   }
 }
 
@@ -137,6 +162,7 @@ export function clearSessionCache() {
   cache.clear();
   inflight.clear();
   oauthSessions.clear();
+  lastOAuthSessionSweepAt = 0;
 }
 
 export interface OAuthSessionExchange {
@@ -182,16 +208,22 @@ export async function exchangeOAuthAccessToken(
     });
   }
 
+  const now = Date.now();
+  evictExpiredOAuthSessions(now);
   const credential = existingCredential || `oauth_${randomUUID()}`;
-  const expiresAt = Date.now() + Math.max(60, Number(body.expiresIn || 600)) * 1000;
+  const expiresAt = now + Math.max(60, Number(body.expiresIn || 600)) * 1000;
   const session: SessionData = {
     sessionToken: body.sessionToken,
     userId: body.userId,
     apiKeyId: body.apiKeyId,
-    cachedAt: Date.now(),
+    cachedAt: now,
     controlPlane: body.controlPlane === true,
   };
+  // Refresh insertion order when a caller reuses a credential, so cap eviction
+  // consistently removes the least recently refreshed entry.
+  oauthSessions.delete(credential);
   oauthSessions.set(credential, { ...session, expiresAt });
+  capOAuthSessionCache();
   return {
     credential,
     session,
@@ -203,6 +235,11 @@ export async function exchangeOAuthAccessToken(
 /** Test helper: peek cache size */
 export function sessionCacheSize(): number {
   return cache.size;
+}
+
+/** Test helper: peek OAuth session cache size. */
+export function oauthSessionCacheSize(): number {
+  return oauthSessions.size;
 }
 
 /** Test helper: peek in-flight validate count */

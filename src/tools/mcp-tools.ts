@@ -59,6 +59,8 @@ export interface McpServerContext {
   mcpSessionId: string;
   registry: RegistryLoader;
   logger: Logger;
+  /** Present only for OAuth-authenticated public ChatGPT requests. */
+  profileId?: string;
 }
 
 type TextContent = { type: "text"; text: string };
@@ -74,6 +76,7 @@ type ToolAnnotations = {
 };
 
 export const TOOL_ANNOTATIONS: Record<string, ToolAnnotations> = {
+  get_profile: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
   plan_task: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
   recall_context: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
   capture_feature: { readOnlyHint: false, openWorldHint: false, destructiveHint: false },
@@ -220,6 +223,59 @@ function textResult(payload: unknown, isError = false): ToolResult {
   };
 }
 
+function registerChatGptProfileTool(server: McpServer, ctx: McpServerContext): void {
+  const register = server.registerTool.bind(server) as (
+    name: string,
+    config: {
+      title: string;
+      description: string;
+      inputSchema: Record<string, z.ZodTypeAny>;
+      outputSchema: Record<string, z.ZodTypeAny>;
+      annotations: ToolAnnotations;
+      _meta: Record<string, unknown>;
+    },
+    callback: () => Promise<{
+      content: TextContent[];
+      structuredContent?: Record<string, unknown>;
+      isError?: boolean;
+    }>
+  ) => void;
+  register(
+    "get_profile",
+    {
+      title: "Get ToolYour profile",
+      description:
+        "Return the stable identity for the ToolYour account represented by this authenticated connection. The opaque ID stays the same across token refreshes and reconnects.",
+      inputSchema: {},
+      outputSchema: {
+        id: z.string().min(1).regex(/\S/).describe(
+          "Stable opaque ToolYour account ID; unchanged across reconnects and token refreshes."
+        ),
+      },
+      annotations: TOOL_ANNOTATIONS.get_profile,
+      _meta: {
+        "openai/profile": true,
+        securitySchemes: [{ type: "oauth2", scopes: ["toolyour:mcp"] }],
+      },
+    },
+    async () => {
+      const id = ctx.profileId?.trim();
+      if (!id) {
+        return {
+          content: [{ type: "text", text: "Profile identity unavailable." }],
+          isError: true,
+        };
+      }
+
+      const profile = { id };
+      return {
+        content: [{ type: "text", text: JSON.stringify(profile) }],
+        structuredContent: profile,
+      };
+    }
+  );
+}
+
 function assertNoForbiddenExecutionTools(server: McpServer): void {
   const names = Object.keys(
     (server as unknown as { _registeredTools?: Record<string, unknown> })
@@ -247,6 +303,7 @@ export function createToolYourMcpServer(
   );
   const profile = options.profile || "default";
   serverProfiles.set(server, profile);
+  if (profile === "chatgpt-public") registerChatGptProfileTool(server, ctx);
 
   registerTool(
     server,

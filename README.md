@@ -19,9 +19,10 @@ npm run dev
 ```
 
 Endpoints: `http://localhost:3090/mcp` (legacy SSE for compatible hosts) · Streamable HTTP: `/mcp` or `/mcp/http`.
-The API-key Streamable HTTP endpoints are stateless: clients do not need session
+All Streamable HTTP endpoints are stateless: clients do not need session
 affinity, and a stale `Mcp-Session-Id` is ignored. The OAuth-protected
-`/mcp/chatgpt` endpoint has its own session behavior.
+`/mcp/chatgpt` endpoint validates its bearer token on every request. `GET /mcp`
+remains the legacy SSE endpoint and keeps its session behavior.
 
 Health: `GET /health/mcp` · Ready: `GET /health/mcp/ready` · Metrics: `GET /health/mcp/metrics` (Prometheus text)
 
@@ -61,7 +62,8 @@ approval. Each account gets owner-scoped playbooks and durable run receipts.
 Enable this only on a private/default MCP deployment with `PLAYBOOKS_BETA=true`. The beta adds
 `create_saved_playbook`, `list_saved_playbooks`, `get_saved_playbook`, `update_saved_playbook`,
 `run_saved_playbook`, and `get_saved_playbook_run`. It is intentionally excluded from
-`/mcp/chatgpt` so the reviewed public 21-tool surface stays unchanged.
+`/mcp/chatgpt` so the reviewed public tool surface stays separate. The public
+surface includes the authenticated `get_profile` identity tool.
 
 See [Saved Playbooks beta design](./docs/SAVED-PLAYBOOKS-BETA.md) for the data model, safe
 execution boundary, and rollout guidance.

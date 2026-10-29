@@ -100,4 +100,38 @@ describe("stateless Streamable HTTP transport", () => {
       listed.payload.result.tools.some((tool) => tool.name === "catalog_probe")
     );
   });
+
+  it("serves separate requests without assigning or requiring a session", async () => {
+    const protocolVersion = "2025-03-26";
+    const init = await rpc({
+      jsonrpc: "2.0",
+      id: 3,
+      method: "initialize",
+      params: {
+        protocolVersion,
+        capabilities: {},
+        clientInfo: { name: "sessionless-client-test", version: "1.0.0" },
+      },
+    });
+
+    assert.equal(init.response.status, 200);
+    assert.equal(init.response.headers.get("mcp-session-id"), null);
+    assert.equal(init.payload.result.protocolVersion, protocolVersion);
+
+    const listed = await rpc(
+      {
+        jsonrpc: "2.0",
+        id: 4,
+        method: "tools/list",
+        params: {},
+      },
+      { protocolVersion }
+    );
+
+    assert.equal(listed.response.status, 200);
+    assert.equal(listed.response.headers.get("mcp-session-id"), null);
+    assert.ok(
+      listed.payload.result.tools.some((tool) => tool.name === "catalog_probe")
+    );
+  });
 });

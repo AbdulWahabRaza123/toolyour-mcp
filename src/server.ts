@@ -2,10 +2,10 @@ import "dotenv/config";
 import express from "express";
 import { randomUUID } from "crypto";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { constants, getEnv } from "./config";
 import { createLogger } from "./observability/logger";
 import { RegistryLoader } from "./registry/loader";
+import { createToolYourProfileId } from "./auth/profile-id";
 import { defsCache } from "./registry/defs-cache";
 import { payloadStore } from "./payloads/store";
 import { runStore } from "./runs/store";
@@ -53,27 +53,10 @@ interface SseSessionEntry {
   mcpSessionId: string;
 }
 
-interface HttpSessionEntry {
-  kind: "http";
-  transport: StreamableHTTPServerTransport;
-  createdAt: number;
-  lastActiveAt: number;
-  mcpSessionId: string;
-  profile: "default" | "chatgpt-public";
-  credential?: string;
-  oauthSubject?: string;
-}
-
 const sseTransports = new Map<string, SseSessionEntry>();
-const httpTransports = new Map<string, HttpSessionEntry>();
 
 function touchSse(sessionId: string) {
   const entry = sseTransports.get(sessionId);
-  if (entry) entry.lastActiveAt = Date.now();
-}
-
-function touchHttp(sessionId: string) {
-  const entry = httpTransports.get(sessionId);
   if (entry) entry.lastActiveAt = Date.now();
 }
 
@@ -89,21 +72,6 @@ function sweepStaleSessions() {
       });
       try {
         (entry.transport as { close?: () => void }).close?.();
-      } catch {
-        /* ignore */
-      }
-    }
-  }
-  for (const [id, entry] of httpTransports.entries()) {
-    if (now - entry.lastActiveAt > constants.mcpSessionTtlMs) {
-      httpTransports.delete(id);
-      logger.info("mcp http session swept", {
-        mcpSessionId: entry.mcpSessionId,
-        idleMs: now - entry.lastActiveAt,
-        transport: "mcp-http",
-      });
-      try {
-        void entry.transport.close?.();
       } catch {
         /* ignore */
       }
@@ -273,84 +241,34 @@ async function handleChatGptHttp(
     return;
   }
 
-  const sessionHeader = req.headers["mcp-session-id"];
-  const existingId =
-    typeof sessionHeader === "string" && sessionHeader.trim()
-      ? sessionHeader.trim()
-      : undefined;
-  const existing = existingId ? httpTransports.get(existingId) : undefined;
-
   let oauth;
   try {
-    oauth = await exchangeOAuthAccessToken(
-      accessToken,
-      logger,
-      existing?.credential
-    );
+    // Authenticate every request independently. MCP transport sessions are
+    // intentionally not pinned to this process, so reconnects and load-balanced
+    // requests do not depend on an in-memory session map.
+    oauth = await exchangeOAuthAccessToken(accessToken, logger);
   } catch {
     sendOAuthChallenge(res);
     return;
   }
 
-  if (existingId && existing) {
-    if (
-      existing.profile !== "chatgpt-public" ||
-      existing.oauthSubject !== oauth.subject
-    ) {
-      res.status(403).json({ error: "MCP session identity mismatch" });
-      return;
-    }
-    touchHttp(existingId);
-    await existing.transport.handleRequest(req, res, req.body);
-    return;
-  }
-
-  if (req.method === "POST" && !existingId) {
-    const mcpSessionId = randomUUID();
-    const transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: () => randomUUID(),
-    });
-    transport.onclose = () => {
-      const sid = transport.sessionId;
-      if (sid) httpTransports.delete(sid);
-    };
-
-    const server = createToolYourMcpServer(
-      {
-        apiKey: oauth.credential,
-        mcpSessionId,
-        registry,
-        logger,
-      },
-      { profile: "chatgpt-public" }
-    );
-    await server.connect(transport);
-    const now = Date.now();
-    await transport.handleRequest(req, res, req.body);
-
-    const sid = transport.sessionId;
-    if (sid) {
-      httpTransports.set(sid, {
-        kind: "http",
-        transport,
-        createdAt: now,
-        lastActiveAt: now,
-        mcpSessionId,
-        profile: "chatgpt-public",
-        credential: oauth.credential,
-        oauthSubject: oauth.subject,
-      });
-      logger.info("chatgpt mcp session started", {
-        mcpSessionId,
-        transport: "mcp-http",
-        sessionId: sid,
-      });
-    }
-    return;
-  }
-
-  res.status(400).json({
-    error: "Unknown or missing MCP session. Initialize with POST /mcp/chatgpt.",
+  const mcpSessionId = randomUUID();
+  const server = createToolYourMcpServer(
+    {
+      apiKey: oauth.credential,
+      mcpSessionId,
+      registry,
+      logger,
+      profileId: createToolYourProfileId(oauth.session.userId),
+    },
+    { profile: "chatgpt-public" }
+  );
+  await handleStatelessMcpHttpRequest(server, req, res, req.body);
+  logger.info("chatgpt mcp request served", {
+    mcpSessionId,
+    method: req.method,
+    path: req.path,
+    transport: "mcp-http",
   });
 }
 

@@ -25,6 +25,7 @@ describe("manifest contract", () => {
 
   it("declares all required ChatGPT safety hints for every MCP tool", () => {
     const expectedTools = [
+      "get_profile",
       "plan_task",
       "recall_context",
       "capture_feature",
@@ -106,6 +107,7 @@ describe("manifest contract", () => {
         mcpSessionId: "chatgpt-contract-test",
         registry,
         logger,
+        profileId: "typrof_contract-test",
       },
       { profile: "chatgpt-public" }
     );
@@ -119,7 +121,7 @@ describe("manifest contract", () => {
       "job_approve",
     ];
 
-    assert.equal(Object.keys(registered).length, 21);
+    assert.equal(Object.keys(registered).length, 22);
     for (const name of internalTools) assert.equal(registered[name], undefined, name);
     for (const [name, tool] of Object.entries(registered)) {
       assert.ok(tool.outputSchema, `${name}.outputSchema`);
@@ -131,11 +133,29 @@ describe("manifest contract", () => {
     const listTools = server.server._requestHandlers.get("tools/list");
     assert.ok(listTools, "tools/list handler");
     const response = await listTools({ method: "tools/list", params: {} }, {});
-    assert.equal(response.tools.length, 21);
+    assert.equal(response.tools.length, 22);
     for (const tool of response.tools) {
       assert.deepEqual(tool.securitySchemes, [
         { type: "oauth2", scopes: ["toolyour:mcp"] },
       ], `${tool.name}.securitySchemes`);
     }
+
+    const profileTool = response.tools.find((tool) => tool.name === "get_profile");
+    assert.ok(profileTool, "get_profile tool is published");
+    assert.equal(profileTool._meta?.["openai/profile"], true);
+    assert.deepEqual(profileTool.annotations, {
+      readOnlyHint: true,
+      openWorldHint: false,
+      destructiveHint: false,
+    });
+
+    const callTool = server.server._requestHandlers.get("tools/call");
+    assert.ok(callTool, "tools/call handler");
+    const profile = await callTool(
+      { method: "tools/call", params: { name: "get_profile", arguments: {} } },
+      {}
+    );
+    assert.deepEqual(profile.structuredContent, { id: "typrof_contract-test" });
+    assert.equal(profile.content[0].text, JSON.stringify({ id: "typrof_contract-test" }));
   });
 });

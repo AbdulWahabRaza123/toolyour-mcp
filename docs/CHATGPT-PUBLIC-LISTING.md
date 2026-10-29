@@ -7,11 +7,14 @@ ToolYour's submission endpoint is a tool-only, submission-ready MCP server:
 - Protected-resource metadata: `https://api.toolyour.com/.well-known/oauth-protected-resource`
 - Domain challenge: `https://api.toolyour.com/.well-known/openai-apps-challenge`
 
-The `/mcp` and `/mcp/http` API-key endpoints use stateless Streamable HTTP, so
-clients can reconnect without process-local session affinity. `GET /mcp`
-continues to serve the legacy SSE transport. The ChatGPT endpoint remains a
-separate OAuth-protected transport and omits all `job_*` and `check_submit`
-control-plane tools.
+The Streamable HTTP endpoints use per-request stateless transports, so clients
+can reconnect or reach another replica without process-local session affinity.
+This includes the OAuth-protected `/mcp/chatgpt` route, which validates its
+bearer token on every request and omits all `job_*` and `check_submit`
+control-plane tools. `GET /mcp` continues to serve the legacy SSE transport.
+
+The OAuth authorization transaction is still handled by ChatGPT and Auth0;
+the MCP server does not own or store the browser OAuth `state` value.
 
 ## Auth0 configuration
 
@@ -46,12 +49,25 @@ transaction. This confirms discovery, not successful sign-in.
 Check the exact `redirect_uri` sent in the authorization request against the
 callback URL configured in Auth0. With the current Auth0 metadata, confirm that
 the callback-ID-specific URL for this ChatGPT connection is allowlisted; do
-not assume that a previously used stable callback is still selected. Also
-confirm the browser returns to the same Auth0 transaction, the authorization
-response preserves `state`, the returned `iss` behavior matches the issuer
-metadata, and the `resource` parameter is preserved through authorization and
-token exchange. OpenAI's [current MCP authentication guide](https://developers.openai.com/plugins/build/auth)
-documents the issuer and redirect-URI requirements.
+not assume that a previously used stable callback is still selected. The
+current callback-specific URI format is
+`https://chatgpt.com/connector/oauth/{callback_id}`; copy the actual URI shown
+for this connection in ChatGPT's MCP server management view instead of typing
+or reusing one from another connection. Auth0 requires an exact callback match,
+including scheme, path, and trailing slash. OpenAI's [current MCP authentication
+guide](https://developers.openai.com/plugins/build/auth) documents the callback
+mode and shows where to find the exact URI; Auth0's [callback URL guidance](https://support.auth0.com/center/s/article/Callback-URL-Mismatch-Error-Is-Not-in-the-List-of-Allowed-Callback-URLs)
+confirms exact matching.
+
+Also confirm the browser returns to the same Auth0 transaction, the
+authorization response preserves `state`, the returned `iss` behavior matches
+the issuer metadata, and the `resource` parameter is preserved through
+authorization and token exchange. A callback mismatch is a configuration lead,
+not proof of the reported ChatGPT `state not found` cause. If it persists after
+the callback allowlist is corrected, compare a sanitized Auth0 log event with
+the failed attempt timestamp and verify state presence/match and PKCE `S256`;
+never collect raw `state`, authorization codes, access tokens, cookies, or PKCE
+verifiers.
 
 Do not log raw `state`, authorization codes, access tokens, cookies, or PKCE
 verifiers. A useful sanitized trace records the endpoint/status, selected
@@ -76,7 +92,8 @@ exports.onExecutePostLogin = async (event, api) => {
 
 1. Deploy `toolyour-saas`, then deploy `toolyour-mcp`.
 2. Connect `/mcp/chatgpt` in ChatGPT Developer Mode and complete OAuth.
-3. Run Scan Tools and verify 21 tools, explicit safety annotations, OAuth
+3. Run Scan Tools and verify 22 tools, including the authenticated `get_profile`
+   profile identity tool, explicit safety annotations, OAuth
    security metadata, and output schemas.
 4. Put the portal-provided challenge token in `OPENAI_APPS_CHALLENGE`, deploy,
    and verify the domain.
