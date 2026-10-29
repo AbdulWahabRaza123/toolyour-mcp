@@ -1313,7 +1313,7 @@ export function createToolYourMcpServer(
       {
         projectId: z.string().min(1).max(100),
         operationId: z.string().min(1).max(100),
-        input: z.record(z.unknown()).describe("Input matching the reviewed operation contract"),
+        input: z.record(z.string(), z.unknown()).describe("Input matching the reviewed operation contract"),
         idempotencyKey: z.string().min(1).max(200).describe("Stable unique key for this intended action"),
       },
       async (args) => {

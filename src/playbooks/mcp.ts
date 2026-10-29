@@ -14,8 +14,8 @@ export interface SavedPlaybookMcpContext { apiKey: string; mcpSessionId: string;
 export const SAVED_PLAYBOOK_BETA_TOOLS = ["create_saved_playbook", "list_saved_playbooks", "get_saved_playbook", "update_saved_playbook", "run_saved_playbook", "get_saved_playbook_run"] as const;
 export const savedPlaybooksBetaEnabled = () => String(process.env.PLAYBOOKS_BETA || "").trim().toLowerCase() === "true";
 const output = (value: unknown, isError = false) => ({ content: [{ type: "text" as const, text: JSON.stringify(value, null, 2) }], isError });
-const inputSchema = z.record(z.unknown()).default({});
-const definitionSchema = z.object({ execution: z.object({ kind: z.enum(["skill", "workflow"]), id: z.string().min(2).max(120) }), inputDefaults: z.record(z.unknown()).optional(), acceptance: z.array(z.string().min(1).max(500)).max(20).optional() });
+const inputSchema = z.record(z.string(), z.unknown()).default({});
+const definitionSchema = z.object({ execution: z.object({ kind: z.enum(["skill", "workflow"]), id: z.string().min(2).max(120) }), inputDefaults: z.record(z.string(), z.unknown()).optional(), acceptance: z.array(z.string().min(1).max(500)).max(20).optional() });
 
 function error(e: unknown) { return output({ error: { code: e instanceof SavedPlaybookStoreError && e.message === "not_found" ? "not_found" : "saved_playbook_unavailable", message: e instanceof Error ? e.message : "Saved Playbooks operation failed" } }, true); }
 function owned(ctx: SavedPlaybookMcpContext) { return ownerKeyFromApiKey(ctx.apiKey); }
