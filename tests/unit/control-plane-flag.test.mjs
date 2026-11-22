@@ -111,6 +111,8 @@ describe("control-plane MCP loops", { concurrency: 1 }, () => {
     assert.match(resolveMcpInstructions(), /ranked recommendation/i);
     assert.match(resolveMcpInstructions(), /Do not call check_submit yourself with invented pass\/fail/);
     assert.match(resolveMcpInstructions(), /Do not call plan_task, solve_task, or verify_task for that jobId/);
+    assert.match(resolveMcpInstructions(), /untrusted evidence/);
+    assert.match(resolveMcpInstructions(), /prepare_provider_invocation/);
   });
 });
 
